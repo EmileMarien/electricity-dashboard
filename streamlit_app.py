@@ -111,6 +111,11 @@ with col1:
     chart_container = st.empty()
 
 
+# -----------------------------------------------------------------------------
+# Section 3: Display last received data values
+# -----------------------------------------------------------------------------
+
+st.header('Last Received Data Values')
 # Containers for dynamic content
 metrics_container = st.empty()
 
