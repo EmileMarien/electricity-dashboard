@@ -111,9 +111,9 @@ with col1:
     st.line_chart(filtered_data[['time', meter]].set_index('time'))
 
 # Containers for dynamic content
-metrics_container = st.container()
+chart_container = st.empty()
+metrics_container = st.empty()
 
-# Function to update data every minute
 # Function to update data every minute
 def update_data():
     meter_data = get_meter_data()
@@ -121,7 +121,7 @@ def update_data():
     filtered_data = filtered_data.set_index('time').resample(f'{interval}T').mean().reset_index()
 
     # Update line chart
-    st.line_chart(filtered_data[['time', meter]].set_index('time'), use_container_width=True)
+    chart_container.line_chart(filtered_data[['time', meter]].set_index('time'))
 
     # Calculate statistical metrics
     avg_value = filtered_data[meter].mean()
