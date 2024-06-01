@@ -122,17 +122,15 @@ def update_data():
     # Update line chart
     chart_container.line_chart(filtered_data[['time', meter]].set_index('time'))
 
-    # Calculate statistical metrics
-    avg_value = filtered_data[meter].mean()
-    min_value = filtered_data[meter].min()
-    max_value = filtered_data[meter].max()
+    # Display the last 5 data values received
+    last_five_values = filtered_data.tail(5)
+    
+    # Clear previous content of metrics_container
+    metrics_container.empty()
 
-    # Display statistical metrics
     with metrics_container:
-        st.subheader(f'Statistical Metrics for {meter} (From {start_datetime} to {end_datetime})')
-        st.write(f'**Average:** {avg_value:.2f}')
-        st.write(f'**Minimum:** {min_value:.2f}')
-        st.write(f'**Maximum:** {max_value:.2f}')
+        st.subheader(f'Last 5 Data Values for {meter} (From {start_datetime} to {end_datetime})')
+        st.write(last_five_values)
 
 # Initial call to display data
 update_data()
@@ -141,6 +139,7 @@ update_data()
 while True:
     time.sleep(60)
     update_data()
+
 
 
 # Extra Guidance:
