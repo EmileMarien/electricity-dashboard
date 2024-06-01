@@ -2,7 +2,10 @@ import streamlit as st
 import pandas as pd
 import math
 from pathlib import Path
-
+import time
+import numpy as np
+from datetime import datetime, timedelta
+import pytz
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
     page_title='GDP Dashboard',
@@ -13,50 +16,25 @@ st.set_page_config(
 # Declare some useful functions.
 
 @st.cache_data
-def get_gdp_data():
-    """Grab GDP data from a CSV file.
+def get_meter_data():
+    """Simulate fetching electricity meter data."""
+    now = datetime.now(pytz.timezone('Europe/Berlin'))
+    times = [now - timedelta(minutes=i) for i in range(60*24*7)]  # Simulate data for the past week
+    meter1 = np.random.random(len(times)) * 100  # Simulated data for meter 1
+    meter2 = np.random.random(len(times)) * 100  # Simulated data for meter 2
+    meter3 = np.random.random(len(times)) * 100  # Simulated data for meter 3
 
-    Test test
-    """
+    data = {
+        'time': times,
+        'Meter 1': meter1,
+        'Meter 2': meter2,
+        'Meter 3': meter3,
+    }
 
-    # Instead of a CSV on disk, you could read from an HTTP endpoint here too.
-    DATA_FILENAME = Path(__file__).parent/'data/gdp_data.csv'
-    raw_gdp_df = pd.read_csv(DATA_FILENAME)
+    return pd.DataFrame(data)
 
-    MIN_YEAR = 1960
-    MAX_YEAR = 2022
-
-    # The data above has columns like:
-    # - Country Name
-    # - Country Code
-    # - [Stuff I don't care about]
-    # - GDP for 1960
-    # - GDP for 1961
-    # - GDP for 1962
-    # - ...
-    # - GDP for 2022
-    #
-    # ...but I want this instead:
-    # - Country Name
-    # - Country Code
-    # - Year
-    # - GDP
-    #
-    # So let's pivot all those year-columns into two: Year and GDP
-    gdp_df = raw_gdp_df.melt(
-        ['Country Code'],
-        [str(x) for x in range(MIN_YEAR, MAX_YEAR + 1)],
-        'Year',
-        'GDP',
-    )
-
-    # Convert years from string to integers
-    gdp_df['Year'] = pd.to_numeric(gdp_df['Year'])
-
-    return gdp_df
-
-gdp_df = get_gdp_data()
-
+# Fetch initial data
+meter_data = get_meter_data()
 # -----------------------------------------------------------------------------
 # Draw the actual page
 
@@ -64,84 +42,81 @@ gdp_df = get_gdp_data()
 '''
 # :earth_americas: GDP Dashboard
 
-Test test
+View the electricity meter data
 '''
 
 # Add some spacing
 ''
 ''
 
-min_value = gdp_df['Year'].min()
-max_value = gdp_df['Year'].max()
 
-from_year, to_year = st.slider(
-    'Which years are you interested in?',
-    min_value=min_value,
-    max_value=max_value,
-    value=[min_value, max_value])
-
-countries = gdp_df['Country Code'].unique()
-
-if not len(countries):
-    st.warning("Select at least one country")
-
-selected_countries = st.multiselect(
-    'Which countries would you like to view?',
-    countries,
-    ['DEU', 'FRA', 'GBR', 'BRA', 'MEX', 'JPN'])
-
-''
-''
-''
-
-# Filter the data
-filtered_gdp_df = gdp_df[
-    (gdp_df['Country Code'].isin(selected_countries))
-    & (gdp_df['Year'] <= to_year)
-    & (from_year <= gdp_df['Year'])
-]
 
 st.header('GDP over time', divider='gray')
-
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+#footer {visibility: hidden;}
+div[data-testid="stToolbar"] {visibility: hidden;}
+div[data-testid="stDecoration"] {visibility: hidden;}
+div[data-testid="stStatusWidget"] {visibility: hidden;}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 ''
-
-st.line_chart(
-    filtered_gdp_df,
-    x='Year',
-    y='GDP',
-    color='Country Code',
+# Dropdown to select meter
+meter = st.selectbox(
+    'Select Meter',
+    ['Meter 1', 'Meter 2', 'Meter 3']
 )
 
-''
-''
+# Date and time pickers for start and end date
+start_date = st.date_input('Start date', value=(datetime.now(pytz.timezone('Europe/Berlin')) - timedelta(days=7)).date())
+end_date = st.date_input('End date', value=datetime.now(pytz.timezone('Europe/Berlin')).date())
 
+start_time = st.time_input('Start time', value=datetime.now(pytz.timezone('Europe/Berlin')).time())
+end_time = st.time_input('End time', value=datetime.now(pytz.timezone('Europe/Berlin')).time())
 
-first_year = gdp_df[gdp_df['Year'] == from_year]
-last_year = gdp_df[gdp_df['Year'] == to_year]
+# Combine date and time
+start_datetime = datetime.combine(start_date, start_time).replace(tzinfo=pytz.timezone('Europe/Berlin'))
+end_datetime = datetime.combine(end_date, end_time).replace(tzinfo=pytz.timezone('Europe/Berlin'))
 
-st.header(f'GDP in {to_year}', divider='gray')
+# Interval for data points
+interval = st.selectbox('Select interval (minutes)', [1, 5, 10, 15, 30, 60])
 
-''
+# Filter data based on selected date and time range
+filtered_data = meter_data[(meter_data['time'] >= start_datetime) & (meter_data['time'] <= end_datetime)]
+filtered_data = filtered_data.set_index('time').resample(f'{interval}T').mean().reset_index()
 
-cols = st.columns(4)
+# Containers for dynamic content
+chart_container = st.empty()
+metrics_container = st.empty()
 
-for i, country in enumerate(selected_countries):
-    col = cols[i % len(cols)]
+# Function to update data every minute
+def update_data():
+    meter_data = get_meter_data()
+    filtered_data = meter_data[(meter_data['time'] >= start_datetime) & (meter_data['time'] <= end_datetime)]
+    filtered_data = filtered_data.set_index('time').resample(f'{interval}T').mean().reset_index()
 
-    with col:
-        first_gdp = first_year[gdp_df['Country Code'] == country]['GDP'].iat[0] / 1000000000
-        last_gdp = last_year[gdp_df['Country Code'] == country]['GDP'].iat[0] / 1000000000
+    # Update line chart
+    chart_container.line_chart(filtered_data[['time', meter]].set_index('time'))
 
-        if math.isnan(first_gdp):
-            growth = 'n/a'
-            delta_color = 'off'
-        else:
-            growth = f'{last_gdp / first_gdp:,.2f}x'
-            delta_color = 'normal'
+    # Calculate statistical metrics
+    avg_value = filtered_data[meter].mean()
+    min_value = filtered_data[meter].min()
+    max_value = filtered_data[meter].max()
 
-        st.metric(
-            label=f'{country} GDP',
-            value=f'{last_gdp:,.0f}B',
-            delta=growth,
-            delta_color=delta_color
-        )
+    # Display statistical metrics
+    with metrics_container:
+        st.subheader(f'Statistical Metrics for {meter} (From {start_datetime} to {end_datetime})')
+        st.write(f'**Average:** {avg_value:.2f}')
+        st.write(f'**Minimum:** {min_value:.2f}')
+        st.write(f'**Maximum:** {max_value:.2f}')
+
+# Initial call to display data
+update_data()
+
+# Refresh data every minute
+while True:
+    time.sleep(60)
+    update_data()
+
