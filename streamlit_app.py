@@ -114,13 +114,14 @@ with col1:
 metrics_container = st.container()
 
 # Function to update data every minute
+# Function to update data every minute
 def update_data():
     meter_data = get_meter_data()
     filtered_data = meter_data[(meter_data['time'] >= start_datetime) & (meter_data['time'] <= end_datetime)]
     filtered_data = filtered_data.set_index('time').resample(f'{interval}T').mean().reset_index()
 
     # Update line chart
-    col1.line_chart(filtered_data[['time', meter]].set_index('time'))
+    st.line_chart(filtered_data[['time', meter]].set_index('time'), use_container_width=True)
 
     # Calculate statistical metrics
     avg_value = filtered_data[meter].mean()
@@ -133,6 +134,15 @@ def update_data():
         st.write(f'**Average:** {avg_value:.2f}')
         st.write(f'**Minimum:** {min_value:.2f}')
         st.write(f'**Maximum:** {max_value:.2f}')
+
+# Initial call to display data
+update_data()
+
+# Refresh data every minute
+while True:
+    time.sleep(60)
+    update_data()
+
 
 # Initial call to display data
 update_data()
