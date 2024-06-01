@@ -108,10 +108,9 @@ filtered_data = filtered_data.set_index('time').resample(f'{interval}T').mean().
 
 # Display line chart
 with col1:
-    st.line_chart(filtered_data[['time', meter]].set_index('time'))
+    chart_container = st.empty()
 
 # Containers for dynamic content
-chart_container = st.empty()
 metrics_container = st.empty()
 
 # Function to update data every minute
