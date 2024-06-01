@@ -40,7 +40,7 @@ meter_data = get_meter_data()
 
 # Set the title that appears at the top of the page.
 '''
-# :earth_americas: GDP Dashboard
+# :earth_americas: Electricity dashboard
 
 View the electricity meter data
 '''
