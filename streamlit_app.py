@@ -110,6 +110,7 @@ filtered_data = filtered_data.set_index('time').resample(f'{interval}T').mean().
 with col1:
     chart_container = st.empty()
 
+
 # Containers for dynamic content
 metrics_container = st.empty()
 
@@ -122,9 +123,13 @@ def update_data():
     # Update line chart
     chart_container.line_chart(filtered_data[['time', meter]].set_index('time'))
 
-    # Display the last 5 data values received
+    # Display the last 5 data values received (excluding specified values)
     last_five_values = filtered_data.tail(5)
-    
+    last_five_values = last_five_values[~last_five_values[meter].isin([10008, 10009, 10010, 10011, 10012])]
+
+    # Set 'time' as index to display it as the first row
+    last_five_values.set_index('time', inplace=True)
+
     # Clear previous content of metrics_container
     metrics_container.empty()
 
@@ -139,6 +144,7 @@ update_data()
 while True:
     time.sleep(60)
     update_data()
+
 
 
 
