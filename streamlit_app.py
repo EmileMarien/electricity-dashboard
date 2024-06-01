@@ -144,14 +144,6 @@ while True:
     update_data()
 
 
-# Initial call to display data
-update_data()
-
-# Refresh data every minute
-while True:
-    time.sleep(60)
-    update_data()
-
 # Extra Guidance:
 # 1. You could add an option to download the displayed data as a CSV file using `st.download_button`.
 # 2. Include additional statistical metrics or visualizations as needed.
