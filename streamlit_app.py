@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import pytz
 import time
+import streamlit as st
 
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
@@ -23,12 +24,6 @@ div[data-testid="stStatusWidget"] {visibility: hidden;}
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-import streamlit as st
-
-st.set_page_config(
-    page_title="Hello",
-    page_icon="👋",
-)
 
 st.write("# Welcome to Streamlit! 👋")
 
