@@ -16,7 +16,9 @@ div[data-testid="stDecoration"] {visibility: hidden;}
 div[data-testid="stStatusWidget"] {visibility: hidden;}
 </style>
 """
-st.sidebar.header("Dashboard")
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+#st.sidebar.header("Dashboard")
 
 # Dummy function to simulate live electricity meter data
 @st.cache_data(ttl=60)
