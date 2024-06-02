@@ -5,10 +5,18 @@ from datetime import datetime, timedelta
 import pytz
 import time
 
-st.set_page_config(page_title="Mapping Demo", page_icon="🌍")
-
-st.markdown("# Mapping Demo")
-st.sidebar.header("Mapping Demo")
+st.set_page_config(page_title="Dashboard", page_icon="🌍")
+# Hide Streamlit's default menu and footer using custom CSS
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+#footer {visibility: hidden;}
+div[data-testid="stToolbar"] {visibility: hidden;}
+div[data-testid="stDecoration"] {visibility: hidden;}
+div[data-testid="stStatusWidget"] {visibility: hidden;}
+</style>
+"""
+st.sidebar.header("Dashboard")
 
 # Dummy function to simulate live electricity meter data
 @st.cache_data(ttl=60)
