@@ -26,5 +26,5 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
 st.write("# ellowwww 👋")
-
+st.write(" ik heb nood aan pauzeeeee")
 st.sidebar.success("Select a demo above.")
