@@ -90,7 +90,7 @@ def get_consumption_data(db,meter_id):
     # Fetch consumption data from Firestore for the specified meter_id
     meter_ref = db.collection('meters').document(meter_id)
     consumption_data = meter_ref.get().to_dict().get('consumptiondata', [])
-
+    st.write(consumption_data)
     # Iterate over each data point and extract timestamp and reading
     for data_point in consumption_data:
         timestamp = data_point['timestamp']
