@@ -113,11 +113,11 @@ def plot_consumption_data(consumption_data, meter_id):
     #st.write(f"Fetched {consumption_data} data points 123 for Meter {meter_id}")
 
     # Resample data to quarterly frequency (sum of readings for each quarter)
-    quarterly_data = consumption_data['reading'].resample('Q').sum()
+    #quarterly_data = consumption_data['reading'].resample('Q').sum()
 
     # Plot quarterly data
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(quarterly_data.index, quarterly_data.values, marker='o', linestyle='-')
+    ax.plot(consumption_data.index, consumption_data["reading"], marker='o', linestyle='-')
     ax.set_title(f"Quarterly Electricity Consumption for Meter {meter_id}")
     ax.set_xlabel("Quarter")
     ax.set_ylabel("Electricity Consumption")
