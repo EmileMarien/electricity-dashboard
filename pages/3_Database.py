@@ -61,7 +61,7 @@ def show_meters(db):
     meters = meters_ref.get()
     
     # Prepare data for the table
-    table_data = [["Meter ID", "Meter Name", "Location", "Status"]]  # Adding headers
+    table_data = []  # Adding headers
     for meter in meters:
         meter_data = meter.to_dict()
         meter_name = meter_data.get('name', '')
