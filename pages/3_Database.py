@@ -141,7 +141,7 @@ def show_meterdata(db):
     meters_ref = db.collection('meters')
     meter_list = [meter.id for meter in meters_ref.get()]
     selected_meter = st.selectbox("Select Meter ID", meter_list)
-    
+    st.write(f"Selected Meter ID: {selected_meter}")
     # Fetch consumption data and plot
     if selected_meter:
         consumption_data = get_consumption_data(db,selected_meter)
