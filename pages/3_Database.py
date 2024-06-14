@@ -110,20 +110,20 @@ def get_consumption_data(db,meter_id):
 # Function to plot consumption data
 def plot_consumption_data(consumption_data, meter_id):
 
-    st.write(f"Fetched {consumption_data} data points 123 for Meter {meter_id}")
+    #st.write(f"Fetched {consumption_data} data points 123 for Meter {meter_id}")
 
     # Resample data to quarterly frequency (sum of readings for each quarter)
     quarterly_data = consumption_data['reading'].resample('Q').sum()
 
-    # Plotting
-    plt.figure(figsize=(10, 6))
-    plt.plot(quarterly_data.index, quarterly_data.values, marker='o', linestyle='-')
-    plt.title(f"Quarterly Electricity Consumption for Meter {meter_id}")
-    plt.xlabel("Quarter")
-    plt.ylabel("Electricity Consumption")
-    plt.grid(True)
-    plt.xticks(rotation=45)
-    st.pyplot()
+    # Plot quarterly data
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(quarterly_data.index, quarterly_data.values, marker='o', linestyle='-')
+    ax.set_title(f"Quarterly Electricity Consumption for Meter {meter_id}")
+    ax.set_xlabel("Quarter")
+    ax.set_ylabel("Electricity Consumption")
+    ax.grid(True)
+    ax.tick_params(axis='x', rotation=45)
+    st.pyplot(fig)
 
 def show_meterdata(db):
     st.subheader("Meter Data")
