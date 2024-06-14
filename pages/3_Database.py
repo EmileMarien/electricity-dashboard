@@ -1,7 +1,6 @@
 import streamlit as st
-from google.cloud import firestore
 from google.oauth2 import service_account
-
+from google.cloud import firestore
 import json
 
 # Load the service account key from Streamlit secrets
@@ -19,15 +18,16 @@ try:
 except Exception as e:
     st.error(f"Failed to authenticate to Firestore: {e}")
     st.stop()
-# Authenticate to Firestore with the JSON account key.
 
-# Create a reference to the Google post.
-doc_ref = db.collection("meters").document("meter_test")
+# Example Firestore query
+try:
+    doc_ref = db.collection("your-collection").document("your-document-id")
+    doc = doc_ref.get()
+    if doc.exists:
+        st.write("Document data:", doc.to_dict())
+    else:
+        st.write("No such document!")
+except Exception as e:
+    st.error(f"Failed to fetch document: {e}")
 
-# Then get the data at that reference.
-doc = doc_ref.get()
-
-# Let's see what we got!
-st.write("The id is: ", doc.id)
-st.write("The contents are: ", doc.to_dict())
 st.write("Hello World")
