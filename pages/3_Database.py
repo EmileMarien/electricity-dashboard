@@ -136,7 +136,7 @@ def show_meterdata(db):
     if selected_meter:
         consumption_data = get_consumption_data(db,meter_dict[selected_meter])
 
-        plot_consumption_data(db,consumption_data, selected_meter)
+        plot_consumption_data(consumption_data, selected_meter)
 
 
 # Function to add multiple datapoints of consumption data for a specified meter ID
