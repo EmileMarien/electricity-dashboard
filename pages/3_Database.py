@@ -2,13 +2,16 @@ import streamlit as st
 from google.cloud import firestore
 
 # Authenticate to Firestore with the JSON account key.
-#db = firestore.Client.from_service_account_json("firestore-key.json")
+import json
+key_dict = json.loads(st.secrets["textkey"])
+creds = service_account.Credentials.from_service_account_info(key_dict)
+db = firestore.Client(credentials=creds, project="streamlit-reddit")
 
 # Create a reference to the Google post.
-#doc_ref = db.collection("meters").document("meter_test")
+doc_ref = db.collection("meters").document("meter_test")
 
 # Then get the data at that reference.
-#doc = doc_ref.get()
+doc = doc_ref.get()
 
 # Let's see what we got!
 #st.write("The id is: ", doc.id)
