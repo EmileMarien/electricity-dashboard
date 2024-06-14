@@ -74,8 +74,8 @@ def show_meters(db):
     
     # Display the table
     if len(table_data) > 1:  # Check if there are meters (excluding headers)
-        df=pd.DataFrame(table_data, columns=['Meter ID', 'Meter Name', 'Location', 'Status'])
-        st.table(table_data)
+        table_data_df=pd.DataFrame(table_data, columns=['Meter ID', 'Meter Name', 'Location', 'Status'])
+        st.table(table_data_df)
     else:
         st.write("No meters found.")
 
