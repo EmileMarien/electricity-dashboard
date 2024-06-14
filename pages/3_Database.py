@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 from google.oauth2 import service_account
 from google.cloud import firestore
@@ -73,6 +74,7 @@ def show_meters(db):
     
     # Display the table
     if len(table_data) > 1:  # Check if there are meters (excluding headers)
+        df=pd.DataFrame(table_data, columns=['Meter ID', 'Meter Name', 'Location', 'Status'])
         st.table(table_data)
     else:
         st.write("No meters found.")
