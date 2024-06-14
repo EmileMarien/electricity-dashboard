@@ -2,7 +2,17 @@ import streamlit as st
 from google.oauth2 import service_account
 from google.cloud import firestore
 import json
-
+# Hide Streamlit's default menu and footer using custom CSS
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+#footer {visibility: hidden;}
+div[data-testid="stToolbar"] {visibility: hidden;}
+div[data-testid="stDecoration"] {visibility: hidden;}
+div[data-testid="stStatusWidget"] {visibility: hidden;}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 def load_key():
     try:
         key_dict = json.loads(st.secrets["textkey"])
