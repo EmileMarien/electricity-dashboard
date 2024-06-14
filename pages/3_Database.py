@@ -110,10 +110,10 @@ def get_consumption_data(db,meter_id):
 # Function to plot consumption data
 def plot_consumption_data(consumption_data, meter_id):
 
+    st.write(f"Fetched {consumption_data} data points 123 for Meter {meter_id}")
 
     # Resample data to quarterly frequency (sum of readings for each quarter)
     quarterly_data = consumption_data['reading'].resample('Q').sum()
-    st.write(f"Fetched {consumption_data} data points 123 for Meter {meter_id}")
 
     # Plotting
     plt.figure(figsize=(10, 6))
