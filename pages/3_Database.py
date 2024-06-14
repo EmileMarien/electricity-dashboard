@@ -42,11 +42,6 @@ def fetch_document(db):
     except Exception as e:
         st.error(f"Failed to fetch document: {e}")
 
-key_dict = load_key()
-if key_dict:
-    db = authenticate_to_firestore(key_dict)
-    if db:
-        fetch_document(db)
 
 def add_meter(db, meter_id, location, status):
     try:
@@ -60,22 +55,42 @@ def add_meter(db, meter_id, location, status):
     except Exception as e:
         st.error(f"Failed to add meter: {e}")
 
+def show_meters(db):
+    st.subheader("Existing Meters")
+    meters_ref = db.collection('meters')
+    meters = meters_ref.get()
+    
+    # Prepare data for the table
+    table_data = []
+    for meter in meters:
+        meter_data = meter.to_dict()
+        table_data.append([meter.id, meter_data.get('location', '')])
+    
+    # Display the table
+    if table_data:
+        st.table(table_data)
+    else:
+        st.write("No meters found.")
+
 key_dict = load_key()
 if key_dict:
     db = authenticate_to_firestore(key_dict)
-    if db:
-        st.header("Fetch a Document")
-        fetch_document(db)
-        
-        st.header("Add a Meter")
-        with st.form("add_meter_form"):
-            meter_id = st.text_input("Meter ID")
-            location = st.text_input("Location")
-            status = st.selectbox("Status", ["Active", "Inactive"])
-            submitted = st.form_submit_button("Add Meter")
 
-            if submitted:
-                if meter_id and location and status:
-                    add_meter(db, meter_id, location, status)
-                else:
-                    st.error("Please fill in all fields")
+if db:
+    st.header("Fetch a Document")
+    fetch_document(db)
+    
+    st.header("Existing Meters")
+    show_meters(db)
+    st.header("Add a Meter")
+    with st.form("add_meter_form"):
+        meter_id = st.text_input("Meter ID")
+        location = st.text_input("Location")
+        status = st.selectbox("Status", ["Active", "Inactive"])
+        submitted = st.form_submit_button("Add Meter")
+
+        if submitted:
+            if meter_id and location and status:
+                add_meter(db, meter_id, location, status)
+            else:
+                st.error("Please fill in all fields")
