@@ -101,7 +101,7 @@ def get_consumption_data(db,meter_id):
         df = pd.DataFrame(data_points, columns=['timestamp', 'reading'])
         df['timestamp'] = pd.to_datetime(df['timestamp'])  # Convert timestamp to datetime object
         df.set_index('timestamp', inplace=True)  # Set timestamp as index
-
+        df.sort_index(inplace=True)  # Sort DataFrame by timestamp
         return df
     else:
         return pd.DataFrame(columns=['timestamp', 'reading'])  # Return empty DataFrame if no data
