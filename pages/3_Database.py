@@ -61,13 +61,18 @@ def show_meters(db):
     meters = meters_ref.get()
     
     # Prepare data for the table
-    table_data = []
+    table_data = [["Meter ID", "Meter Name", "Location", "Status"]]  # Adding headers
     for meter in meters:
         meter_data = meter.to_dict()
-        table_data.append([meter.id, meter_data.get('location', '')])
+        meter_name = meter_data.get('name', '')
+        location = meter_data.get('location', '')
+        status = meter_data.get('status', '')
+        meter_id = meter_data.get('meter_id', '')
+        
+        table_data.append([meter_id, meter_name, location, status])
     
     # Display the table
-    if table_data:
+    if len(table_data) > 1:  # Check if there are meters (excluding headers)
         st.table(table_data)
     else:
         st.write("No meters found.")
