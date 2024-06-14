@@ -110,21 +110,10 @@ def get_consumption_data(db,meter_id):
 
 # Function to plot consumption data
 def plot_consumption_data(consumption_data, meter_id):
-    timestamps = []
-    readings = []
 
-    for doc in consumption_data:
-        data = doc.to_dict()
-        timestamps.append(data['timestamp'])
-        readings.append(data['reading'])
-
-    # Convert timestamps to pandas datetime for easier plotting
-    df = pd.DataFrame({'timestamp': timestamps, 'reading': readings})
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
-    df.set_index('timestamp', inplace=True)
 
     # Resample data to quarterly frequency (sum of readings for each quarter)
-    quarterly_data = df['reading'].resample('Q').sum()
+    quarterly_data = consumption_data['reading'].resample('Q').sum()
 
     # Plotting
     plt.figure(figsize=(10, 6))
