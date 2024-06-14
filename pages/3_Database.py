@@ -116,6 +116,7 @@ def plot_consumption_data(consumption_data, meter_id):
     #quarterly_data = consumption_data['reading'].resample('Q').sum()
 
     # Plot quarterly data
+    st.table(consumption_data)
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(consumption_data.index, consumption_data["reading"], marker='o', linestyle='-')
     ax.set_title(f"Quarterly Electricity Consumption for Meter {meter_id}")
