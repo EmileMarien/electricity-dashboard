@@ -96,12 +96,13 @@ def get_consumption_data(db,meter_id):
         reading = data_point['reading']
         data_points.append((timestamp, reading))
 
-    st.write(f"Fetched {data_points} data points for Meter {meter_id}")
     # Convert data_points to pandas DataFrame
     if data_points:
         df = pd.DataFrame(data_points, columns=['timestamp', 'reading'])
         df['timestamp'] = pd.to_datetime(df['timestamp'])  # Convert timestamp to datetime object
         df.set_index('timestamp', inplace=True)  # Set timestamp as index
+        st.write(f"Fetched {df} data points for Meter {meter_ref.to_dict().get('meter_id', '')}")
+
         return df
     else:
         return pd.DataFrame(columns=['timestamp', 'reading'])  # Return empty DataFrame if no data
