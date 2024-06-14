@@ -183,7 +183,7 @@ if key_dict:
     db = authenticate_to_firestore(key_dict)
 
 if db:
-    add_consumption_data("meter_test", 10)
+    #add_consumption_data("meter_test", 10)
     st.header("Fetch a Document")
     st.write("Click the button below to fetch a document from Firestore.")
     if st.button("Fetch Document"):
