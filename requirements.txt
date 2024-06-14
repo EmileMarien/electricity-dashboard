@@ -2,3 +2,7 @@ streamlit-nightly
 pandas
 streamlit
 google-cloud-firestore
+matplotlib
+datetime
+numpy
+random
