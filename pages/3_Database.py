@@ -91,6 +91,7 @@ def get_consumption_data(db,meter_id):
     meter_ref = db.collection('meters').document(meter_id)
     consumption_data = meter_ref.get().to_dict().get('consumptiondata', [])
     # Iterate over each data point and extract timestamp and reading
+    st.write(consumption_data)
     for data_point in consumption_data:
         timestamp = data_point['timestamp']
         reading = data_point['reading']
