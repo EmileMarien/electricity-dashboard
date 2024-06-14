@@ -185,7 +185,9 @@ if key_dict:
 if db:
     add_consumption_data("meter_test", 10)
     st.header("Fetch a Document")
-    fetch_document(db)
+    st.write("Click the button below to fetch a document from Firestore.")
+    if st.button("Fetch Document"):
+        fetch_document(db)
     st.header("Meter data")
     show_meterdata(db)
     st.header("Existing Meters")
