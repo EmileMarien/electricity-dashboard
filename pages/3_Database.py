@@ -139,12 +139,12 @@ def show_meterdata(db):
     st.subheader("Meter Data")
 
     meters_ref = db.collection('meters')
-    meter_list = [meter for meter in meters_ref.get()] # .to_dict().get('meter_id', '')
-    selected_meter = st.selectbox("Select Meter ID", meter_list)
+    meter_dict = {meter.to_dict().get('meter_id', ''): meter.id for meter in meters_ref.get()} 
+    selected_meter = st.selectbox("Select Meter ID", meter_dict.keys())
     st.write(f"Selected Meter ID: {selected_meter}")
     # Fetch consumption data and plot
     if selected_meter:
-        consumption_data = get_consumption_data(db,selected_meter)
+        consumption_data = get_consumption_data(db,meter_dict[selected_meter])
         if consumption_data:
             plot_consumption_data(db,consumption_data, selected_meter)
         else:
