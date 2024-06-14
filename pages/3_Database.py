@@ -14,7 +14,7 @@ def load_key():
 def authenticate_to_firestore(key_dict):
     try:
         creds = service_account.Credentials.from_service_account_info(key_dict)
-        db = firestore.Client(credentials=creds, project="ElectricityDashboard")
+        db = firestore.Client(credentials=creds, project="electricitydashboard")
         st.success("Successfully authenticated to Firestore.")
         return db
     except Exception as e:
