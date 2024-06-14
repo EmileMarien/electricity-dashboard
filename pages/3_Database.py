@@ -47,3 +47,35 @@ if key_dict:
     db = authenticate_to_firestore(key_dict)
     if db:
         fetch_document(db)
+
+def add_meter(db, meter_id, location, status):
+    try:
+        meter_data = {
+            "meter_id": meter_id,
+            "location": location,
+            "status": status
+        }
+        db.collection("meters").document(meter_id).set(meter_data)
+        st.success(f"Meter {meter_id} added successfully!")
+    except Exception as e:
+        st.error(f"Failed to add meter: {e}")
+
+key_dict = load_key()
+if key_dict:
+    db = authenticate_to_firestore(key_dict)
+    if db:
+        st.header("Fetch a Document")
+        fetch_document(db)
+        
+        st.header("Add a Meter")
+        with st.form("add_meter_form"):
+            meter_id = st.text_input("Meter ID")
+            location = st.text_input("Location")
+            status = st.selectbox("Status", ["Active", "Inactive"])
+            submitted = st.form_submit_button("Add Meter")
+
+            if submitted:
+                if meter_id and location and status:
+                    add_meter(db, meter_id, location, status)
+                else:
+                    st.error("Please fill in all fields")
