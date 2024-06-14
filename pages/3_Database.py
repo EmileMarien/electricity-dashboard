@@ -101,7 +101,7 @@ def get_consumption_data(db,meter_id):
         df = pd.DataFrame(data_points, columns=['timestamp', 'reading'])
         df['timestamp'] = pd.to_datetime(df['timestamp'])  # Convert timestamp to datetime object
         df.set_index('timestamp', inplace=True)  # Set timestamp as index
-        st.write(f"Fetched {df} data points for Meter {meter_ref.to_dict().get('meter_id', '')}")
+        st.write(f"Fetched {df} data points for Meter {meter_ref.get().to_dict().get('meter_id', '')}")
 
         return df
     else:
