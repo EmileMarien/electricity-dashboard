@@ -31,7 +31,8 @@ def fetch_electricity_prices():
     prices = []
     
     # Loop through the table rows and extract data
-    for row in table.find_all('tr')[1:]:  # Skip the header row
+    """
+        for row in table.find_all('tr')[1:]:  # Skip the header row
         cols = row.find_all('td')
         date_str = cols[0].text.strip()
         price_str = cols[1].text.strip().replace('€', '').replace(',', '.')
@@ -46,6 +47,6 @@ def fetch_electricity_prices():
     # Create a DataFrame with the scraped data
     df = pd.DataFrame({'Date': dates, 'Price (Euro)': prices})
     df.set_index('Date', inplace=True)
-    
-    return df
+    """
+    return table
 
