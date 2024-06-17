@@ -5,3 +5,4 @@ google-cloud-firestore
 matplotlib
 datetime
 numpy
+beautifulsoup4
