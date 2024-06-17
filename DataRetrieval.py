@@ -49,11 +49,3 @@ def fetch_electricity_prices():
     
     return df
 
-# URL of the page to scrape
-url = 
-
-# Fetch the electricity prices and store in a DataFrame
-df = fetch_electricity_prices(url)
-
-# Display the DataFrame
-print(df)
