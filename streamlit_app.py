@@ -15,8 +15,15 @@ st.set_page_config(
 # Hide Streamlit's default menu and footer using custom CSS
 apply_custom_css()
 
-st.image("data/logo_lama.png", width=10, use_column_width='always') # caption='Lama Icon'
+col1, col2, col3 = st.beta_columns([1,6,1])
+with col1:
+    st.write("")
+with col2:
+    st.image("data/logo_lama.png", use_column_width='always') # caption='Lama Icon'
+with col3:
+    st.write("")
 st.write("# Lama energies")
 st.write("laten we die daken nekeer volleggen")
+
 
 st.sidebar.success("Select a demo above.")
