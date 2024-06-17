@@ -46,7 +46,7 @@ div[data-testid="stStatusWidget"] {visibility: hidden;}
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-st.image("data/logo_lama.png", width=150)  # Replace with your Lama icon image path
+st.image("data/logo_lama.png", width=150, use_column_width='always', caption='Lama Icon')
 st.write("# Lama energies")
 st.write("laten we die daken nekeer volleggen")
 
