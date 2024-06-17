@@ -26,4 +26,4 @@ st.write("# Lama energies")
 st.write("laten we die daken nekeer volleggen")
 
 
-st.sidebar.success("Select a demo above.")
+st.sidebar.success("Select a page above.")
