@@ -8,12 +8,10 @@ st.set_page_config(page_title="Plotting Demo", page_icon="📈")
 menu_with_redirect()
 apply_custom_css()
 
-st.markdown("# Plotting Demo")
-st.sidebar.header("Plotting Demo")
+st.markdown("# Portfolio Simulation")
+st.sidebar.header("Portfolio Simulation")
 st.write(
-    """This demo illustrates a combination of plotting and animation with
-Streamlit. We're generating a bunch of random numbers in a loop for around
-5 seconds. Enjoy!"""
+    """An example of future evolution of your portfolio value"""
 )
 
 progress_bar = st.sidebar.progress(0)
