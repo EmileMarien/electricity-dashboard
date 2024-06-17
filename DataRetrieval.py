@@ -1,3 +1,4 @@
+import pytz
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -73,19 +74,25 @@ def add_belpex_to_firestore(belpex:pd.DataFrame, db:firestore.Client):
 
     #latest_timestamp= get_latest_belpex_timestamp_from_firestore(db)
     data_to_add = []
+    # Define the timezone for the timestamps
+    utc_plus_2 = pytz.timezone('Europe/Brussels')  # Adjust to the specific timezone name for UTC+2 if needed
 
     for index, row in belpex.iterrows():
         timestamp_str = row['DateTime']
         price_str = row['Price']
 
         # Parse timestamp (adjust according to your specific datetime format)
-        timestamp = datetime.strptime(timestamp_str, '%d/%m/%Y %H:%M:%S')
+        timestamp_naive = datetime.strptime(timestamp_str, '%d/%m/%Y %H:%M:%S')
 
-        # Check if timestamp is after the latest timestamp in Firestore
-        #if timestamp > latest_timestamp:
-            # Prepare data object
+        # Localize the naive datetime object to UTC+2
+        timestamp_utc_plus_2 = utc_plus_2.localize(timestamp_naive)
+
+        # Convert to UTC
+        timestamp_utc = timestamp_utc_plus_2.astimezone(pytz.utc)
+
+        # Prepare the data to add
         data = {
-            'timestamp': timestamp,
+            'timestamp': timestamp_utc,
             'value': float(price_str.replace(',', '.').strip().replace('€', ''))  # Assuming price needs to be stored as a float
         }
         data_to_add.append(data)
@@ -99,24 +106,5 @@ def add_belpex_to_firestore(belpex:pd.DataFrame, db:firestore.Client):
 
     return f"Added {len(data_to_add)} new datapoints to Firestore under 'prices/belpex'"
 
-"""
-def get_latest_belpex_timestamp_from_firestore(db):
-    prices_ref = db.collection('prices').document('belpex')
-    doc = prices_ref.get()
 
-    if doc.exists:
-        data = doc.to_dict()
-        datapoints = data.get('datapoints', [])
-
-        if datapoints:
-            # Sort datapoints by timestamp in descending order to get the latest
-            datapoints_sorted = sorted(datapoints, key=lambda x: x['timestamp'], reverse=True)
-            return datapoints_sorted[0]['timestamp']
-        else:
-            # Return a default timestamp if no datapoints exist
-            return datetime.min
-    else:
-        # Handle case where document 'belpex' does not exist
-        return datetime.min
-"""
 
