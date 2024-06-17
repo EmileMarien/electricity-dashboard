@@ -1,10 +1,4 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-import pytz
-import time
-import streamlit as st
 from css import apply_custom_css
 from menu import menu
 

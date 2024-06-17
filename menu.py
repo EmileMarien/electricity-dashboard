@@ -11,7 +11,7 @@ def authenticated_menu():
     if st.session_state.role in ["investor"]:
         st.sidebar.page_link("pages/1_Investor_page.py", label="Investors")
 
-    st.sidebar.success("Select a page above")
+    #st.sidebar.success("Select a page above")
 
 
 def unauthenticated_menu():
