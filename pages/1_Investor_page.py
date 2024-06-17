@@ -1,26 +1,17 @@
 import streamlit as st
 import time
 import numpy as np
-
+from css import apply_custom_css
+from menu import menu_with_redirect
 st.set_page_config(page_title="Plotting Demo", page_icon="📈")
 # Hide Streamlit's default menu and footer using custom CSS
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-#footer {visibility: hidden;}
-div[data-testid="stToolbar"] {visibility: hidden;}
-div[data-testid="stDecoration"] {visibility: hidden;}
-div[data-testid="stStatusWidget"] {visibility: hidden;}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+menu_with_redirect()
+apply_custom_css()
 
-st.markdown("# Plotting Demo")
-st.sidebar.header("Plotting Demo")
+st.markdown("# Portfolio Simulation")
+st.sidebar.header("Portfolio Simulation")
 st.write(
-    """This demo illustrates a combination of plotting and animation with
-Streamlit. We're generating a bunch of random numbers in a loop for around
-5 seconds. Enjoy!"""
+    """An example of future evolution of your portfolio value"""
 )
 
 progress_bar = st.sidebar.progress(0)

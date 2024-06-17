@@ -4,21 +4,14 @@ import numpy as np
 from datetime import datetime, timedelta
 import pytz
 import time
-from DataRetrieval import fetch_electricity_prices
-
+from DataRetrieval import fetch_electricity_prices, add_belpex_to_firestore
+from firestore_init import load_key, authenticate_to_firestore
+from menu import menu_with_redirect
 st.set_page_config(page_title="Dashboard", page_icon="🌍")
+from css import apply_custom_css
 # Hide Streamlit's default menu and footer using custom CSS
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-#footer {visibility: hidden;}
-div[data-testid="stToolbar"] {visibility: hidden;}
-div[data-testid="stDecoration"] {visibility: hidden;}
-div[data-testid="stStatusWidget"] {visibility: hidden;}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
+apply_custom_css()
+menu_with_redirect()
 #st.sidebar.header("Dashboard")
 
 # Dummy function to simulate live electricity meter data
@@ -143,11 +136,13 @@ def update_data():
 # Initial call to display data
 update_data()
 
-st.header("Fetching electricity prices from Elexys website...")
+st.header("Fetching BELPEX prices")
 data=fetch_electricity_prices()
 #Show the data in a table
 st.write(data)
-
+# Authenticate to Firestore
+db = authenticate_to_firestore(load_key())
+st.write(add_belpex_to_firestore(belpex=data,db=db))
 
 # -----------------------------------------------------------------------------
 # Refresh data every minute
