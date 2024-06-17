@@ -101,9 +101,59 @@ filtered_data = filtered_data.set_index('time').resample(f'{interval}T').mean().
 with col1:
     chart_container = st.empty()
 
-
 # -----------------------------------------------------------------------------
 # Section 3: Display last received data values
+# -----------------------------------------------------------------------------
+def run_app(df):
+    """
+    Runs a Streamlit app that allows visualization of hourly energy data.
+    
+    Parameters:
+    df (pd.DataFrame): A DataFrame with datetime index, hourly consumption values,
+                       hourly prices, and hourly costs.
+    """
+    st.title('Energy Data Visualization')
+
+    st.write("""
+    This app allows you to visualize hourly energy consumption, prices, and costs.
+    Use the checkboxes below to toggle the visibility of each dataset.
+    """)
+
+    # Sidebar for toggling datasets
+    show_consumption = st.sidebar.checkbox('Show Consumption', value=True)
+    show_price = st.sidebar.checkbox('Show Price', value=True)
+    show_cost = st.sidebar.checkbox('Show Cost', value=True)
+
+    # Plotting
+    st.subheader('Hourly Data')
+
+    fig, ax = plt.subplots()
+
+    if show_consumption:
+        ax.plot(df.index, df['consumption'], label='Consumption', color='blue')
+    if show_price:
+        ax.plot(df.index, df['price'], label='Price', color='green')
+    if show_cost:
+        ax.plot(df.index, df['cost'], label='Cost', color='red')
+
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Values')
+    ax.legend()
+    ax.grid(True)
+
+    st.pyplot(fig)
+
+# Sample DataFrame creation for demonstration purposes
+# This would normally be loaded from a data source
+date_rng = pd.date_range(start='2023-01-01', end='2023-01-02', freq='H')
+df = pd.DataFrame(date_rng, columns=['date'])
+df = df.set_index('date')
+df['consumption'] = np.random.randint(0, 100, size=(len(date_rng)))
+df['price'] = np.random.uniform(0, 10, size=(len(date_rng)))
+df['cost'] = df['consumption'] * df['price']
+
+# -----------------------------------------------------------------------------
+# Section 4: Display last received data values
 # -----------------------------------------------------------------------------
 
 st.header('Last Received Data Values')
