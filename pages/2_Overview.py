@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import pytz
 import time
-from DataRetrieval import fetch_electricity_prices
+from DataRetrieval import fetch_electricity_prices, add_belpex_to_firestore
 
 st.set_page_config(page_title="Dashboard", page_icon="🌍")
 # Hide Streamlit's default menu and footer using custom CSS
@@ -143,11 +143,11 @@ def update_data():
 # Initial call to display data
 update_data()
 
-st.header("Fetching electricity prices from Elexys website...")
+st.header("Fetching BELPEX prices")
 data=fetch_electricity_prices()
 #Show the data in a table
 st.write(data)
-
+st.write(add_belpex_to_firestore(data))
 
 # -----------------------------------------------------------------------------
 # Refresh data every minute
