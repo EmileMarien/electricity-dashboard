@@ -82,6 +82,7 @@ def show_meters(db):
     else:
         st.write("No meters found.")
 
+
 # Function to fetch consumption data from Firestore and return as DataFrame
 def get_consumption_data(db,meter_id):
     # Initialize an empty list to collect data points

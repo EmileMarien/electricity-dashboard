@@ -1,13 +1,18 @@
-#import requests
-#from bs4 import BeautifulSoup
-#from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
 import pandas as pd
+from datetime import datetime
 
-dataframe=pd.DataFrame({'Date': ['2021-01-01', '2021-01-02', '2021-01-03'],
-                            'Price (Euro)': [50, 55, 60]})
-print("Hello World")
-"""
-def fetch_electricity_prices(url):
+def fetch_electricity_prices():
+    """
+    Fetches the electricity prices from the Elexys website and returns as a DataFrame.
+    
+    Returns:
+        pd.DataFrame: A DataFrame containing the electricity prices with timestamps.
+    """
+    # URL of the page to scrape
+    url= 'https://my.elexys.be/MarketInformation/SpotBelpex.aspx'
+    
     # Send a GET request to fetch the HTML content
     response = requests.get(url)
     
@@ -45,12 +50,10 @@ def fetch_electricity_prices(url):
     return df
 
 # URL of the page to scrape
-url = 'https://my.elexys.be/MarketInformation/SpotBelpex.aspx'
+url = 
 
 # Fetch the electricity prices and store in a DataFrame
-#df = fetch_electricity_prices(url)
+df = fetch_electricity_prices(url)
 
 # Display the DataFrame
-print(url)
-
-"""
+print(df)

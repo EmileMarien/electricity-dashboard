@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import pytz
 import time
+from DataRetrieval import fetch_electricity_prices
 
 st.set_page_config(page_title="Dashboard", page_icon="🌍")
 # Hide Streamlit's default menu and footer using custom CSS
@@ -142,6 +143,13 @@ def update_data():
 # Initial call to display data
 update_data()
 
+
+data=fetch_electricity_prices()
+#Show the data in a table
+st.write(data)
+
+
+# -----------------------------------------------------------------------------
 # Refresh data every minute
 while True:
     time.sleep(60)
