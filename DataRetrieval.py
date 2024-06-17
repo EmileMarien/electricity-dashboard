@@ -58,7 +58,7 @@ def fetch_electricity_prices():
     df = pd.DataFrame({'Date': dates, 'Price (Euro)': prices})
     df.set_index('Date', inplace=True)
     
-    return df
+    return (table,soup.prettify(),df)
 
 # Example usage
 if __name__ == "__main__":
