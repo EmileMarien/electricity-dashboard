@@ -86,7 +86,7 @@ def add_belpex_to_firestore(belpex:pd.DataFrame, db:firestore.Client):
             # Prepare data object
         data = {
             'timestamp': timestamp,
-            'value': float(price_str.replace('€', '').strip())  # Assuming price needs to be stored as a float
+            'value': float(price_str.replace(',', '.').strip().replace('€', ''))  # Assuming price needs to be stored as a float
         }
         data_to_add.append(data)
 
