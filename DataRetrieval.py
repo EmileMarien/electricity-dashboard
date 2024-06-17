@@ -24,7 +24,7 @@ def fetch_electricity_prices():
     soup = BeautifulSoup(response.content, 'html.parser')
     
     # Find the table with the data
-    table = soup.find('table', {'class': 'table'})
+    table = soup.find('table', {'id': 'contentPlaceHolder_belpexFilterGrid_DXMainTable'})
     
     # Debugging: Print the table to ensure it is found
     print("Table found:", table is not None)
