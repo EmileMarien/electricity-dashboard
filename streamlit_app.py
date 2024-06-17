@@ -15,7 +15,7 @@ st.set_page_config(
 # Hide Streamlit's default menu and footer using custom CSS
 apply_custom_css()
 
-col1, col2, col3 = st.columns([1, 6, 1])
+col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     st.write("")
 with col2:
