@@ -35,32 +35,23 @@ def fetch_electricity_prices():
         #raise Exception("Failed to find the table in the HTML content")
 
     # Initialize lists to store the dates and prices
-    dates = []
+    datetimes = []
     prices = []
-    """
-    # Loop through the table rows and extract data
-    for row in table.find_all('tr')[1:]:  # Skip the header row
-        cols = row.find_all('td')
-        if len(cols) < 2:
-            continue  # Skip rows that do not have enough columns
-        
-        date_str = cols[0].text.strip()
-        price_str = cols[1].text.strip().replace('€', '').replace(',', '.')
-        
-        # Convert strings to appropriate data types
-        date = datetime.strptime(date_str, '%d/%m/%Y %H:%M:%S')
-        price = float(price_str)
-        
-        dates.append(date)
-        prices.append(price)
     
-    # Create a DataFrame with the scraped data
-    df = pd.DataFrame({'Date': dates, 'Price (Euro)': prices})
-    df.set_index('Date', inplace=True)
-    """
+    rows = table.find_all('tr', class_='dxgvDataRow_Office2010Blue')
+    for row in rows:
+        cols = row.find_all('td', class_='dxgv')
+        if len(cols) == 2:
+            datetimes.append(cols[0].get_text(strip=True))
+            prices.append(cols[1].get_text(strip=True))
+
+    # Create a DataFrame
+    df = pd.DataFrame({
+        'DateTime': datetimes,
+        'Price': prices
+    })
     
-    
-    return (table,soup.prettify())
+    return df
 
 # Example usage
 if __name__ == "__main__":
