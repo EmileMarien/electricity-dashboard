@@ -1,19 +1,11 @@
 import streamlit as st
 import time
 import numpy as np
-
+from css import apply_custom_css
 st.set_page_config(page_title="Plotting Demo", page_icon="📈")
 # Hide Streamlit's default menu and footer using custom CSS
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-#footer {visibility: hidden;}
-div[data-testid="stToolbar"] {visibility: hidden;}
-div[data-testid="stDecoration"] {visibility: hidden;}
-div[data-testid="stStatusWidget"] {visibility: hidden;}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+apply_custom_css()
 
 st.markdown("# Plotting Demo")
 st.sidebar.header("Plotting Demo")

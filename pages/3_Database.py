@@ -5,17 +5,9 @@ import pandas as pd
 from google.cloud import firestore
 import streamlit as st
 from firestore_init import load_key, authenticate_to_firestore
+from css import apply_custom_css
 # Hide Streamlit's default menu and footer using custom CSS
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-#footer {visibility: hidden;}
-div[data-testid="stToolbar"] {visibility: hidden;}
-div[data-testid="stDecoration"] {visibility: hidden;}
-div[data-testid="stStatusWidget"] {visibility: hidden;}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+apply_custom_css()
 
 def fetch_document(db):
     try:

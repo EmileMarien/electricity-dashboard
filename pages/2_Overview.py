@@ -7,17 +7,9 @@ import time
 from DataRetrieval import fetch_electricity_prices, add_belpex_to_firestore
 from firestore_init import load_key, authenticate_to_firestore
 st.set_page_config(page_title="Dashboard", page_icon="🌍")
+from css import apply_custom_css
 # Hide Streamlit's default menu and footer using custom CSS
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-#footer {visibility: hidden;}
-div[data-testid="stToolbar"] {visibility: hidden;}
-div[data-testid="stDecoration"] {visibility: hidden;}
-div[data-testid="stStatusWidget"] {visibility: hidden;}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+apply_custom_css()
 
 #st.sidebar.header("Dashboard")
 
