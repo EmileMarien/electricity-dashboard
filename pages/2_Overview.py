@@ -143,7 +143,7 @@ def update_data():
 # Initial call to display data
 update_data()
 
-st.write("Fetching electricity prices from Elexys website...")
+st.header("Fetching electricity prices from Elexys website...")
 data=fetch_electricity_prices()
 #Show the data in a table
 st.write(data)
