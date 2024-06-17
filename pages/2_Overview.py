@@ -149,7 +149,7 @@ data=fetch_electricity_prices()
 st.write(data)
 # Authenticate to Firestore
 db = authenticate_to_firestore(load_key())
-st.write(add_belpex_to_firestore(db,data))
+st.write(add_belpex_to_firestore(belpex=data,db=db))
 
 # -----------------------------------------------------------------------------
 # Refresh data every minute

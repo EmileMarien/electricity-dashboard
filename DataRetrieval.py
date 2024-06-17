@@ -58,7 +58,7 @@ def fetch_electricity_prices():
     return df
 
 
-def add_belpex_to_firestore(belpex, db):
+def add_belpex_to_firestore(belpex:pd.DataFrame, db:firestore.Client):
     """
     Adds the BELPEX prices to Firestore for the specified meter_id.
 
