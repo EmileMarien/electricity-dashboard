@@ -31,13 +31,13 @@ def fetch_electricity_prices():
     print("HTML content:", soup.prettify())
     
     # Return if table is not found
-    if table is None:
-        raise Exception("Failed to find the table in the HTML content")
+    #if table is None:
+        #raise Exception("Failed to find the table in the HTML content")
 
     # Initialize lists to store the dates and prices
     dates = []
     prices = []
-    
+    """
     # Loop through the table rows and extract data
     for row in table.find_all('tr')[1:]:  # Skip the header row
         cols = row.find_all('td')
@@ -57,8 +57,10 @@ def fetch_electricity_prices():
     # Create a DataFrame with the scraped data
     df = pd.DataFrame({'Date': dates, 'Price (Euro)': prices})
     df.set_index('Date', inplace=True)
+    """
     
-    return (table,soup.prettify(),df)
+    
+    return (table,soup.prettify())
 
 # Example usage
 if __name__ == "__main__":
