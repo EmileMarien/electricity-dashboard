@@ -40,4 +40,4 @@ st.selectbox(
     key="_role",
     on_change=set_role,
 )
-menu() # Render the dynamic menu! "#d6c0a1"
+menu() # Render the dynamic menu! 
