@@ -38,7 +38,11 @@ def fetch_electricity_prices():
     datetimes = []
     prices = []
     
+
     rows = table.find_all('tr', class_='dxgvDataRow_Office2010Blue')
+    if rows is None or len(rows) == 0:
+        return "No data rows found in the table"
+    
     for row in rows:
         cols = row.find_all('td', class_='dxgv')
         if len(cols) == 2:
