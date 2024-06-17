@@ -30,8 +30,8 @@ def apply_custom_css():
             }
 
             /* Hide Streamlit elements */
-            #MainMenu {visibility: hidden;}
-            #footer {visibility: hidden;}
+            MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
             div[data-testid="stToolbar"] {visibility: hidden;}
             div[data-testid="stDecoration"] {visibility: hidden;}
             div[data-testid="stStatusWidget"] {visibility: hidden;}
