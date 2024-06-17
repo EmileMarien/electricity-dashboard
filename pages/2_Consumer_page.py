@@ -6,11 +6,12 @@ import pytz
 import time
 from DataRetrieval import fetch_electricity_prices, add_belpex_to_firestore
 from firestore_init import load_key, authenticate_to_firestore
+from menu import menu_with_redirect
 st.set_page_config(page_title="Dashboard", page_icon="🌍")
 from css import apply_custom_css
 # Hide Streamlit's default menu and footer using custom CSS
 apply_custom_css()
-
+menu_with_redirect()
 #st.sidebar.header("Dashboard")
 
 # Dummy function to simulate live electricity meter data

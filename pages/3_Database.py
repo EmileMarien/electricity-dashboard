@@ -6,9 +6,10 @@ from google.cloud import firestore
 import streamlit as st
 from firestore_init import load_key, authenticate_to_firestore
 from css import apply_custom_css
+from menu import menu_with_redirect
 # Hide Streamlit's default menu and footer using custom CSS
 apply_custom_css()
-
+menu_with_redirect()
 def fetch_document(db):
     try:
         doc_ref = db.collection("meters").document("meter_test")
