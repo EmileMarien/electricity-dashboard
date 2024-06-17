@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -104,7 +105,7 @@ with col1:
 # -----------------------------------------------------------------------------
 # Section 3: Display last received data values
 # -----------------------------------------------------------------------------
-def run_app(df):
+def plot_consumption(df):
     """
     Runs a Streamlit app that allows visualization of hourly energy data.
     
@@ -151,7 +152,7 @@ df = df.set_index('date')
 df['consumption'] = np.random.randint(0, 100, size=(len(date_rng)))
 df['price'] = np.random.uniform(0, 10, size=(len(date_rng)))
 df['cost'] = df['consumption'] * df['price']
-
+plot_consumption(df)
 # -----------------------------------------------------------------------------
 # Section 4: Display last received data values
 # -----------------------------------------------------------------------------
