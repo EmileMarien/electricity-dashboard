@@ -21,6 +21,7 @@ with col3:
 st.write("# Lama energies")
 st.write("laten we die daken nekeer volleggen")
 st.write("blabla")
+st.write("JUW JUW")
 
 # Initialize st.session_state.role to None
 if "role" not in st.session_state:
