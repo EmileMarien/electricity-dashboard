@@ -1,9 +1,4 @@
-
-
 import pandas as pd
-
-from visualisations.visualisations import plot_series
-
 
 
 def add_EV_load_type(self,type:str='Load_EV_kW_with_SC'):

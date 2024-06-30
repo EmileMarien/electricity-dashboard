@@ -4,15 +4,9 @@ import pandas as pd
 import pickle
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import powercalculations.powercalculations as pc
+import solarpowermodel.solarpowermodel as pc
 
 print('test')
-#file_path_combined = 'data/combined_data_v9.xlsx'
-#irradiancefilepath='data/Irradiance_data_vtest.xlsx'
-#loadfilepath='data/Load_profile_6_vtest.xlsx'
-#irradiance=pc.PowerCalculations(file_path_combined= file_path_combined)
-#irradiance.interpolate_columns(interval='1min')
-
 
 latitude=50.99461 # [degrees]
 longitude=5.53972 # [degrees]

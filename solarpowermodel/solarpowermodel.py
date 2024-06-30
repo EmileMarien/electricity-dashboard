@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from torch import sgn
 
-class PowerCalculations():
+class SolarPowerModel():
     def __init__(self, file_path_irradiance: str="",file_path_SPP:str="",file_path_SLP:str="",file_path_load: str="", file_path_combined:str=""):
         """
         Initializes the PowerCalculations class with the given dataset
@@ -63,19 +63,23 @@ class PowerCalculations():
             expected_columns = ['DateTime', 'Load_kW', 'GlobRad', 'DiffRad', 'T_RV_degC', 'T_CommRoof_degC']
             self.pd=merged_df[expected_columns]
         
+
+        
         #Set a datetime index
         self.pd.set_index('DateTime', inplace=True)
         self.pd.index = pd.to_datetime(self.pd.index)
 
         # Initialize the columns that will be used for the calculations
         self.pd['DirectIrradiance'] = None    # [W]  
-        self.pd['PV_generated_power'] = None  # [kW]
+        self.pd['PV_Power_kW'] = None  # [kW]
         self.pd['GridFlow'] = None           # [kW], if neg, then subtracted from grid, if pos the added to the grid
         self.pd['BatteryCharge'] = None       # [kW]
         self.pd['NettoProduction'] = None # Netto production is the difference between the PV generated power and the load
         self.pd['EVLoad'] = None # [kW]
         self.pd['PowerLoss'] = None # [kW]
         self.pd['BatteryFlow'] = None
+        self.pd['DualTariff'] = None
+        self.pd['DynamicTariff'] = None
 
     # Imported methods
     from ._datacleaning import filter_data_by_date_interval
@@ -84,12 +88,12 @@ class PowerCalculations():
     from ._datacleaning import empty_column
     from ._datacleaning import update_column
 
-    from ._pvpower import PV_generated_power
-    from ._pvpower import PV_generated_power_SPP
+    from ._pvpower import PV_Power_kW
+    from ._pvpower import PV_Power_kW_SPP
 
-    from ._visualisations import plot_columns
-    from ._visualisations import plot_dataframe
-    from ._visualisations import plot_series
+    from .OLD._visualisations import plot_columns
+    from .OLD._visualisations import plot_dataframe
+    from .OLD._visualisations import plot_series
     
     from ._directirradiance import calculate_direct_irradiance
     from ._directirradiance import calculate_solar_angles
@@ -102,7 +106,7 @@ class PowerCalculations():
     from ._getters import get_irradiance
     from ._getters import get_load
     from ._getters import get_direct_irradiance
-    from ._getters import get_PV_generated_power
+    from ._getters import get_PV_Power_kW
     from ._getters import get_energy_TOT
     from ._getters import get_average_per_hour
     from ._getters import get_grid_power
@@ -110,7 +114,19 @@ class PowerCalculations():
     from ._getters import get_monthly_peaks
     from ._getters import get_total_injection_and_consumption
     from ._getters import get_average_per_minute_day
+    from ._getters import get_grid_cost_total
 
     from ._export import export_dataframe_to_excel
 
     from ._EVload import add_EV_load
+
+    from ._tariffs import capacity_tariff
+    from ._tariffs import dual_tariff
+    from ._tariffs import dynamic_tariff
+
+    from ._setters import set_belpex_df
+    from ._setters import set_belpex_xlsx
+    from ._setters import set_irradiance_df
+    from ._setters import set_irradiance_xlsx
+    from ._setters import set_load_df
+    from ._setters import set_load_xslx

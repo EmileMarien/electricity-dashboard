@@ -9,6 +9,9 @@ def get_irradiance(self):
     """
     return self.pd['DiffRad']
 
+def get_datetimerange(self):
+    return self.pd.index #TODO: how??
+
 def get_load(self):
     """
     Returns the load data
@@ -28,18 +31,18 @@ def get_direct_irradiance(self):
     """
     return self.pd['DirectIrradiance']
 
-def get_PV_generated_power(self):
+def get_PV_Power_kW(self):
     """
     Returns the PV generated power data
     """
-    return self.pd['PV_generated_power']
+    return self.pd['PV_Power_kW']
 
 def get_energy_TOT(self,column_name:str='Load_kW',peak:str='all'):
     """
     Calculates the total energy in kWh for the entire year in the DataFrame. The energy is calculated for the specified power values and peak or offpeak period.
 
     Args:
-    column_name (str): The name of the column to be used for the calculation. Choose between: 'Load_kW', 'GridPower', 'PV_generated_power'. Default: 'Load_kW'
+    column_name (str): The name of the column to be used for the calculation. Choose between: 'Load_kW', 'GridPower', 'PV_Power_kW'. Default: 'Load_kW'
     peak (str): The period to calculate the energy. Choose between: 'peak', 'offpeak'. Default: 'peak'
     
     Returns:
@@ -51,8 +54,8 @@ def get_energy_TOT(self,column_name:str='Load_kW',peak:str='all'):
         df_load=self.pd['Load_kW']
     elif column_name=='GridFlow':
         df_load=self.pd['GridFlow']
-    elif column_name=='PV_generated_power':
-        df_load=self.pd['PV_generated_power']
+    elif column_name=='PV_Power_kW':
+        df_load=self.pd['PV_Power_kW']
 
     else:
         AssertionError('The column_name must be either Load_kW or PowerGrid')
@@ -95,7 +98,7 @@ def get_columns(self,columns:List[str]):
     return self.pd[columns]
 
 def get_PV_energy_per_hour(self):
-    power=get_average_per_hour(self,"PV_generated_power")
+    power=get_average_per_hour(self,"PV_Power_kW")
     
 def get_average_per_hour(self, column_name: str = 'Load_kW'):
     """
@@ -203,3 +206,136 @@ def get_total_injection_and_consumption(self):
     total_consumption_offpeak_kWh = total_consumption_offpeak * interval  # [kWh]
 
     return total_injection_peak_kWh, total_injection_offpeak_kWh, total_consumption_peak_kWh, total_consumption_offpeak_kWh
+
+
+def get_grid_cost_perhour(self,calculationtype:str="DualTariff"):
+    """
+    Returns the grid cost data based on the specified type of cost calculation
+    """
+    return self.pd[calculationtype]
+
+def get_grid_cost_total(self,calculationtype:str="DualTariff"):
+    cost_perhour=self.pd[calculationtype]
+    cost_total=sum(cost_perhour)
+    return cost_total
+
+def get_columns(self,columns:List[str]):
+    """
+    Returns the dataset with the specific columns
+    """
+
+    assert all(col in self.pd.columns for col in columns), 'The columns must be present in the DataFrame'
+
+    return self.pd[columns]
+
+def get_total_energy_from_grid(self):
+    """
+    Returns the total energy in kWh taken from the grid
+    """
+    return sum(self.pd['GridFlow'])
+
+def get_average_per_minute_day(self,column_name:str='Load_kW'):
+    """
+    Calculates the average load per minute for each day of the year based on the entire year in the DataFrame. in kW
+
+    Returns:
+        pandas.Series: A Series containing the average 'Load_kW' for each minute of the day.
+        The index of the Series is the minute of the day (0-1439).
+    """
+
+
+    # Group by hour and minute and calculate average value
+    avg_by_time = self.pd.groupby([self.pd.index.hour, self.pd.index.minute])[column_name].mean()        
+    avg_by_time.index = [f"{x[0]:02d}:{x[1]:02d}" for x in avg_by_time.index]
+
+    return avg_by_time
+def get_total_energy_to_grid(self):
+    """
+    Returns the total energy in kWh sent to the grid
+    """
+    return -sum(self.pd['GridFlow'])
+
+def get_total_energy_from_battery(self):
+    """
+    Returns the total energy in kWh taken from the battery
+    """
+    return sum(self.pd['BatteryCharge'])
+
+def get_total_cost(self,tariff: str='DynamicTariff',start_date:str=self.pd.index[0],end_date:str=self.pd.index[-1],interval_str:str="10min",purchase_rate_injection:float=0.00414453,purchase_rate_consumption=0.0538613,data_management_cost: float =13.95,capacity_rate: float=41.3087,fixed_component_dual=111.3,fixed_component_dynamic=100.7,excise_duty_energy_contribution_rate=0,include_PV:bool=True): #TODO: fix
+    """
+    Calculate the electricity cost for a given solar panel configuration and tariff.
+
+    Args:
+    fixed_component_dual [€/year]
+    fixed_component_dynamic [€/year]
+    """
+
+
+    print("1/4: start calculations")
+    self.pd.filter_data_by_date_interval(start_date=start_date,end_date=end_date,interval_str=interval_str)
+    #TODO: check if the right data is available (no None rows or columns)
+    
+    
+    ## Electricity cost
+    energy_cost=sum(self.pd[tariff])
+
+    fixed_component = fixed_component_dual if tariff=='DualTariff' else fixed_component_dynamic
+    ## Network rates
+    #data_management_cost
+
+    ## Special excise duty and energy contribution
+    levy_cost=excise_duty_energy_contribution_rate*(get_total_injection_and_consumption()[2]+get_total_injection_and_consumption()[3])
+
+    # Calculate the purchase cost
+    purchase_cost_injection=purchase_rate_injection*(get_total_injection_and_consumption()[0]+get_total_injection_and_consumption()[1])
+    purchase_cost_consumption=purchase_rate_consumption*(get_total_injection_and_consumption()[2]+get_total_injection_and_consumption()[3])
+
+    purchase_cost=purchase_cost_injection+purchase_cost_consumption
+    capacity_cost = max(-(get_monthly_peaks('GridFlow').sum() / 12), 2.5) * capacity_rate #TODO: check calculations
+
+    # Total cost
+    cost=energy_cost+data_management_cost+purchase_cost+capacity_cost+levy_cost+fixed_component
+    print("Components of the cost:")
+    print("Fixed component:", fixed_component)
+    print("Energy cost:", energy_cost)
+    print("Data management cost:", data_management_cost)
+    print("Purchase cost (injection):", purchase_cost_injection)
+    print("Purchase cost (consumption):", purchase_cost_consumption)
+    print("Capacity cost:", capacity_cost)
+    print("Levy cost:", levy_cost)
+    print("Total cost:", cost)
+    print("Total production:",get_energy_TOT(column_name='PV_Power_kW'))
+    print("Total injection: peak:", get_total_injection_and_consumption()[0],"offpeak:",get_total_injection_and_consumption()[1])    
+    print("Total consumption: peak:", get_total_injection_and_consumption()[2],"offpeak:",get_total_injection_and_consumption()[3])
+
+    return cost
+
+def get_npv(battery_cost, total_solar_panel_cost, inverter_cost, discount_rate, annual_degradation):
+    
+    initial_cash_flow=get_total_cost()-
+    # Calculate the least common multiple (LCM) of battery and solar panel lifetimes
+
+    installation_cost = total_solar_panel_cost*0.3/0.35
+    print("Installation cost:", installation_cost*(1+0.21))
+    BOS_cost = total_solar_panel_cost/0.35*0.125
+    print("BOS_cost:", BOS_cost*(1+0.21))
+    inverter = inverter_cost + (inverter_cost + battery_cost) / pow(1 + discount_rate, 10) + \
+                      (inverter_cost + battery_cost) / pow(1 + discount_rate, 20) - \
+                      (inverter_cost + battery_cost) / pow(1 + discount_rate, 25) 
+    print("Inverter cost:",inverter)
+    print("total_solar_panel_cost:",total_solar_panel_cost*(1+0.21))
+    capex = (BOS_cost + installation_cost + total_solar_panel_cost)*(1+0.21)  + inverter_cost  + battery_cost  # multiplication for installation_cost + maintenance_cost
+   
+    investment_cost = capex+ \
+                      (inverter_cost + battery_cost) / pow(1 + discount_rate, 10) + \
+                      (inverter_cost + battery_cost) / pow(1 + discount_rate, 20) - \
+                      (inverter_cost + battery_cost) / pow(1 + discount_rate, 25) 
+    print("Investment cost:", investment_cost)
+    Year_1_payback = initial_cash_flow/investment_cost
+    payback = 1/Year_1_payback
+    print("payback",payback)
+    print("Year 1 payback:", Year_1_payback)
+    cost_savings = sum((initial_cash_flow * pow(1 - annual_degradation, t - 1)) / pow(1 + discount_rate, t) for t in range(1, 26))
+    print("Total cost savings:", cost_savings)
+    npv = -investment_cost + cost_savings
+    return npv

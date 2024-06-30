@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
 from google.cloud import firestore
-
+import solarpowermodel
+from solarpowermodel.solarpowermodel import SolarPowerModel
 def fetch_electricity_prices():
     """
     Fetches the electricity prices from the Elexys website and returns as a DataFrame.
@@ -108,3 +109,11 @@ def add_belpex_to_firestore(belpex:pd.DataFrame, db:firestore.Client):
 
 
 
+model=SolarPowerModel()
+model.set_load_df()
+model.set_belpex_df()
+model.PV_generated_power_SPP()
+model.power_flow()
+model.dual_tariff()
+model.dynamic_tariff()
+model.get_grid_cost_total()

@@ -6,7 +6,6 @@ def calculate_npv(battery_cost, total_solar_panel_cost, inverter_cost, discount_
     # Calculate the least common multiple (LCM) of battery and solar panel lifetimes
 
     installation_cost = total_solar_panel_cost*0.3/0.35
-<<<<<<< HEAD
     print("Installation cost:", installation_cost*(1+0.21))
     BOS_cost = total_solar_panel_cost/0.35*0.125
     print("BOS_cost:", BOS_cost*(1+0.21))
@@ -15,9 +14,6 @@ def calculate_npv(battery_cost, total_solar_panel_cost, inverter_cost, discount_
                       (inverter_cost + battery_cost) / pow(1 + discount_rate, 25) 
     print("Inverter cost:",inverter)
     print("total_solar_panel_cost:",total_solar_panel_cost*(1+0.21))
-=======
-    BOS_cost = total_solar_panel_cost/0.35*0.125
->>>>>>> de18ab8e8cb80935fbac367a8445eb87f155eea5
     capex = (BOS_cost + installation_cost + total_solar_panel_cost)*(1+0.21)  + inverter_cost  + battery_cost  # multiplication for installation_cost + maintenance_cost
    
     investment_cost = capex+ \

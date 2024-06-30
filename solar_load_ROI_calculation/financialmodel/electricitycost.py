@@ -6,7 +6,7 @@ import pickle
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from visualisations.visualisations import plot_dataframe
 
-import powercalculations.powercalculations as pc
+import solarpowermodel.solarpowermodel as pc
 import gridcost.gridcost as gc
 
 def electricity_cost(solar_panel_count: int=10, panel_surface:int= 1.9,annual_degradation: float=0.000, panel_efficiency: int= 0.2253, temperature_coefficient: float=-0.0026, inverter_size_AC: int = 5, inverter_maxsolar_DC: int = 8, inverter_maxbattery_DC: int=5,tilt_angle:int=-1, Orientation:str="S", battery_capacity: float= 0, battery_count: int=0,tariff: str='DynamicTariff', battery_roundtrip_efficiency:float=97.5, battery_PeakPower:int=11, battery_Degradation:int=3,EV_type:str='B2G'):

@@ -5,7 +5,7 @@ import pandas as pd
 def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_batterypower: int = 5, max_PV_input: int = 10, max_EV_power: int = 3.7, max_EV_charge=82.3,EV_type:str='no_EV',battery_roundtrip_efficiency:float=97.5, battery_PeakPower:int=11):
     """
     Calculates power flows, how much is going to and from the battery and how much is being tapped from the grid
-    #TODO: add units, PV_generated_power and Load_kW are both in kW. Depending on the frequency of this data, a different amount is subtracted from the battery charge (in kWh?) (e.g. if 1h freq, the load of each line can be subtracted directly since 1kW*1h=1kWh. If in minutes, then 1kW*1min=1/60kWh) 
+    #TODO: add units, PV_Power_kW and Load_kW are both in kW. Depending on the frequency of this data, a different amount is subtracted from the battery charge (in kWh?) (e.g. if 1h freq, the load of each line can be subtracted directly since 1kW*1h=1kWh. If in minutes, then 1kW*1min=1/60kWh) 
     ADD BATTERY DEGRADATION
 
     Args:
@@ -18,6 +18,14 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
     Returns:
         None
     """ 
+    
+    # Check if all required columns are present
+    required_columns = ['PV_Power_kW','Load_kW'] # [kW]
+    missing_columns = [col for col in required_columns if col not in self.pd.columns]
+    assert not missing_columns, f"The following columns are missing: {', '.join(missing_columns)}"
+
+    # Check if no None values are present
+
     # convert charges to unit of frequency of the data
     interval = 3600/pd.Timedelta(self.pd.index.freq).total_seconds() # hours to seconds
     max_charge = max_charge*interval
@@ -44,17 +52,9 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
     for _, row in self.pd.iterrows():
         print(f"Calculating power flows for row {counter}/{length}", end="\r")
         counter+=1
-        PV_power = min(row['PV_generated_power'], max_PV_input) #power_loss = row['PV_generated_power'] - PV_power
-        loss+=row['PV_generated_power'] - PV_power
+        PV_power = min(row['PV_Power_kW'], max_PV_input) #power_loss = row['PV_Power_kW'] - PV_power
+        loss+=row['PV_Power_kW'] - PV_power
         load = -row['Load_kW']
-        """
-        # Calculate battery charge and grid flow
-        if load > max_AC_power_output:  # Load too high for inverter, switch to grid-tie to avoid overloading of inverter #TODO: everything until max_AC_power is still gotten from the PV
-            load_to_EV = PV_power
-            load_to_battery, new_charge_EV= EV(row=row,load_to_EV=load_to_EV,old_capacity=previous_charge_EV,EV_type=EV_type)
-            load_from_battery, new_charge_battery = battery(load_to_battery, previous_charge_battery)
-            grid_flow = load + load_from_battery
-        """
  
         excess_load=-max(0,-load-max_AC_power_output) #load that is immediately sent to the grid
         load=load-excess_load #load that is left after the excess load is sent to the grid 
@@ -79,6 +79,7 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
 
     self.pd['BatteryCharge'] = battery_charge_list
     self.pd['GridFlow'] = grid_flow_list
+    self.pd['GridFlow_Load']=self.pd['Load_kW']*0.9 #TODO: add efficiencies of the inverter
     #row['PowerLoss'] = power_loss
     self.pd['BatteryFlow'] = battery_flow_list
     self.pd['EVCharge'] = EV_charge_list
@@ -202,11 +203,13 @@ def nettoProduction(self):
     Calculates the netto production by subtracting the load from the PV generated power
     """
 
-    assert 'PV_generated_power' in self.pd.columns, 'The column PV_generated_power is missing'
+    assert 'PV_Power_kW' in self.pd.columns, 'The column PV_Power_kW is missing'
     assert 'Load_kW' in self.pd.columns, 'The column Load_kW is missing'
 
-    self.pd['NettoProduction'] = self.pd['PV_generated_power'] - self.pd['Load_kW']
+    self.pd['NettoProduction'] = self.pd['PV_Power_kW'] - self.pd['Load_kW']
     return None
+
+
 
 def optimized_charging(time:pd.DatetimeIndex, max_charge: int = 8, max_AC_power_output: int = 2, max_DC_batterypower: int = 2, max_PV_input: int = 10):
     """
@@ -254,88 +257,5 @@ print("Maximum value of X * B:", -result.fun)  # Since we were minimizing -X * B
 
 """
 
-def power_flow_old(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_batterypower: int = 5, max_PV_input: int = 10, max_EV_power: int = 3.7, max_EV_charge=82.3):
-    """
-    Calculates power flows, how much is going to and from the battery and how much is being tapped from the grid
-    #TODO: add units, PV_generated_power and Load_kW are both in kW. Depending on the frequency of this data, a different amount is subtracted from the battery charge (in kWh?) (e.g. if 1h freq, the load of each line can be subtracted directly since 1kW*1h=1kWh. If in minutes, then 1kW*1min=1/60kWh) 
-    ADD BATTERY DEGRADATION
 
-    Args:
-        max_charge (int, optional): Maximum charge capacity of the battery in kWh. Defaults to 8.
-        max_AC_power_output (int): Maximum power that can be sent to the grid in kW. Defaults to 2.
-        max_DC_batterypower_output (int, optional): Maximum power that can be sent to the battery in kW. Defaults to 2.
-        max_PV_input (int, optional): Maximum power that can be sent to the battery in kW. Defaults to 10.
-        max_EV_power (int, optional): Maximum power that can be sent to the EV in kW. Defaults to 3.7.
-        max_EV_charge (int, optional): Maximum charge capacity of the EV in kWh. Defaults to 82.3.
-    Returns:
-        None
-    """ 
-    # Initialize variables
-    previous_charge = 0  # Initialize as integer
-    battery_charge = []  # List to store calculated battery charges
-    grid_flow_list = []  # List to store calculated grid flows
-    power_loss_list = [] # List to store calculated power loss
-    battery_flow_list = [] # List to store flow to and from the battery
-    max_charge=max_charge*60 #kWmin
-    # Iterate over DataFrame rows
-    for _, row in self.pd.iterrows():
-        PV_power = min(row['PV_generated_power'], max_PV_input) 
-        power_loss = row['PV_generated_power'] - PV_power
-        load = row['Load_kW']
-        excess_power = PV_power - load
-        available_space = max_charge - previous_charge #kWh
-        # Calculate battery charge and grid flow
-        if load > max_AC_power_output:  # Load too high for inverter, switch to grid-tie to avoid overloading of inverter
-            battery_flow = min(available_space, PV_power, max_DC_batterypower) # kW, PV power is sent straight to battery, depending on how much space there is
-            power_loss += min(available_space, PV_power) - battery_flow # kWh, Battery charging power is limited, causing power loss
-            grid_flow = -load + (PV_power-battery_flow) # kW, All power that is not sent to the battery, is sent to the grid
-            new_charge = previous_charge + battery_flow
-        elif excess_power > 0:  # Excess power from PV
-            if available_space > 0:  # Battery has room for excess power
-                if excess_power <= available_space:  # Excess power fills battery partially
-                    battery_flow = min(excess_power, max_DC_batterypower) # Powerflow to battery has limit, excess is power loss
-                    power_loss += excess_power - battery_flow
-                    new_charge = previous_charge + battery_flow
-                    grid_flow = 0  # No grid draw
-                else:  # Battery almost full, partially fill it and send excess to grid
-                    battery_flow = min(available_space, max_DC_batterypower) # Battery is filled, or is limited by power flow
-                    new_charge = previous_charge + battery_flow # Update battery charge
-                    grid_flow = min(excess_power - battery_flow, max_AC_power_output) # Excess power is sent to grid (positive flow), limited by power flow
-                    power_loss += (available_space - battery_flow) + ((excess_power-battery_flow)-grid_flow) #Power loss due to limited battery flow, and due to limited grid flow
-            else:  # Battery full, send excess power to the grid
-                battery_flow = 0
-                new_charge = max_charge
-                grid_flow = min(excess_power, max_AC_power_output) # All power is sent to grid (positive flow), output has limit
-                power_loss += excess_power - grid_flow
-        elif excess_power < 0:  # Insufficient PV power, need to draw from battery or grid
-            if previous_charge >= -excess_power:  # Battery has enough power to cover load deficit
-                battery_flow = -min(-excess_power, max_DC_batterypower)  # Adjusted here to prevent overcharging the battery
-                new_charge = previous_charge + battery_flow
-                grid_flow = 0  # No grid flow
-                power_loss += (-excess_power) - (-battery_flow) # Power loss due to limited battery flow
-            else:  # Battery does not have enough power, draw from battery and grid
-                battery_flow = -min(previous_charge, max_DC_batterypower)
-                new_charge = 0
-                grid_flow = previous_charge - (-excess_power) # Draw from grid (negative)
-                power_loss += previous_charge - (-battery_flow) # Power loss due to limited battery flow
-        else:  # No excess power or deficit
-            battery_flow = 0
-            new_charge = previous_charge
-            grid_flow = 0
-            power_loss = 0
-
-        # Append calculated values to lists
-        battery_charge.append(new_charge/60) #kWmin -> kWh
-        grid_flow_list.append(grid_flow)
-        power_loss_list.append(power_loss)
-        battery_flow_list.append(battery_flow)
-        previous_charge = new_charge  # Update previous charge for next iteration
-
-    # Update DataFrame with optimized data
-    self.pd['BatteryCharge'] = battery_charge
-    self.pd['GridFlow'] = grid_flow_list # Negative values indicate power drawn from the grid, positive values indicate power sent to the grid
-    self.pd['PowerLoss'] = power_loss_list
-    self.pd['BatteryFlow'] = battery_flow_list
-
-    return None
 
