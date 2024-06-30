@@ -5,10 +5,29 @@ import pandas as pd
 #TODO: how to merge? don't forget to set datetimeindex
 
 def set_load_df(self,df_load:pd.Dataframe):
-    self.pd.merge(df_load)
+    
+    assert 'Load_kW' in df_load.columns and 'DateTime' in df_load.columns
+    if not (df_load.index.name == 'DateTime' and df_load.index.format() == 'datetime64[ns]'):
+        df_load.set_index('DateTime', inplace=True)
+        df_load.index = pd.to_datetime(df_load.index)
+
+    if self.pd is not None:
+        self.pd = pd.concat([self.pd, df_load], axis=1, join="inner")
+    else:
+        self.pd = df_load
     return None
 
 def set_irradiance_df(self,df_irradiance:pd.Dataframe):
+    
+    assert 'DirectIrradiance' in df_irradiance.columns and 'DateTime' in df_irradiance.columns
+    if not (df_irradiance.index.name == 'DateTime' and df_irradiance.index.format() == 'datetime64[ns]'):
+        df_irradiance.set_index('DateTime', inplace=True)
+        df_irradiance.index = pd.to_datetime(df_irradiance.index)
+
+    if self.pd is not None:
+        self.pd = pd.concat([self.pd, df_irradiance], axis=1, join="inner")
+    else:
+        self.pd = df_irradiance
     return None
 
 def set_belpex_df():
