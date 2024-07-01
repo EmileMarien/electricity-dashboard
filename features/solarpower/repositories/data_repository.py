@@ -1,6 +1,8 @@
 
+from datetime import datetime
 import pandas as pd
 from google.cloud import firestore
+import pytz
 #from solarpowermodel.solarpowermodel import SolarPowerModel
 
 class DataRepositorySolarPower():
@@ -49,7 +51,7 @@ class DataRepositorySolarPower():
 
     # Update Firestore with new datapoints
     if data_to_add:
-        prices_ref = db.collection('prices').document('belpex')
+        prices_ref = self.db.collection('prices').document('belpex')
         prices_ref.update({
             'datapoints': firestore.ArrayUnion(data_to_add)
         })
