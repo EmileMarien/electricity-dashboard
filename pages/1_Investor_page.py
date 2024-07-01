@@ -3,6 +3,7 @@ import time
 import numpy as np
 from css import apply_custom_css
 from menu import menu_with_redirect
+from solarpowermodel.solarpowermodel import SolarPowerModel
 st.set_page_config(page_title="Plotting Demo", page_icon="📈")
 # Hide Streamlit's default menu and footer using custom CSS
 menu_with_redirect()
@@ -33,3 +34,11 @@ progress_bar.empty()
 # this button is not connected to any other logic, it just causes a plain
 # rerun.
 st.button("Re-run")
+
+
+model = SolarPowerModel()
+model.set_load_df(pd.DataFrame({
+    'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00'],
+    'Load_kW': [100, 200]
+}))
+st.write(model.get_dataset())
