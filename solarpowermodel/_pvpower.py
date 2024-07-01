@@ -55,4 +55,4 @@ def PV_Power_kW_SPP(self,SPP_path:str,sheet_name:str,max_power:float,efficiency_
         raise ValueError("The 'time' column is not present in the synthetic production profile (SPP)")
     return None
 
-PV_Power_kW_SPP(SPP_path='solar_load_ROI_calculation/data/SPP.xlsx',sheet_name='5414494999996',max_power=100,efficiency_coefficient=0.223)
+#PV_Power_kW_SPP(SPP_path='solar_load_ROI_calculation/data/SPP.xlsx',sheet_name='5414494999996',max_power=100,efficiency_coefficient=0.223)
