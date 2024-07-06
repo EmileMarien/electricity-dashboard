@@ -11,7 +11,7 @@ def set_load_df(self, df_load: pd.DataFrame):
         df_load.set_index('DateTime', inplace=True)
         df_load.index = pd.to_datetime(df_load.index)
 
-    self.pd.merge(df_load, on='Load_kW',how='right')
+    self.pd.merge(df_load)
     return None
 
 def append_load_df(self, df_load: pd.DataFrame):      
