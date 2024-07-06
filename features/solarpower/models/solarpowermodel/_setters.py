@@ -11,7 +11,10 @@ def set_load_df(self, df_load: pd.DataFrame):
         df_load.set_index('DateTime', inplace=True)
         df_load.index = pd.to_datetime(df_load.index)
 
-    self.pd.merge(df_load)
+    if self.pd.empty:
+        self.pd['Load_kW'] = df_load
+    else:
+        self.pd = self.pd.merge(df_load, how='outer', left_index=True, right_index=True)
     return None
 
 def append_load_df(self, df_load: pd.DataFrame):      
@@ -36,7 +39,24 @@ def set_irradiance_df(self,df_irradiance:pd.DataFrame):
         df_irradiance.set_index('DateTime', inplace=True)
         df_irradiance.index = pd.to_datetime(df_irradiance.index)
 
-    self.pd = pd.merge(self.pd, df_irradiance, how='left', on='DirectIrradiance', left_index=True, right_index=True)
+
+    # Ensure we only add values at indices already present in self.pd and df_irradiance
+    common_indices = self.pd.index.intersection(df_irradiance.index)
+
+    # Update self.pd with the values from df_irradiance at the common indices
+    self.pd.loc[common_indices, 'DirectIrradiance'] = df_irradiance.loc[common_indices, 'DirectIrradiance']
+
+    # Identify missing indices in df1 that are present in df2 and add them
+    missing_indices = df_irradiance.index.difference(self.pd['DirectIrradiance'].index)
+    missing_data = df_irradiance.loc[missing_indices]
+    print(missing_data)
+    print(self.pd)
+    # Append the missing data to df1
+    self.pd = pd.concat([self.pd,missing_data]).sort_index()
+
+    # Set the previous data to nan
+    missing_indices_2=self.pd.index.difference(df_irradiance.index)
+    self.pd.loc[missing_indices_2, 'DirectIrradiance'] = None
     return None
 
 def append_irradiance_df(self,df_irradiance:pd.DataFrame):
