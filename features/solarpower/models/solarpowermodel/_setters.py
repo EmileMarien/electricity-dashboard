@@ -49,8 +49,8 @@ def set_irradiance_df(self,df_irradiance:pd.DataFrame):
     # Identify missing indices in df1 that are present in df2 and add them
     missing_indices = df_irradiance.index.difference(self.pd['DirectIrradiance'].index)
     missing_data = df_irradiance.loc[missing_indices]
-    print(missing_data)
-    print(self.pd)
+    #print(missing_data)
+    #print(self.pd)
     # Append the missing data to df1
     self.pd = pd.concat([self.pd,missing_data]).sort_index()
 

@@ -81,6 +81,7 @@ class SolarPowerModel():
         self.pd['DirectIrradiance'] = None    # [W]  
         self.pd['PV_Power_kW'] = None  # [kW]
         self.pd['GridFlow'] = None           # [kW], if neg, then subtracted from grid, if pos the added to the grid
+        self.pd['GridFlow_Load'] = None
         self.pd['BatteryCharge'] = None       # [kW]
         self.pd['NettoProduction'] = None # Netto production is the difference between the PV generated power and the load
         self.pd['EVLoad'] = None # [kW]
@@ -121,7 +122,7 @@ class SolarPowerModel():
     from ._getters import get_monthly_peaks
     from ._getters import get_total_injection_and_consumption
     from ._getters import get_average_per_minute_day
-    from ._getters import get_grid_cost_total
+    from ._getters import get_total_cost
 
     from ._export import export_dataframe_to_excel
 

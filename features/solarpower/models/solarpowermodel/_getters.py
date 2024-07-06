@@ -2,7 +2,6 @@
 from typing import List
 import pandas as pd
 
-
 def get_irradiance(self):
     """
     Returns the irradiance data
@@ -77,7 +76,7 @@ def get_energy_TOT(self,column_name:str='Load_kW',peak:str='all'):
     # Check if the input data contains NA values
     assert not df_load.isnull().values.any(), 'The input data contains NA values'
     #Integrate the power over time to get the energy in [kWh]
-    interval = pd.Timedelta(df_load.index.freq).total_seconds() / 3600 # Convert seconds to hours
+    interval = 1 #pd.Timedelta(df_load.index.freq).total_seconds() / 3600 # Convert seconds to hours TODO:
     energy_peak=load_tot_day*interval# [kWh]
 
     return energy_peak
@@ -199,7 +198,9 @@ def get_total_injection_and_consumption(self):
     total_consumption_offpeak = -self.pd['GridFlow'][(self.pd['GridFlow'] < 0) & (((self.pd.index.hour < 8) | (self.pd.index.hour >= 18)) & (self.pd.index.weekday < 5) | (self.pd.index.weekday >= 5))].sum()
     
     #Integrate the power over time to get the energy in [kWh]
-    interval = pd.Timedelta(self.pd['GridFlow'].index.freq).total_seconds() / 3600 # Convert seconds to hours
+    #interval = pd.Timedelta(self.pd['GridFlow'].index.freq).total_seconds() / 3600 # 
+    interval=1 #TODO: check if this is correct and we want to take care of interval
+    #Convert seconds to hours
     total_injection_peak_kWh = total_injection_peak * interval        # [kWh]
     total_injection_offpeak_kWh = total_injection_offpeak * interval  # [kWh]
     total_consumption_peak_kWh = total_consumption_peak * interval    # [kWh]
@@ -215,6 +216,10 @@ def get_grid_cost_perhour(self,calculationtype:str="DualTariff"):
     return self.pd[calculationtype]
 
 def get_grid_cost_total(self,calculationtype:str="DualTariff"):
+    """
+    Returns the total grid cost based on the specified type of cost calculation (tariff)
+    Choose between 'DualTariff' and 'DynamicTariff'
+    """
     cost_perhour=self.pd[calculationtype]
     cost_total=sum(cost_perhour)
     return cost_total
@@ -274,7 +279,7 @@ def get_total_cost(self,tariff: str='DynamicTariff',interval_str:str="10min",pur
     end_date:str=self.pd.index[-1]
 
     print("1/4: start calculations")
-    self.pd.filter_data_by_date_interval(start_date=start_date,end_date=end_date,interval_str=interval_str)
+    #filter_data_by_date_interval(start_date=start_date,end_date=end_date,interval_str=interval_str)
     #TODO: check if the right data is available (no None rows or columns)
     
     
@@ -286,14 +291,14 @@ def get_total_cost(self,tariff: str='DynamicTariff',interval_str:str="10min",pur
     #data_management_cost
 
     ## Special excise duty and energy contribution
-    levy_cost=excise_duty_energy_contribution_rate*(get_total_injection_and_consumption()[2]+get_total_injection_and_consumption()[3])
+    levy_cost=excise_duty_energy_contribution_rate*(get_total_injection_and_consumption(self)[2]+get_total_injection_and_consumption(self)[3])
 
     # Calculate the purchase cost
-    purchase_cost_injection=purchase_rate_injection*(get_total_injection_and_consumption()[0]+get_total_injection_and_consumption()[1])
-    purchase_cost_consumption=purchase_rate_consumption*(get_total_injection_and_consumption()[2]+get_total_injection_and_consumption()[3])
+    purchase_cost_injection=purchase_rate_injection*(get_total_injection_and_consumption(self)[0]+get_total_injection_and_consumption(self)[1])
+    purchase_cost_consumption=purchase_rate_consumption*(get_total_injection_and_consumption(self)[2]+get_total_injection_and_consumption(self)[3])
 
     purchase_cost=purchase_cost_injection+purchase_cost_consumption
-    capacity_cost = max(-(get_monthly_peaks('GridFlow').sum() / 12), 2.5) * capacity_rate #TODO: check calculations
+    capacity_cost = max(-(get_monthly_peaks(self,column_name='GridFlow').sum() / 12), 2.5) * capacity_rate #TODO: check calculations
 
     # Total cost
     cost=energy_cost+data_management_cost+purchase_cost+capacity_cost+levy_cost+fixed_component
@@ -306,9 +311,9 @@ def get_total_cost(self,tariff: str='DynamicTariff',interval_str:str="10min",pur
     print("Capacity cost:", capacity_cost)
     print("Levy cost:", levy_cost)
     print("Total cost:", cost)
-    print("Total production:",get_energy_TOT(column_name='PV_Power_kW'))
-    print("Total injection: peak:", get_total_injection_and_consumption()[0],"offpeak:",get_total_injection_and_consumption()[1])    
-    print("Total consumption: peak:", get_total_injection_and_consumption()[2],"offpeak:",get_total_injection_and_consumption()[3])
+    print("Total production:",get_energy_TOT(self,column_name='PV_Power_kW'))
+    print("Total injection: peak:", get_total_injection_and_consumption(self)[0],"offpeak:",get_total_injection_and_consumption(self)[1])    
+    print("Total consumption: peak:", get_total_injection_and_consumption(self)[2],"offpeak:",get_total_injection_and_consumption(self)[3])
 
     return cost
 
