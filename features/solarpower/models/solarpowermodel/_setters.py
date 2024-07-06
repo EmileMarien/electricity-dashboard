@@ -4,45 +4,79 @@ import pandas as pd
 
 #TODO: how to merge? don't forget to set datetimeindex
 
-def set_load_df(self,df_load:pd.Dataframe):
+def set_load_df(self, df_load: pd.DataFrame):
     
     assert 'Load_kW' in df_load.columns and 'DateTime' in df_load.columns
     if not (df_load.index.name == 'DateTime' and df_load.index.format() == 'datetime64[ns]'):
         df_load.set_index('DateTime', inplace=True)
         df_load.index = pd.to_datetime(df_load.index)
 
-    if self.pd is not None:
-        self.pd = pd.concat([self.pd, df_load], axis=1, join="inner")
-    else:
-        self.pd = df_load
+    self.pd.merge(df_load, on='Load_kW',how='right')
     return None
 
-def set_irradiance_df(self,df_irradiance:pd.Dataframe):
+def append_load_df(self, df_load: pd.DataFrame):      
+    assert 'Load_kW' in df_load.columns and 'DateTime' in df_load.columns
+    if not (df_load.index.name == 'DateTime' and df_load.index.format() == 'datetime64[ns]'):
+        df_load.set_index('DateTime', inplace=True)
+        df_load.index = pd.to_datetime(df_load.index)
+
+    if 'Load_kW' not in self.pd.columns:
+        self.pd['Load_kW'] = df_load['Load_kW']
+    else:
+        self.pd['Load_kW'] = pd.concat([self.pd['Load_kW'], df_load['Load_kW']], axis=1, join="outer")
+    if 'DateTime' not in self.pd.columns:
+        self.pd['DateTime'] = df_load['DateTime']
+        self.pd.set_index('DateTime', inplace=True)
+    return None
+
+def set_irradiance_df(self,df_irradiance:pd.DataFrame):
     
     assert 'DirectIrradiance' in df_irradiance.columns and 'DateTime' in df_irradiance.columns
     if not (df_irradiance.index.name == 'DateTime' and df_irradiance.index.format() == 'datetime64[ns]'):
         df_irradiance.set_index('DateTime', inplace=True)
         df_irradiance.index = pd.to_datetime(df_irradiance.index)
 
-    if self.pd is not None:
-        self.pd = pd.concat([self.pd, df_irradiance], axis=1, join="inner")
-    else:
-        self.pd = df_irradiance
+    self.pd = pd.merge(self.pd, df_irradiance, how='left', on='DirectIrradiance', left_index=True, right_index=True)
     return None
 
-def set_belpex_df(self,df_belpex:pd.Dataframe):
+def append_irradiance_df(self,df_irradiance:pd.DataFrame):
+    assert 'DirectIrradiance' in df_irradiance.columns and 'DateTime' in df_irradiance.columns
+    if not (df_irradiance.index.name == 'DateTime' and df_irradiance.index.format() == 'datetime64[ns]'):
+        df_irradiance.set_index('DateTime', inplace=True)
+        df_irradiance.index = pd.to_datetime(df_irradiance.index)
+
+    if 'DirectIrradiance' not in self.pd.columns:
+        self.pd['DirectIrradiance'] = df_irradiance['DirectIrradiance']
+    else:
+        self.pd['DirectIrradiance'] = pd.concat([self.pd['DirectIrradiance'], df_irradiance['DirectIrradiance']], axis=1, join="outer")
+    if 'DateTime' not in self.pd.columns:
+        self.pd['DateTime'] = df_irradiance['DateTime']
+        self.pd.set_index('DateTime', inplace=True)
+    return None
+
+def set_belpex_df(self,df_belpex:pd.DataFrame):
     assert 'Belpex' in df_belpex.columns and 'DateTime' in df_belpex.columns
     if not (df_belpex.index.name == 'DateTime' and df_belpex.index.format() == 'datetime64[ns]'):
         df_belpex.set_index('DateTime', inplace=True)
         df_belpex.index = pd.to_datetime(df_belpex.index)
 
-    if self.pd is not None:
-        self.pd = pd.concat([self.pd, df_belpex], axis=1, join="inner")
-    else:
-        self.pd = df_belpex
+    self.pd['Belpex'] = df_belpex['Belpex']
     return None
 
+def append_belpex_df(self,df_belpex:pd.DataFrame):
+    assert 'Belpex' in df_belpex.columns and 'DateTime' in df_belpex.columns
+    if not (df_belpex.index.name == 'DateTime' and df_belpex.index.format() == 'datetime64[ns]'):
+        df_belpex.set_index('DateTime', inplace=True)
+        df_belpex.index = pd.to_datetime(df_belpex.index)
 
+    if 'Belpex' not in self.pd.columns:
+        self.pd['Belpex'] = df_belpex['Belpex']
+    else:
+        self.pd['Belpex'] = pd.concat([self.pd['Belpex'], df_belpex['Belpex']], axis=1, join="outer")
+    if 'DateTime' not in self.pd.columns:
+        self.pd['DateTime'] = df_belpex['DateTime']
+        self.pd.set_index('DateTime', inplace=True)
+    return None
 
 def set_irradiance_xlsx(self,file_path_Irradiance):
     # Add load data
@@ -52,7 +86,7 @@ def set_irradiance_xlsx(self,file_path_Irradiance):
     assert 'DateTime' in belpex_df.columns, "'DateTime' column not found in the Irradiance Excel file"
     assert 'Belpex' in belpex_df.columns, "'Belpex' column not found in the Irradiance Excel file"
     # Merge the DataFrame with the one read from excel
-    self.pd = pd.concat(belpex_df, self.pd, join="inner") #TODO: check how to merge both
+    self.pd = pd.concat(belpex_df, self.pd, join="outer") #TODO: check how to merge both
     return None
 
 def set_load_xslx(self,file_path_Load):
@@ -63,7 +97,7 @@ def set_load_xslx(self,file_path_Load):
     assert 'DateTime' in belpex_df.columns, "'DateTime' column not found in the Irradiance Excel file"
     assert 'Belpex' in belpex_df.columns, "'Belpex' column not found in the Irradiance Excel file"
     # Merge the DataFrame with the one read from excel
-    self.pd = pd.concat(belpex_df, self.pd, join="inner") #TODO: check how to merge both
+    self.pd = pd.concat(belpex_df, self.pd, join="outer") #TODO: check how to merge both
     return None
 
 def set_belpex_xlsx(self,file_path_BelpexFilter:str):
@@ -74,5 +108,30 @@ def set_belpex_xlsx(self,file_path_BelpexFilter:str):
     assert 'DateTime' in belpex_df.columns, "'DateTime' column not found in the Irradiance Excel file"
     assert 'Belpex' in belpex_df.columns, "'Belpex' column not found in the Irradiance Excel file"
     # Merge the DataFrame with the one read from excel
-    self.pd = pd.concat(belpex_df, self.pd, join="inner") #TODO: check how to merge both
+    self.pd = pd.concat(belpex_df, self.pd, join="outer") #TODO: check how to merge both
+    return None
+
+def set_pv_power_df(self,df_pv_power:pd.DataFrame):
+    assert 'PV_Power_kW' in df_pv_power.columns and 'DateTime' in df_pv_power.columns
+    if not (df_pv_power.index.name == 'DateTime' and df_pv_power.index.format() == 'datetime64[ns]'):
+        df_pv_power.set_index('DateTime', inplace=True)
+        df_pv_power.index = pd.to_datetime(df_pv_power.index)
+
+    self.pd['PV_Power_kW'] = df_pv_power['PV_Power_kW']
+
+    return None
+
+def append_pv_power_df(self,df_pv_power:pd.DataFrame):
+    assert 'PV_Power_kW' in df_pv_power.columns and 'DateTime' in df_pv_power.columns
+    if not (df_pv_power.index.name == 'DateTime' and df_pv_power.index.format() == 'datetime64[ns]'):
+        df_pv_power.set_index('DateTime', inplace=True)
+        df_pv_power.index = pd.to_datetime(df_pv_power.index)
+
+    if 'PV_Power_kW' not in self.pd.columns:
+        self.pd['PV_Power_kW'] = df_pv_power['PV_Power_kW']
+    else:
+        self.pd['PV_Power_kW'] = pd.concat([self.pd['PV_Power_kW'], df_pv_power['PV_Power_kW']], axis=1, join="outer")
+    if 'DateTime' not in self.pd.columns:
+        self.pd['DateTime'] = df_pv_power['DateTime']
+        self.pd.set_index('DateTime', inplace=True)
     return None

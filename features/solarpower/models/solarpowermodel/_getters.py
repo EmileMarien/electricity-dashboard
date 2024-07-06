@@ -261,7 +261,7 @@ def get_total_energy_from_battery(self):
     """
     return sum(self.pd['BatteryCharge'])
 
-def get_total_cost(self,tariff: str='DynamicTariff',start_date:str=self.pd.index[0],end_date:str=self.pd.index[-1],interval_str:str="10min",purchase_rate_injection:float=0.00414453,purchase_rate_consumption=0.0538613,data_management_cost: float =13.95,capacity_rate: float=41.3087,fixed_component_dual=111.3,fixed_component_dynamic=100.7,excise_duty_energy_contribution_rate=0,include_PV:bool=True): #TODO: fix
+def get_total_cost(self,tariff: str='DynamicTariff',interval_str:str="10min",purchase_rate_injection:float=0.00414453,purchase_rate_consumption=0.0538613,data_management_cost: float =13.95,capacity_rate: float=41.3087,fixed_component_dual=111.3,fixed_component_dynamic=100.7,excise_duty_energy_contribution_rate=0,include_PV:bool=True): #TODO: fix
     """
     Calculate the electricity cost for a given solar panel configuration and tariff.
 
@@ -270,6 +270,8 @@ def get_total_cost(self,tariff: str='DynamicTariff',start_date:str=self.pd.index
     fixed_component_dynamic [€/year]
     """
 
+    start_date:str=self.pd.index[0] #TODO: only set these when nothing else is given with parameters
+    end_date:str=self.pd.index[-1]
 
     print("1/4: start calculations")
     self.pd.filter_data_by_date_interval(start_date=start_date,end_date=end_date,interval_str=interval_str)
@@ -312,7 +314,7 @@ def get_total_cost(self,tariff: str='DynamicTariff',start_date:str=self.pd.index
 
 def get_npv(battery_cost, total_solar_panel_cost, inverter_cost, discount_rate, annual_degradation):
     
-    initial_cash_flow=get_total_cost()-
+    initial_cash_flow=get_total_cost() #TODO: UPDATE with savings
     # Calculate the least common multiple (LCM) of battery and solar panel lifetimes
 
     installation_cost = total_solar_panel_cost*0.3/0.35

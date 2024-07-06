@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from torch import sgn
 
 class SolarPowerModel():
-    def __init__(self, file_path_irradiance: str="",file_path_SPP:str="",file_path_SLP:str="",file_path_load: str="", file_path_combined:str=""):
+    def __init__(self):
         """
         Initializes the PowerCalculations class with the given dataset
         
@@ -17,6 +17,9 @@ class SolarPowerModel():
         file_path (str): The file path to the Excel file containing the dataset 
         dataset (DataFrame): The dataset to be used for the calculations if file_path is not provided       
         """
+        """
+        
+        
         if file_path_combined != "":
             # Use the dataset directly if provided
             merged_df = pd.read_excel(file_path_combined)
@@ -68,8 +71,13 @@ class SolarPowerModel():
         #Set a datetime index
         self.pd.set_index('DateTime', inplace=True)
         self.pd.index = pd.to_datetime(self.pd.index)
-
+        """
+        self.pd=pd.DataFrame()
         # Initialize the columns that will be used for the calculations
+        self.pd['DateTime'] = None
+        #Set a datetime index
+        self.pd.set_index('DateTime', inplace=True)
+        self.pd['Load_kW'] = None
         self.pd['DirectIrradiance'] = None    # [W]  
         self.pd['PV_Power_kW'] = None  # [kW]
         self.pd['GridFlow'] = None           # [kW], if neg, then subtracted from grid, if pos the added to the grid
@@ -100,7 +108,6 @@ class SolarPowerModel():
 
     from ._powerflows import power_flow
     from ._powerflows import nettoProduction
-    from ._powerflows import power_flow_old
     
     from ._getters import get_dataset
     from ._getters import get_irradiance
@@ -130,3 +137,4 @@ class SolarPowerModel():
     from ._setters import set_irradiance_xlsx
     from ._setters import set_load_df
     from ._setters import set_load_xslx
+    from ._setters import set_pv_power_df
