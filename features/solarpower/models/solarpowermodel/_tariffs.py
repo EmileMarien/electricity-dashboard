@@ -25,10 +25,12 @@ def dynamic_tariff(self,A_injection=0.1,B_injection=-0.905,A_offtake=0.1,B_offta
 
 
     # Define a function to calculate the dynamic tariff for a single row
-    def calculate_tariff_row(row):
+    cost_list = []
+    cost_load_list = []
+    for _, row in self.pd.iterrows():
         grid_flow = row['GridFlow']
         grid_flow_load=row['GridFlow_Load']
-        dynamic_cost = row['BelpexFilter'] # euro per MWh to cent per kWh
+        dynamic_cost = row['Belpex'] # euro per MWh to cent per kWh
         if grid_flow < 0: # Energy is taken off the grid
             cost_per = A_offtake*dynamic_cost+B_offtake # cent cost per kWh
             cost = (-grid_flow)*(cost_per) # total cost
@@ -46,12 +48,12 @@ def dynamic_tariff(self,A_injection=0.1,B_injection=-0.905,A_offtake=0.1,B_offta
             cost_load = (-grid_flow_load)*(cost_per) # cent total profit 
         else:
             cost_load = 0
-        return (cost*0.01,cost_load*0.01) #TODO: add more clear that it is from cents
+        cost_list.append(cost*0.01)
+        cost_load_list.append(cost_load*0.01)#TODO: add more clear that it is from cents
 
     
-    self.pd['DynamicTariff','DynamicTariff_Load'] = self.pd.apply(
-        lambda row: calculate_tariff_row(row=row), axis=1
-    )
+    self.pd['DynamicTariff'] = cost_list
+    self.pd['DynamicTariff_Load'] = cost_load_list
     return None
 
 

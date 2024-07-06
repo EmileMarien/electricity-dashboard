@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -24,10 +25,10 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
     missing_columns = [col for col in required_columns if col not in self.pd.columns]
     assert not missing_columns, f"The following columns are missing: {', '.join(missing_columns)}"
 
-    # Check if no None values are present
 
     # convert charges to unit of frequency of the data
-    interval = 3600/pd.Timedelta(self.pd.index.freq).total_seconds() # hours to seconds
+    #interval = 3600/pd.Timedelta(self.pd.index.freq).total_seconds() if pd.Timedelta#(self.pd.index.freq).total_seconds() != 0 else 1 # hours to seconds #TODO: do we want to include intervalchanges or not?
+    interval=1
     max_charge = max_charge*interval
     max_EV_charge = max_EV_charge*interval
 
@@ -46,14 +47,12 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
     battery_flow_list = [] # List to store flow to and from the battery
     EV_charge_list = [] # List to store calculated EV charges
     EV_flow_list = [] # List to store flow to and from the EV
-    PV_power=[]
-    loss=[]
     # Iterate over DataFrame rows
     for _, row in self.pd.iterrows():
         print(f"Calculating power flows for row {counter}/{length}", end="\r")
         counter+=1
         PV_power = min(row['PV_Power_kW'], max_PV_input) #power_loss = row['PV_Power_kW'] - PV_power
-        loss+=row['PV_Power_kW'] - PV_power
+        loss=row['PV_Power_kW'] - PV_power #TODO: check all losses
         load = -row['Load_kW']
  
         excess_load=-max(0,-load-max_AC_power_output) #load that is immediately sent to the grid
@@ -71,7 +70,7 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
         # Append calculated values to lists
         battery_charge_list.append(new_charge_battery/interval) 
         grid_flow_list.append(grid_flow)
-        power_loss_list.append(0)
+        power_loss_list.append(loss)
         battery_flow_list.append(load_to_battery-load_from_battery) # Battery flow is positive when charging, negative when discharging
         EV_charge_list.append(new_charge_EV/interval)
         EV_flow_list.append(load_to_EV-load_to_battery)     # EV flow is positive when charging, negative when discharging
