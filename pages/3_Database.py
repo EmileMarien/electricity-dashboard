@@ -4,9 +4,9 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from google.cloud import firestore
 import streamlit as st
-from firestore_init import load_key, authenticate_to_firestore
-from css import apply_custom_css
-from menu import menu_with_redirect
+from core.firestore_init import load_key, authenticate_to_firestore
+from core.css import apply_custom_css
+from routes.menu import menu_with_redirect
 # Hide Streamlit's default menu and footer using custom CSS
 apply_custom_css()
 menu_with_redirect()

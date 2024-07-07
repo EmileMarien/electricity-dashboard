@@ -1,6 +1,6 @@
 import streamlit as st
-from css import apply_custom_css
-from menu import menu
+from core.css import apply_custom_css
+from routes.menu import menu
 
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
