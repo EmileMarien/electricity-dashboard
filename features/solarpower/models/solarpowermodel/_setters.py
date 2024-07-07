@@ -17,6 +17,23 @@ def set_load_df(self, df_load: pd.DataFrame):
         self.pd = self.pd.merge(df_load, how='outer', left_index=True, right_index=True)
     return None
 
+def set_load_slp_df(self, set:str,yearly_average:int):
+    if set == 'SLP_2022':
+        SLP=pd.read_csv('SLP_2022.csv')
+        SLP['DateTime'] = pd.to_datetime(SLP['DateTime'])
+        SLP.set_index('DateTime', inplace=True)
+        SLP['Load_kW'] = SLP['Load_kW']*yearly_average
+        self.pd['Load_kW'] = SLP['Load_kW']           # add data independent of the year  
+    elif set == 'SLP_2023':
+        SLP=pd.read_csv('SLP_2023.csv')
+        SLP['DateTime'] = pd.to_datetime(SLP['DateTime'])
+        SLP.set_index('DateTime', inplace=True)
+        SLP['Load_kW'] = SLP['Load_kW']*yearly_average
+        self.pd['Load_kW'] = SLP['Load_kW']
+    return None
+
+
+
 def append_load_df(self, df_load: pd.DataFrame):      
     assert 'Load_kW' in df_load.columns and 'DateTime' in df_load.columns
     if not (df_load.index.name == 'DateTime' and df_load.index.format() == 'datetime64[ns]'):
@@ -154,4 +171,17 @@ def append_pv_power_df(self,df_pv_power:pd.DataFrame):
     if 'DateTime' not in self.pd.columns:
         self.pd['DateTime'] = df_pv_power['DateTime']
         self.pd.set_index('DateTime', inplace=True)
+    return None
+
+def set_pv_power_spp_df(self,set:str,peak_power:int):
+    if set == 'SPP_2022':
+        SPP=pd.read_csv('SPP_2022.csv')
+        SPP['DateTime'] = pd.to_datetime(SPP['DateTime'])
+        SPP.set_index('DateTime', inplace=True)
+        self.pd['PV_Power_kW'] = SPP['PV_Power_kW']*peak_power #add independent of data
+    elif set == 'SPP_2023':
+        SPP=pd.read_csv('SPP_2023.csv')
+        SPP['DateTime'] = pd.to_datetime(SPP['DateTime'])
+        SPP.set_index('DateTime', inplace=True)
+        self.pd['PV_Power_kW'] = SPP['PV_Power_kW']*peak_power  #add independent of data
     return None
