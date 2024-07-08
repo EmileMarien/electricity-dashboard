@@ -1,9 +1,11 @@
+from features.solarpower.models.battery.battery import Battery
+from features.solarpower.models.inverter.inverter import Inverter
 import numpy as np
 import pandas as pd
 
 
 
-def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_batterypower: int = 5, max_PV_input: int = 10, max_EV_power: int = 3.7, max_EV_charge=82.3,EV_type:str='no_EV',battery_roundtrip_efficiency:float=97.5, battery_PeakPower:int=11):
+def refresh_power_flow(self, new_inverter:Inverter, new_battery:Battery):
     """
     Calculates power flows, how much is going to and from the battery and how much is being tapped from the grid
     #TODO: add units, PV_Power_kW and Load_kW are both in kW. Depending on the frequency of this data, a different amount is subtracted from the battery charge (in kWh?) (e.g. if 1h freq, the load of each line can be subtracted directly since 1kW*1h=1kWh. If in minutes, then 1kW*1min=1/60kWh) 
@@ -19,7 +21,21 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
     Returns:
         None
     """ 
-    
+    # Set the new inverter and battery
+    self.inverter=new_inverter
+    self.battery=new_battery
+    # Get the maximum values from the inverter and battery
+    max_AC_power_output=self.inverter.get_inverter_size_AC() #TODO: check if this is correct
+    max_DC_batterypower=self.inverter.get_inverter_maxbattery_DC() #TODO: check if this is correct
+    max_PV_input=self.inverter.get_inverter_maxsolar_DC() #TODO: check if this is correct
+    max_EV_power=self.battery.get_battery_peak_power() #TODO: check if this is correct
+    max_EV_charge=self.battery.get_battery_capacity() #TODO: check if this is correct
+    EV_type=self.battery.get_battery_type() #TODO: check if this is correct
+    battery_roundtrip_efficiency=self.battery.get_battery_roundtrip_efficiency() #TODO: check if this is correct
+    battery_peak_power=self.battery.get_battery_peak_power() #TODO: check if this is correct
+    max_charge=self.battery.get_battery_capacity() #TODO: check if this is correct
+
+
     # Check if all required columns are present
     required_columns = ['PV_Power_kW','Load_kW'] # [kW]
     missing_columns = [col for col in required_columns if col not in self.pd.columns]
@@ -59,7 +75,7 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
         load=load-excess_load #load that is left after the excess load is sent to the grid 
         load_to_EV =PV_power+load
         load_to_battery, new_charge_EV= EV(row=row,load_to_EV=load_to_EV,old_capacity=previous_charge_EV,EV_type=EV_type,max_EV_charge=max_EV_charge,max_EV_power=max_EV_power,freq=interval)
-        load_from_battery, new_charge_battery = battery(row,load_to_battery, previous_charge_battery,max_charge=max_charge,max_DC_batterypower=max_DC_batterypower,battery_PeakPower=battery_PeakPower,battery_roundtrip_efficiency=battery_roundtrip_efficiency)
+        load_from_battery, new_charge_battery = battery(row,load_to_battery, previous_charge_battery,max_charge=max_charge,max_DC_batterypower=max_DC_batterypower,battery_peak_power=battery_peak_power,battery_roundtrip_efficiency=battery_roundtrip_efficiency)
         grid_flow = load_from_battery
         
         grid_flow = min(grid_flow, max_AC_power_output) # Limit positive grid flow to max AC power output
@@ -85,14 +101,97 @@ def power_flow(self, max_charge: int = 8, max_AC_power_output: int = 5, max_DC_b
     self.pd['EVFlow'] = EV_flow_list
     return None
 
-def battery(row,load_to_battery:float,old_capacity:float,max_charge: int = 8, max_DC_batterypower: int = 2,battery_roundtrip_efficiency:float=97.5, battery_PeakPower:int=11):
+def refresh_power_flow(self):
+    """
+    Calculates power flows, how much is going to and from the battery and how much is being tapped from the grid
+    """
+
+    # Get the maximum values from the inverter and battery
+    max_AC_power_output = self.inverter.get_inverter_size_AC()  # TODO: check if this is correct
+    max_DC_batterypower = self.inverter.get_inverter_maxbattery_DC()  # TODO: check if this is correct
+    max_PV_input = self.inverter.get_inverter_maxsolar_DC()  # TODO: check if this is correct
+    max_EV_power = self.battery.get_battery_peak_power()  # TODO: check if this is correct
+    max_EV_charge = self.battery.get_battery_capacity()  # TODO: check if this is correct
+    EV_type = self.battery.get_battery_type()  # TODO: check if this is correct
+    battery_roundtrip_efficiency = self.battery.get_battery_roundtrip_efficiency()  # TODO: check if this is correct
+    battery_peak_power = self.battery.get_battery_peak_power()  # TODO: check if this is correct
+    max_charge = self.battery.get_battery_capacity()  # TODO: check if this is correct
+
+    # Check if all required columns are present
+    required_columns = ['PV_Power_kW', 'Load_kW']  # [kW]
+    missing_columns = [col for col in required_columns if col not in self.pd.columns]
+    assert not missing_columns, f"The following columns are missing: {', '.join(missing_columns)}"
+
+    # Convert charges to unit of frequency of the data
+    interval = 1
+    max_charge = max_charge * interval
+    max_EV_charge = max_EV_charge * interval
+
+    # Initialize variables
+    previous_charge_battery = 0.1 * max_charge  # Initialize as integer
+    previous_charge_EV = 0.5 * max_EV_charge  # Initialize as integer
+
+    # Initialize counters
+    length = self.pd.shape[0]
+    counter = 0
+
+    # Set lists to store calculated values
+    battery_charge_list = []  # List to store calculated battery charges
+    grid_flow_list = []  # List to store calculated grid flows
+    power_loss_list = []  # List to store calculated power loss
+    battery_flow_list = []  # List to store flow to and from the battery
+    EV_charge_list = []  # List to store calculated EV charges
+    EV_flow_list = []  # List to store flow to and from the EV
+
+    # Create a mask for rows where 'GridFlow' is NaN
+    mask = self.pd['GridFlow'].isna()
+
+    # Iterate over DataFrame rows
+    for idx, row in self.pd[mask].iterrows():
+        print(f"Calculating power flows for row {counter}/{length}", end="\r")
+        counter += 1
+        PV_power = min(row['PV_Power_kW'], max_PV_input)
+        loss = row['PV_Power_kW'] - PV_power  # TODO: check all losses
+        load = -row['Load_kW']
+
+        excess_load = -max(0, -load - max_AC_power_output)  # Load that is immediately sent to the grid
+        load = load - excess_load  # Load that is left after the excess load is sent to the grid
+        load_to_EV = PV_power + load
+        load_to_battery, new_charge_EV = EV(row=row, load_to_EV=load_to_EV, old_capacity=previous_charge_EV, EV_type=EV_type, max_EV_charge=max_EV_charge, max_EV_power=max_EV_power, freq=interval)
+        load_from_battery, new_charge_battery = battery(row, load_to_battery, previous_charge_battery, max_charge=max_charge, max_DC_batterypower=max_DC_batterypower, battery_peak_power=battery_peak_power, battery_roundtrip_efficiency=battery_roundtrip_efficiency)
+        grid_flow = load_from_battery
+
+        grid_flow = min(grid_flow, max_AC_power_output)  # Limit positive grid flow to max AC power output
+        grid_flow = grid_flow + excess_load  # Add the excess load to the grid flow
+        previous_charge_battery = new_charge_battery
+        previous_charge_EV = new_charge_EV
+
+        # Append calculated values to lists
+        battery_charge_list.append(new_charge_battery / interval)
+        grid_flow_list.append(grid_flow)
+        power_loss_list.append(loss)
+        battery_flow_list.append(load_to_battery - load_from_battery)  # Battery flow is positive when charging, negative when discharging
+        EV_charge_list.append(new_charge_EV / interval)
+        EV_flow_list.append(load_to_EV - load_to_battery)  # EV flow is positive when charging, negative when discharging
+
+    # Only update the DataFrame with calculated values for NaN rows
+    self.pd.loc[mask, 'BatteryCharge'] = battery_charge_list
+    self.pd.loc[mask, 'GridFlow'] = grid_flow_list
+    self.pd.loc[mask, 'GridFlow_Load'] = self.pd.loc[mask, 'Load_kW'] * 0.9  # TODO: add efficiencies of the inverter
+    self.pd.loc[mask, 'BatteryFlow'] = battery_flow_list
+    self.pd.loc[mask, 'EVCharge'] = EV_charge_list
+    self.pd.loc[mask, 'EVFlow'] = EV_flow_list
+
+    return None
+
+def battery(row,load_to_battery:float,old_capacity:float,max_charge: int = 8, max_DC_batterypower: int = 2,battery_roundtrip_efficiency:float=97.5, battery_peak_power:int=11):
     """
     Calculate load after the battery and the new battery capacity using the old capacity and load
     """
     #power_loss=0
     min_capacity=0#max_charge*0.1
     max_capacity=max_charge#max_charge*0.9
-    max_DC_batterypower=min(max_DC_batterypower,battery_PeakPower)
+    max_DC_batterypower=min(max_DC_batterypower,battery_peak_power)
     if load_to_battery > 0:  # Excess power from PV
         max_input=min(max_capacity-old_capacity,load_to_battery,max_DC_batterypower) #TODO: add function that it can be better to charge at a later time and move more to the grid now
         load_from_battery=load_to_battery-max_input

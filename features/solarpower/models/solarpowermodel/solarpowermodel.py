@@ -6,72 +6,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
+from features.solarpower.models.battery.battery import Battery
+from features.solarpower.models.solarpanel.solarpanel import SolarPanel
+from features.solarpower.models.inverter.inverter import Inverter
 from torch import sgn
 
 class SolarPowerModel():
     def __init__(self):
-        """
-        Initializes the PowerCalculations class with the given dataset
-        
-        Args:
-        file_path (str): The file path to the Excel file containing the dataset 
-        dataset (DataFrame): The dataset to be used for the calculations if file_path is not provided       
-        """
-        """
-        
-        
-        if file_path_combined != "":
-            # Use the dataset directly if provided
-            merged_df = pd.read_excel(file_path_combined)
-            print(merged_df)
-        elif (file_path_SPP != "") and (file_path_SLP != ""):
-            # Read the dataset from the Excel file
-            SPP = pd.read_excel(file_path_SPP,sheet_name='Ex-ante 2022 (IP8)')
-            # Check if all required columns are present
-            required_columns = ['UTC', '5414494999996']
-            missing_columns = [col for col in required_columns if col not in SPP.columns]
-            assert not missing_columns, f"The following columns are missing: {', '.join(missing_columns)}"
-            self.pd=SPP['UTC','5414494999996']
 
-            # Read the dataset from the Excel file
-            SLP = pd.read_excel(file_path_SLP,sheet_name='ENU_UTC')
-            # Check if all required columns are present
-            required_columns = ['UTC', 'EN']
-            missing_columns = [col for col in required_columns if col not in SLP.columns]
-            assert not missing_columns, f"The following columns are missing: {', '.join(missing_columns)}"
-            self.pd = self.pd.merge(SLP, on='UTC', how='outer') #TODO: check if this is the right way to merge & correct reading of info
-        else:
-            assert file_path_irradiance.endswith('.xlsx'), 'The file must be an Excel file'
-            assert file_path_load.endswith('.xlsx'), 'The file must be an Excel file'
-            
-            # Read the dataset from the Excel file
-            irradiance_df = pd.read_excel(file_path_irradiance)
-            
-            # Read the Excel file into a DataFrame
-            load_df = pd.read_excel(file_path_load)
-
-            # Assert that 'Load_kW' and 'DateTime' columns are present in the Excel file
-            assert 'DateTime' in irradiance_df.columns, "'DateTime' column not found in the Irradiance Excel file"
-            assert 'DateTime' in load_df.columns, "'DateTime' column not found in the Load Excel file"
-            
-            # Merge the DataFrame with the one read from excel
-            merged_df = pd.merge(irradiance_df, load_df, on='DateTime', how='outer') 
-        
-            # Check if all required columns are present
-            required_columns = ['DateTime', 'GlobRad', 'DiffRad', 'T_RV_degC', 'T_CommRoof_degC','Load_kW']
-            missing_columns = [col for col in required_columns if col not in merged_df.columns]
-            assert not missing_columns, f"The following columns are missing: {', '.join(missing_columns)}"
-
-
-            expected_columns = ['DateTime', 'Load_kW', 'GlobRad', 'DiffRad', 'T_RV_degC', 'T_CommRoof_degC']
-            self.pd=merged_df[expected_columns]
-        
-
-        
-        #Set a datetime index
-        self.pd.set_index('DateTime', inplace=True)
-        self.pd.index = pd.to_datetime(self.pd.index)
-        """
         self.pd=pd.DataFrame()
         # Initialize the columns that will be used for the calculations
         self.pd['DateTime'] = None
@@ -89,6 +31,12 @@ class SolarPowerModel():
         self.pd['BatteryFlow'] = None
         self.pd['DualTariff'] = None
         self.pd['DynamicTariff'] = None
+
+        self.solarpanel=SolarPanel()
+        self.T_STC=25
+        self.inverter=Inverter()
+        self.battery=Battery()
+
 
     # Imported methods
     from ._datacleaning import filter_data_by_date_interval
