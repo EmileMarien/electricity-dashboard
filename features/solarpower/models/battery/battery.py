@@ -1,3 +1,7 @@
+import firebase_admin
+from firebase_admin import credentials, firestore
+from google.cloud.firestore_v1.document import DocumentReference
+from google.cloud.firestore_v1.base_document import DocumentSnapshot
 
 class Battery:
     def __init__(self, battery_type=None, battery_cost=None, battery_lifetime=None, battery_capacity=None, battery_inverter=None,battery_Roundtrip_Efficiency=None, battery_PeakPower=None, battery_Degradation=None, battery_count=None,reference_id=None):
@@ -86,6 +90,8 @@ class Battery:
             self.battery_degradation = battery_types[battery_type]["battery_Degradation"]
             self.battery_count = battery_types[battery_type]["battery_count"]
 
+        self.reference_id = reference_id
+
 
     
     from .utils._getters import get_battery_inverter
@@ -97,4 +103,8 @@ class Battery:
     from .utils._getters import get_battery_degradation
     from .utils._getters import get_battery_count
 
-    from .utils._repository import from_snapshot
+
+    @staticmethod
+    def from_snapshot(snapshot: DocumentSnapshot):
+        data = snapshot.to_dict()
+        return Battery(**data, reference_id=snapshot.id)

@@ -11,6 +11,11 @@ from features.solarpower.models.solarpanel.solarpanel import SolarPanel
 from features.solarpower.models.inverter.inverter import Inverter
 from torch import sgn
 
+import firebase_admin
+from firebase_admin import credentials, firestore
+from google.cloud.firestore_v1.document import DocumentReference
+from google.cloud.firestore_v1.base_document import DocumentSnapshot
+
 class SolarPowerModel():
     def __init__(self, solarpanel=None, inverter=None, battery=None,reference_id=None):
         if solarpanel is None:
@@ -54,6 +59,8 @@ class SolarPowerModel():
         self.tariff_dynamic_B_injection=-0.905
         self.tariff_dynamic_A_offtake=0.1
         self.tariff_dynamic_B_offtake=1.1
+
+        self.reference_id=reference_id
 
     # Imported methods
     from .utils._datacleaning import filter_data_by_date_interval
@@ -110,4 +117,15 @@ class SolarPowerModel():
     from .utils._setters import append_irradiance_df
     from .utils._setters import append_load_df
 
-    from .utils._repository import from_snapshot
+
+
+    @staticmethod
+    def from_snapshot(snapshot: DocumentSnapshot):
+        """
+        Convert a Firestore snapshot to a SolarPowerModel object
+        
+        :param snapshot: Firestore snapshot
+        :return: SolarPowerModel object
+        """
+        data = snapshot.to_dict()
+        return SolarPowerModel(**data, reference_id=snapshot.id)

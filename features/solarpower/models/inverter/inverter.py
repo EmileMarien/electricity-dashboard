@@ -1,5 +1,10 @@
+import firebase_admin
+from firebase_admin import credentials, firestore
+from google.cloud.firestore_v1.document import DocumentReference
+from google.cloud.firestore_v1.base_document import DocumentSnapshot
+
 class Inverter:
-    def __init__(self, inverter_type=None, inverter_cost=None, inverter_size_AC=None, inverter_maxbattery_DC=None, inverter_lifetime=None, inverter_efficiency=None, inverter_maxsolar_DC=None):
+    def __init__(self, inverter_type=None, inverter_cost=None, inverter_size_AC=None, inverter_maxbattery_DC=None, inverter_lifetime=None, inverter_efficiency=None, inverter_maxsolar_DC=None, reference_id=None):
         """
         
 
@@ -166,6 +171,8 @@ class Inverter:
             self.inverter_maxsolar_DC = inverter_types[inverter_type]["inverter_maxsolar_DC"]
             self.inverter_lifetime = inverter_types[inverter_type]["inverter_lifetime"]
             self.inverter_efficiency = inverter_types[inverter_type]["inverter_efficiency"]
+
+        self.reference_id = reference_id
     # Imported methods
     
     from .utils._getters import get_inverter_cost
@@ -175,5 +182,9 @@ class Inverter:
     from .utils._getters import get_inverter_efficiency
     from .utils._getters import get_inverter_maxbattery_DC
 
-    from .utils._repository import from_snapshot
-    
+
+
+    @staticmethod
+    def from_snapshot(snapshot: DocumentSnapshot):
+        data = snapshot.to_dict()
+        return Inverter(**data, reference_id=snapshot.id)    

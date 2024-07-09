@@ -1,5 +1,10 @@
+import firebase_admin
+from firebase_admin import credentials, firestore
+from google.cloud.firestore_v1.document import DocumentReference
+from google.cloud.firestore_v1.base_document import DocumentSnapshot
+
 class SolarPanel:
-    def __init__(self, solar_panel_type=None, solar_panel_cost=None, solar_panel_count=None, solar_panel_lifetime=None, panel_surface=None, annual_degradation=None, panel_efficiency=None, temperature_coefficient=None):
+    def __init__(self, solar_panel_type=None, solar_panel_cost=None, solar_panel_count=None, solar_panel_lifetime=None, panel_surface=None, annual_degradation=None, panel_efficiency=None, temperature_coefficient=None, reference_id=None):
         """
         solar_panel_cost: cost of a single solar panel
         solar_panel_count: number of solar panels
@@ -88,6 +93,9 @@ class SolarPanel:
 
             self.total_panel_surface = self.panel_surface * self.solar_panel_count if self.panel_surface is not None and self.solar_panel_count is not None else None
     
+    
+        self.reference_id = reference_id
+
     from .utils._getters import get_solar_panel_cost
     from .utils._getters import get_solar_panel_count
     from .utils._getters import get_solar_panel_lifetime
@@ -98,4 +106,8 @@ class SolarPanel:
     from .utils._getters import get_total_solar_panel_cost
     from .utils._getters import get_total_panel_surface
 
-    from .utils._repository import from_snapshot
+
+    @staticmethod
+    def from_snapshot(snapshot: DocumentSnapshot):
+        data = snapshot.to_dict()
+        return SolarPanel(**data, reference_id=snapshot.id)
