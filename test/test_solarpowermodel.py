@@ -2,6 +2,7 @@ import unittest
 import pandas as pd
 from context import SolarPowerModel
 from context import fetch_electricity_prices
+from features.solarpower.models.battery.battery import Battery
 
 class TestSolarPowerModel(unittest.TestCase):
     def test_set_solar_power(self):
@@ -78,6 +79,26 @@ class TestSolarPowerModel(unittest.TestCase):
         #print(model.get_columns(columns=['Belpex']))
 
     # test calling SLP & SPP & when adding only single lines and converting to JSON
+
+    def test_databasefunctions(self):
+        model=SolarPowerModel(battery=Battery(battery_type="LG RESU Prime 16"))
+        json=model.__dict__
+        print(json)
+        # Creating a new instance of the SolarPowerModel
+        new_model = SolarPowerModel.__new__(SolarPowerModel)
+
+        # Updating the new instance's __dict__ with the saved state
+        new_model.__dict__.update(json)
+        self.assertEqual(model.__dict__, new_model.__dict__)
+        # Now the new_model should be an exact copy of the original model
+        #print(new_model.__dict__)
+        #print(model.battery.__dict__)
+        #print(new_model.battery.__dict__)
+        self.assertEqual(model.battery.__dict__, new_model.battery.__dict__)
+
+        self.assertEqual(model.reference_id==None)
+        model_with_id=model.from_snapshot("123")
+        self.assertEqual(model_with_id.reference_id=="123")
 
 if __name__ == '__main__':
     unittest.main()

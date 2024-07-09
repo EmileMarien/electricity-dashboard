@@ -168,10 +168,12 @@ class Inverter:
             self.inverter_efficiency = inverter_types[inverter_type]["inverter_efficiency"]
     # Imported methods
     
-    from ._getters import get_inverter_cost
-    from ._getters import get_inverter_size_AC
-    from ._getters import get_inverter_maxsolar_DC
-    from ._getters import get_inverter_lifetime
-    from ._getters import get_inverter_efficiency
-    from ._getters import get_inverter_maxbattery_DC
+    from .utils._getters import get_inverter_cost
+    from .utils._getters import get_inverter_size_AC
+    from .utils._getters import get_inverter_maxsolar_DC
+    from .utils._getters import get_inverter_lifetime
+    from .utils._getters import get_inverter_efficiency
+    from .utils._getters import get_inverter_maxbattery_DC
+
+    from .utils._repository import from_snapshot
     

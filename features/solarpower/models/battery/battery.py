@@ -1,6 +1,6 @@
+
 class Battery:
-    def __init__(self, battery_type=None, battery_cost=None, battery_lifetime=None, battery_capacity=None, battery_inverter=None,
-                 battery_Roundtrip_Efficiency=None, battery_PeakPower=None, battery_Degradation=None, battery_count=None):
+    def __init__(self, battery_type=None, battery_cost=None, battery_lifetime=None, battery_capacity=None, battery_inverter=None,battery_Roundtrip_Efficiency=None, battery_PeakPower=None, battery_Degradation=None, battery_count=None,reference_id=None):
         """
         battery_cost: cost of a single battery
         battery_lifetime: lifetime of a single battery
@@ -86,11 +86,15 @@ class Battery:
             self.battery_degradation = battery_types[battery_type]["battery_Degradation"]
             self.battery_count = battery_types[battery_type]["battery_count"]
 
-    from ._getters import get_battery_inverter
-    from ._getters import get_battery_cost
-    from ._getters import get_battery_lifetime
-    from ._getters import get_battery_capacity
-    from ._getters import get_battery_roundtrip_efficiency
-    from ._getters import get_battery_peak_power
-    from ._getters import get_battery_degradation
-    from ._getters import get_battery_count
+
+    
+    from .utils._getters import get_battery_inverter
+    from .utils._getters import get_battery_cost
+    from .utils._getters import get_battery_lifetime
+    from .utils._getters import get_battery_capacity
+    from .utils._getters import get_battery_roundtrip_efficiency
+    from .utils._getters import get_battery_peak_power
+    from .utils._getters import get_battery_degradation
+    from .utils._getters import get_battery_count
+
+    from .utils._repository import from_snapshot

@@ -12,7 +12,13 @@ from features.solarpower.models.inverter.inverter import Inverter
 from torch import sgn
 
 class SolarPowerModel():
-    def __init__(self,solarpanel:SolarPanel=SolarPanel(solar_panel_type="Jinko"), inverter:Inverter=Inverter(inverter_type="Sungrow_3"), battery:Battery=Battery(battery_type="LG RESU 2.9")):
+    def __init__(self, solarpanel=None, inverter=None, battery=None,reference_id=None):
+        if solarpanel is None:
+            solarpanel = SolarPanel(solar_panel_type="Jinko")
+        if inverter is None:
+            inverter = Inverter(inverter_type="Sungrow_3")
+        if battery is None:
+            battery = Battery(battery_type="LG RESU 2.9")
 
         self.pd=pd.DataFrame()
         # Initialize the columns that will be used for the calculations
@@ -50,51 +56,58 @@ class SolarPowerModel():
         self.tariff_dynamic_B_offtake=1.1
 
     # Imported methods
-    from ._datacleaning import filter_data_by_date_interval
-    from ._datacleaning import interpolate_columns
-    from ._datacleaning import find_duplicate_indices
-    from ._datacleaning import empty_column
-    from ._datacleaning import update_column
+    from .utils._datacleaning import filter_data_by_date_interval
+    from .utils._datacleaning import interpolate_columns
+    from .utils._datacleaning import find_duplicate_indices
+    from .utils._datacleaning import empty_column
+    from .utils._datacleaning import update_column
 
-    from ._pvpower import refresh_PV_Power_kW, update_PV_Power_kW
-    from ._pvpower import PV_Power_kW_SPP
+    from .utils._pvpower import refresh_PV_Power_kW, update_PV_Power_kW
+    from .utils._pvpower import PV_Power_kW_SPP
 
-    from .OLD._visualisations import plot_columns
-    from .OLD._visualisations import plot_dataframe
-    from .OLD._visualisations import plot_series
+    #from .OLD._visualisations import plot_columns
+    #from .OLD._visualisations import plot_dataframe
+    #from .OLD._visualisations import plot_series
     
-    from ._directirradiance import calculate_direct_irradiance
-    from ._directirradiance import calculate_solar_angles
+    from .utils._directirradiance import calculate_direct_irradiance
+    from .utils._directirradiance import calculate_solar_angles
 
-    from ._powerflows import refresh_power_flow
-    from ._powerflows import update_power_flow
-    from ._powerflows import nettoProduction
-    
-    from ._getters import get_dataset
-    from ._getters import get_irradiance
-    from ._getters import get_load
-    from ._getters import get_direct_irradiance
-    from ._getters import get_PV_Power_kW
-    from ._getters import get_energy_TOT
-    from ._getters import get_average_per_hour
-    from ._getters import get_grid_power
-    from ._getters import get_columns
-    from ._getters import get_monthly_peaks
-    from ._getters import get_total_injection_and_consumption
-    from ._getters import get_average_per_minute_day
-    from ._getters import get_total_cost
+    from .utils._powerflows import refresh_power_flow
+    from .utils._powerflows import update_power_flow
+    from .utils._powerflows import nettoProduction
 
-    from ._export import export_dataframe_to_excel
+    from .utils._getters import get_dataset
+    from .utils._getters import get_irradiance
+    from .utils._getters import get_load
+    from .utils._getters import get_direct_irradiance
+    from .utils._getters import get_PV_Power_kW
+    from .utils._getters import get_energy_TOT
+    from .utils._getters import get_average_per_hour
+    from .utils._getters import get_grid_power
+    from .utils._getters import get_columns
+    from .utils._getters import get_monthly_peaks
+    from .utils._getters import get_total_injection_and_consumption
+    from .utils._getters import get_average_per_minute_day
+    from .utils._getters import get_total_cost
 
-    from ._EVload import add_EV_load
+    from .utils._export import export_dataframe_to_excel
 
-    from ._tariffs import capacity_tariff
-    from ._tariffs import refresh_dual_tariff, update_dual_tariff, refresh_dynamic_tariff, update_dynamic_tariff
+    from .utils._EVload import add_EV_load
 
-    from ._setters import set_belpex_df
-    from ._setters import set_belpex_xlsx
-    from ._setters import set_irradiance_df
-    from ._setters import set_irradiance_xlsx
-    from ._setters import set_load_df
-    from ._setters import set_load_xslx
-    from ._setters import set_pv_power_df
+    from .utils._tariffs import capacity_tariff
+    from .utils._tariffs import refresh_dual_tariff, update_dual_tariff, refresh_dynamic_tariff, update_dynamic_tariff
+
+    from .utils._setters import set_belpex_df
+    from .utils._setters import set_belpex_xlsx
+    from .utils._setters import set_irradiance_df
+    from .utils._setters import set_irradiance_xlsx
+    from .utils._setters import set_load_df
+    from .utils._setters import set_load_xslx
+    from .utils._setters import set_pv_power_df
+    from .utils._setters import append_pv_power_df
+    from .utils._setters import set_pv_power_spp_df
+    from .utils._setters import append_belpex_df
+    from .utils._setters import append_irradiance_df
+    from .utils._setters import append_load_df
+
+    from .utils._repository import from_snapshot

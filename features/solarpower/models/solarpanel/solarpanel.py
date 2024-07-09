@@ -83,21 +83,19 @@ class SolarPanel:
             self.panel_efficiency = solar_panel_types[solar_panel_type]["panel_efficiency"]
             self.temperature_coefficient = solar_panel_types[solar_panel_type]["temperature_coefficient"]
                         
-        self.calculate_total_cost()
-        self.calculate_total_surface()
+ 
+            self.total_solar_panel_cost = self.solar_panel_cost * self.solar_panel_count if self.solar_panel_cost is not None and self.solar_panel_count is not None else None
 
-    def calculate_total_cost(self):
-        self.total_solar_panel_cost = self.solar_panel_cost * self.solar_panel_count if self.solar_panel_cost is not None and self.solar_panel_count is not None else None
-
-    def calculate_total_surface(self):
-        self.total_panel_surface = self.panel_surface * self.solar_panel_count if self.panel_surface is not None and self.solar_panel_count is not None else None
+            self.total_panel_surface = self.panel_surface * self.solar_panel_count if self.panel_surface is not None and self.solar_panel_count is not None else None
     
-    from ._getters import get_solar_panel_cost
-    from ._getters import get_solar_panel_count
-    from ._getters import get_solar_panel_lifetime
-    from ._getters import get_panel_surface
-    from ._getters import get_annual_degradation
-    from ._getters import get_panel_efficiency
-    from ._getters import get_temperature_coefficient
-    from ._getters import get_total_solar_panel_cost
-    from ._getters import get_total_panel_surface
+    from .utils._getters import get_solar_panel_cost
+    from .utils._getters import get_solar_panel_count
+    from .utils._getters import get_solar_panel_lifetime
+    from .utils._getters import get_panel_surface
+    from .utils._getters import get_annual_degradation
+    from .utils._getters import get_panel_efficiency
+    from .utils._getters import get_temperature_coefficient
+    from .utils._getters import get_total_solar_panel_cost
+    from .utils._getters import get_total_panel_surface
+
+    from .utils._repository import from_snapshot
