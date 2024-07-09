@@ -1,5 +1,5 @@
 class SolarPanel:
-    def __init__(self,solar_panel_cost, solar_panel_count, solar_panel_lifetime, panel_surface, annual_degradation, panel_efficiency, temperature_coefficient, solar_panel_type:str=None):
+    def __init__(self, solar_panel_type=None, solar_panel_cost=None, solar_panel_count=None, solar_panel_lifetime=None, panel_surface=None, annual_degradation=None, panel_efficiency=None, temperature_coefficient=None):
         """
         solar_panel_cost: cost of a single solar panel
         solar_panel_count: number of solar panels
@@ -87,17 +87,17 @@ class SolarPanel:
         self.calculate_total_surface()
 
     def calculate_total_cost(self):
-        self.total_solar_panel_cost = self.solar_panel_cost * self.solar_panel_count
+        self.total_solar_panel_cost = self.solar_panel_cost * self.solar_panel_count if self.solar_panel_cost is not None and self.solar_panel_count is not None else None
 
     def calculate_total_surface(self):
-        self.total_panel_surface = self.panel_surface * self.solar_panel_count
+        self.total_panel_surface = self.panel_surface * self.solar_panel_count if self.panel_surface is not None and self.solar_panel_count is not None else None
     
-    from _getters import get_solar_panel_cost
-    from _getters import get_solar_panel_count
-    from _getters import get_solar_panel_lifetime
-    from _getters import get_panel_surface
-    from _getters import get_annual_degradation
-    from _getters import get_panel_efficiency
-    from _getters import get_temperature_coefficient
-    from _getters import get_total_solar_panel_cost
-    from _getters import get_total_panel_surface
+    from ._getters import get_solar_panel_cost
+    from ._getters import get_solar_panel_count
+    from ._getters import get_solar_panel_lifetime
+    from ._getters import get_panel_surface
+    from ._getters import get_annual_degradation
+    from ._getters import get_panel_efficiency
+    from ._getters import get_temperature_coefficient
+    from ._getters import get_total_solar_panel_cost
+    from ._getters import get_total_panel_surface

@@ -1,14 +1,25 @@
 class Battery:
-    def __init__(self, battery_cost, battery_lifetime, battery_capacity, battery_inverter,
-                 battery_Roundtrip_Efficiency, battery_PeakPower, battery_Degradation, battery_count, battery_type: str=None):
+    def __init__(self, battery_type=None, battery_cost=None, battery_lifetime=None, battery_capacity=None, battery_inverter=None,
+                 battery_Roundtrip_Efficiency=None, battery_PeakPower=None, battery_Degradation=None, battery_count=None):
+        """
+        battery_cost: cost of a single battery
+        battery_lifetime: lifetime of a single battery
+        battery_capacity: capacity of a single battery
+        battery_inverter: inverter choice for battery
+        battery_Roundtrip_Efficiency: roundtrip efficiency of a single battery
+        battery_PeakPower: peak power of a single battery
+        battery_Degradation: degradation of a single battery
+        battery_count: number of batteries
+        battery_type: type of battery, choose from the following: "LG RESU 2.9", "LG RESU 5.9", "LG RESU Prime 9.6", "LG RESU Prime 16"
+        """
         if battery_type is None:
             self.battery_cost = battery_cost
             self.battery_lifetime = battery_lifetime
             self.battery_capacity = battery_capacity
             self.battery_inverter = battery_inverter
-            self.battery_Roundtrip_Efficiency = battery_Roundtrip_Efficiency
-            self.battery_PeakPower = battery_PeakPower
-            self.battery_Degradation = battery_Degradation
+            self.battery_roundtrip_efficiency = battery_Roundtrip_Efficiency
+            self.battery_peak_power = battery_PeakPower
+            self.battery_degradation = battery_Degradation
             self.battery_count = battery_count
         else:
 
@@ -69,10 +80,17 @@ class Battery:
             self.battery_lifetime = battery_types[battery_type]["battery_lifetime"]
             self.battery_capacity = battery_types[battery_type]["battery_capacity"]
             self.battery_inverter = battery_types[battery_type]["battery_inverter"]
-            self.battery_Roundtrip_Efficiency = battery_types[battery_type]["battery_Roundtrip_Efficiency"]
-            self.battery_PeakPower = battery_types[battery_type]["battery_PeakPower"]
+            self.battery_roundtrip_efficiency = battery_types[battery_type]["battery_Roundtrip_Efficiency"]
+            self.battery_peak_power = battery_types[battery_type]["battery_PeakPower"]
     
-            self.battery_Degradation = battery_types[battery_type]["battery_Degradation"]
+            self.battery_degradation = battery_types[battery_type]["battery_Degradation"]
             self.battery_count = battery_types[battery_type]["battery_count"]
 
-    from _getters import get_battery_inverter, get_battery_cost, get_battery_lifetime, get_battery_capacity, get_battery_Roundtrip_Efficiency, get_battery_PeakPower, get_battery_Degradation, get_battery_count
+    from ._getters import get_battery_inverter
+    from ._getters import get_battery_cost
+    from ._getters import get_battery_lifetime
+    from ._getters import get_battery_capacity
+    from ._getters import get_battery_roundtrip_efficiency
+    from ._getters import get_battery_peak_power
+    from ._getters import get_battery_degradation
+    from ._getters import get_battery_count

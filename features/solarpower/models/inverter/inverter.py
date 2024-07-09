@@ -1,10 +1,20 @@
 class Inverter:
-    def __init__(self, inverter_cost, inverter_size_AC, inverter_maxbattery_DC, inverter_lifetime, inverter_efficiency, inverter_maxsolar_DC,inverter_type:str=None):
+    def __init__(self, inverter_type=None, inverter_cost=None, inverter_size_AC=None, inverter_maxbattery_DC=None, inverter_lifetime=None, inverter_efficiency=None, inverter_maxsolar_DC=None):
+        """
+        
 
+        
+        inverter_cost: cost of a single inverter
+        inverter_size_AC: size of a single inverter
+        inverter_maxbattery_DC: maximum battery DC of a single inverter
+        inverter_maxsolar_DC: maximum solar DC of a single inverter
+        inverter_lifetime: lifetime of a single inverter
+        inverter_efficiency: efficiency of a single inverter
+        inverter_type: type of inverter, choose from the following: "Sungrow_3", "Sungrow_3.6", "Sungrow_4", "Sungrow_5", "Fronius_3", "Fronius_3.6", "Fronius_4", "Fronius_4.6", "Fronius_5", "Sungrow SG2.0RS-S", "Sungrow SG2.5RS-S", "Sungrow SG3.0RS-S", "Sungrow SG3.0RS", "Sungrow SG3.6RS", "Sungrow SG4.0RS", "Sungrow SG5.0RS"
+        """
         if inverter_type is None:
             self.inverter_cost = inverter_cost
             self.inverter_size_AC = inverter_size_AC
-            self.inverter_maxsolar_DC = inverter_maxbattery_DC
             self.inverter_maxsolar_DC = inverter_maxsolar_DC
             self.inverter_lifetime = inverter_lifetime
             self.inverter_efficiency = inverter_efficiency
@@ -150,19 +160,18 @@ class Inverter:
                 },
             }
         
-            self.inverter_cost = inverter_types[inverter_type].inverter_cost
-            self.inverter_size_AC = inverter_types[inverter_type].inverter_size_AC
-            self.inverter_maxsolar_DC = inverter_types[inverter_type].inverter_maxsolar_DC
-            self.inverter_maxsolar_DC = inverter_types[inverter_type].inverter_maxsolar_DC
-            self.inverter_lifetime = inverter_types[inverter_type].inverter_lifetime
-            self.inverter_efficiency = inverter_types[inverter_type].inverter_efficiency
-            self.inverter_maxbattery_DC = inverter_types[inverter_type].inverter_maxbattery_DC
+            self.inverter_cost = inverter_types[inverter_type]["inverter_cost"]
+            self.inverter_size_AC = inverter_types[inverter_type]["inverter_size_AC"]
+            self.inverter_maxbattery_DC = inverter_types[inverter_type]["inverter_maxbattery_DC"]
+            self.inverter_maxsolar_DC = inverter_types[inverter_type]["inverter_maxsolar_DC"]
+            self.inverter_lifetime = inverter_types[inverter_type]["inverter_lifetime"]
+            self.inverter_efficiency = inverter_types[inverter_type]["inverter_efficiency"]
     # Imported methods
     
-    from _getters import get_inverter_cost
-    from _getters import get_inverter_size_AC
-    from _getters import get_inverter_maxsolar_DC
-    from _getters import get_inverter_lifetime
-    from _getters import get_inverter_efficiency
-    from _getters import get_inverter_maxbattery_DC
+    from ._getters import get_inverter_cost
+    from ._getters import get_inverter_size_AC
+    from ._getters import get_inverter_maxsolar_DC
+    from ._getters import get_inverter_lifetime
+    from ._getters import get_inverter_efficiency
+    from ._getters import get_inverter_maxbattery_DC
     

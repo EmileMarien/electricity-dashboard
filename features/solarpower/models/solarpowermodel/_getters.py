@@ -271,8 +271,15 @@ def get_total_cost(self,tariff: str='DynamicTariff',interval_str:str="10min",pur
     Calculate the electricity cost for a given solar panel configuration and tariff.
 
     Args:
+    tariff (str): The type of tariff to be used for the calculation. Choose between: 'DualTariff', 'DynamicTariff', 'DualTariff_Load', 'DynamicTariff_Load'. Default: 'DynamicTariff'
     fixed_component_dual [€/year]
     fixed_component_dynamic [€/year]
+    purchase_rate_injection [€/kWh]
+    purchase_rate_consumption [€/kWh]
+    data_management_cost [€/year]
+    capacity_rate [€/kW]
+    excise_duty_energy_contribution_rate [€/kWh]
+    include_PV (bool): Whether to include the PV generated power in the calculation. Default: True
     """
 
     start_date:str=self.pd.index[0] #TODO: only set these when nothing else is given with parameters

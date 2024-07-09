@@ -51,16 +51,31 @@ class TestSolarPowerModel(unittest.TestCase):
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00','2022-01-01 02:00:00'],
             'Belpex': [100, 200, 300]
         }))
-        print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex',]))
-        model.power_flow()
-        model.dynamic_tariff()
-        print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex', 'GridFlow', 'DynamicTariff','GridFlow_Load','DynamicTariff_Load']))
-        self.assertEqual(round(model.get_total_cost()), 1285)
+        #print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex',]))
+        model.update_power_flow()
+        model.update_dynamic_tariff()
+        #print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex', 'GridFlow', 'DynamicTariff','GridFlow_Load','DynamicTariff_Load']))
+        self.assertEqual(round(model.get_total_cost()), 1301)
+        model.append_pv_power_df(pd.DataFrame({
+            'DateTime': ['2022-01-01 03:00:00', '2022-01-01 04:00:00'],
+            'PV_Power_kW': [400, 500]
+        }))
+        print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex', 'GridFlow']))
+        model.append_belpex_df(pd.DataFrame({
+            'DateTime': ['2022-01-01 03:00:00', '2022-01-01 04:00:00'],
+            'Belpex': [400, 500]
+        }))
+        model.append_load_df(pd.DataFrame({
+            'DateTime': ['2022-01-01 03:00:00', '2022-01-01 04:00:00'],
+            'Load_kW': [400, 500]
+        }))
+        model.update_power_flow()
+        
 
     def test_belpex_fetch_input(self):
         model=SolarPowerModel()
         model.set_belpex_df(fetch_electricity_prices())
-        print(model.get_columns(columns=['Belpex']))
+        #print(model.get_columns(columns=['Belpex']))
 
     # test calling SLP & SPP & when adding only single lines and converting to JSON
 

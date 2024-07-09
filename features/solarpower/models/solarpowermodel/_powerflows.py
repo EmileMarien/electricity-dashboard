@@ -101,7 +101,7 @@ def refresh_power_flow(self, new_inverter:Inverter, new_battery:Battery):
     self.pd['EVFlow'] = EV_flow_list
     return None
 
-def refresh_power_flow(self):
+def update_power_flow(self):
     """
     Calculates power flows, how much is going to and from the battery and how much is being tapped from the grid
     """
@@ -112,7 +112,7 @@ def refresh_power_flow(self):
     max_PV_input = self.inverter.get_inverter_maxsolar_DC()  # TODO: check if this is correct
     max_EV_power = self.battery.get_battery_peak_power()  # TODO: check if this is correct
     max_EV_charge = self.battery.get_battery_capacity()  # TODO: check if this is correct
-    EV_type = self.battery.get_battery_type()  # TODO: check if this is correct
+    EV_type = "no_EV"  # TODO: check if this is correct
     battery_roundtrip_efficiency = self.battery.get_battery_roundtrip_efficiency()  # TODO: check if this is correct
     battery_peak_power = self.battery.get_battery_peak_power()  # TODO: check if this is correct
     max_charge = self.battery.get_battery_capacity()  # TODO: check if this is correct
@@ -148,6 +148,9 @@ def refresh_power_flow(self):
 
     # Iterate over DataFrame rows
     for idx, row in self.pd[mask].iterrows():
+        assert row['PV_Power_kW'] is not None, f"PV_Power_kW is None for row {idx}"
+        assert row['Load_kW'] is not None, f"Load_kW is None for row {idx}"
+        
         print(f"Calculating power flows for row {counter}/{length}", end="\r")
         counter += 1
         PV_power = min(row['PV_Power_kW'], max_PV_input)

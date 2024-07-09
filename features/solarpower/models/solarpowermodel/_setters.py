@@ -92,9 +92,13 @@ def append_irradiance_df(self,df_irradiance:pd.DataFrame):
     return None
 
 def set_belpex_df(self,df_belpex:pd.DataFrame):
-    assert 'Belpex' in df_belpex.columns and 'DateTime' in df_belpex.columns
-    if not (df_belpex.index.name == 'DateTime' and df_belpex.index.format() == 'datetime64[ns]'):
+    print(df_belpex.columns)
+    assert 'Belpex' in df_belpex.columns
+    if not df_belpex.index.name == 'DateTime':
+        assert 'DateTime' in df_belpex.columns
         df_belpex.set_index('DateTime', inplace=True)
+
+    if not df_belpex.index.dtype == 'datetime64[ns]':
         df_belpex.index = pd.to_datetime(df_belpex.index)
 
     self.pd['Belpex'] = df_belpex['Belpex']
