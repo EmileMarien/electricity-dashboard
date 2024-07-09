@@ -32,6 +32,11 @@ def set_load_df(self, df_load: pd.DataFrame):
     # Set the previous data to nan
     missing_indices_2=self.pd.index.difference(df_load.index)
     self.pd.loc[missing_indices_2, 'Load_kW'] = None
+
+    # Set all other columns to nan
+    for column in self.pd.columns:
+        if column != 'Load_kW' and column != 'DateTime' and column != 'DirectIrradiance' and column != 'PV_Power_kW' and column != 'Belpex':
+            self.pd.loc[column] = None
     return None
 
 def set_load_slp_df(self, set:str,yearly_average:int):
@@ -110,6 +115,11 @@ def set_irradiance_df(self,df_irradiance:pd.DataFrame):
     # Set the previous data to nan
     missing_indices_2=self.pd.index.difference(df_irradiance.index)
     self.pd.loc[missing_indices_2, 'DirectIrradiance'] = None
+
+    # Set all other columns to nan
+    for column in self.pd.columns:
+        if column != 'Load_kW' and column != 'DateTime' and column != 'DirectIrradiance' and column != 'Belpex':
+            self.pd.loc[column] = None
     return None
 
 def append_irradiance_df(self,df_irradiance:pd.DataFrame):
@@ -169,6 +179,11 @@ def set_belpex_df(self,df_belpex:pd.DataFrame):
     # Set the previous data to nan
     missing_indices_2=self.pd.index.difference(df_belpex.index)
     self.pd.loc[missing_indices_2, 'Belpex'] = None
+
+    # Set all other columns to nan
+    for column in self.pd.columns:
+        if column != 'Load_kW' and column != 'DateTime' and column != 'DirectIrradiance' and column != 'PV_Power_kW':
+            self.pd.loc[column] = None
     return None
 
 def append_belpex_df(self,df_belpex:pd.DataFrame):
@@ -261,6 +276,11 @@ def set_pv_power_df(self,df_pv_power:pd.DataFrame):
     # Set the previous data to nan
     missing_indices_2=self.pd.index.difference(df_pv_power.index)
     self.pd.loc[missing_indices_2, 'PV_Power_kW'] = None
+
+    # Set all other columns to nan
+    for column in self.pd.columns:
+        if column != 'Load_kW' and column != 'DateTime' and column != 'PV_Power_kW' and column != 'Belpex':
+            self.pd.loc[column] = None
     return None
 
 

@@ -40,6 +40,7 @@ class TestSolarPowerModel(unittest.TestCase):
         }))
         #print(model.get_columns(columns=['Belpex']))
         self.assertEqual(model.get_columns(columns=['Belpex']).shape, (3, 1))
+        #TODO: test setters better (removal of other columns, etc)
     
     def test_get_total_cost(self):
         model = SolarPowerModel()
