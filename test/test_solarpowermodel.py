@@ -56,7 +56,7 @@ class TestSolarPowerModel(unittest.TestCase):
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00','2022-01-01 02:00:00'],
             'Belpex': [100, 200, 300]
         }))
-        #print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex',]))
+        #print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex']))
         model.update_power_flow()
         model.update_dynamic_tariff()
         #print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex', 'GridFlow', 'DynamicTariff','GridFlow_Load','DynamicTariff_Load']))
@@ -65,7 +65,7 @@ class TestSolarPowerModel(unittest.TestCase):
             'DateTime': ['2022-01-01 03:00:00', '2022-01-01 04:00:00'],
             'PV_Power_kW': [400, 500]
         }))
-        print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex', 'GridFlow']))
+        #print(model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex', 'GridFlow']))
         model.append_belpex_df(pd.DataFrame({
             'DateTime': ['2022-01-01 03:00:00', '2022-01-01 04:00:00'],
             'Belpex': [400, 500]
@@ -87,7 +87,7 @@ class TestSolarPowerModel(unittest.TestCase):
     def test_databasefunctions(self):
         model=SolarPowerModel(battery=Battery(battery_type="LG RESU Prime 16"))
         json=model.__dict__
-        print(json)
+        #print(json)
         # Creating a new instance of the SolarPowerModel
         new_model = SolarPowerModel.__new__(SolarPowerModel)
 

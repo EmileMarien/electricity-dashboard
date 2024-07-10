@@ -1,4 +1,5 @@
 import pandas as pd
+from features.solarpower.controllers.controller_solarpower import ControllerSolarPower
 import streamlit as st
 import time
 import numpy as np
@@ -37,9 +38,5 @@ progress_bar.empty()
 st.button("Re-run")
 
 
-model = SolarPowerModel()
-model.set_load_df(pd.DataFrame({
-    'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00'],
-    'Load_kW': [100, 200]
-}))
-st.write(model.get_dataset())
+controller= ControllerSolarPower()
+st.write(controller.get_gridflow())

@@ -36,7 +36,7 @@ def set_load_df(self, df_load: pd.DataFrame):
     # Set all other columns to nan
     for column in self.pd.columns:
         if column != 'Load_kW' and column != 'DateTime' and column != 'DirectIrradiance' and column != 'PV_Power_kW' and column != 'Belpex':
-            self.pd.loc[column] = None
+            self.pd[column] = None
     return None
 
 def set_load_slp_df(self, set:str,yearly_average:int):
@@ -119,7 +119,7 @@ def set_irradiance_df(self,df_irradiance:pd.DataFrame):
     # Set all other columns to nan
     for column in self.pd.columns:
         if column != 'Load_kW' and column != 'DateTime' and column != 'DirectIrradiance' and column != 'Belpex':
-            self.pd.loc[column] = None
+            self.pd[column] = None
     return None
 
 def append_irradiance_df(self,df_irradiance:pd.DataFrame):
@@ -165,8 +165,9 @@ def set_belpex_df(self,df_belpex:pd.DataFrame):
     common_indices = self.pd.index.intersection(df_belpex.index)
 
     # Update self.pd with the values from df_belpex at the common indices
-    self.pd.loc[common_indices, 'Belpex'] = df_belpex.loc[common_indices, 'Belpex']
-
+    #print(df_belpex.loc[common_indices, 'Belpex'].astype(float) )
+    self.pd.loc[common_indices, 'Belpex'] = df_belpex.loc[common_indices, 'Belpex'].astype(float)    
+    #print(self.pd['Belpex'])
     # Identify missing indices in df1 that are present in df2 and add them
     missing_indices = df_belpex.index.difference(self.pd['Belpex'].index)
     missing_data = df_belpex.loc[missing_indices]
@@ -182,8 +183,8 @@ def set_belpex_df(self,df_belpex:pd.DataFrame):
 
     # Set all other columns to nan
     for column in self.pd.columns:
-        if column != 'Load_kW' and column != 'DateTime' and column != 'DirectIrradiance' and column != 'PV_Power_kW':
-            self.pd.loc[column] = None
+        if column != 'Load_kW' and column != 'DateTime' and column != 'DirectIrradiance' and column != 'PV_Power_kW' and column != 'Belpex':
+            self.pd[column] = None
     return None
 
 def append_belpex_df(self,df_belpex:pd.DataFrame):
@@ -280,7 +281,7 @@ def set_pv_power_df(self,df_pv_power:pd.DataFrame):
     # Set all other columns to nan
     for column in self.pd.columns:
         if column != 'Load_kW' and column != 'DateTime' and column != 'PV_Power_kW' and column != 'Belpex':
-            self.pd.loc[column] = None
+            self.pd[column] = None
     return None
 
 
