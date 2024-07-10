@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 import time
 from features.solarpower.models.pricefetching.pricefetching import fetch_electricity_prices
-from features.solarpower.repositories.data_repository_belpex import add_belpex_to_firestore
+from features.solarpower.repositories.data_repository_belpex import DataRepositoryBelpex
 from core.firestore_init import load_key, authenticate_to_firestore
 from routes.menu import menu_with_redirect
 st.set_page_config(page_title="Dashboard", page_icon="🌍")
@@ -194,7 +194,7 @@ data=fetch_electricity_prices()
 st.write(data)
 # Authenticate to Firestore
 db = authenticate_to_firestore(load_key())
-st.write(add_belpex_to_firestore(belpex=data,db=db))
+st.write(DataRepositoryBelpex.add_belpex_to_firestore(belpex=data,db=db))
 
 # -----------------------------------------------------------------------------
 # Refresh data every minute

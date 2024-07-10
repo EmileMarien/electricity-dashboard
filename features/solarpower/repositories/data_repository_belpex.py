@@ -5,12 +5,13 @@ from google.cloud import firestore
 import pytz
 #from solarpowermodel.solarpowermodel import SolarPowerModel
 
-class DataRepositorySolarPower():
+class DataRepositoryBelpex():
   def __init__(self,firestore_reference:firestore.Client):
       self.db=firestore_reference 
 
   
 
+  @staticmethod
   def add_belpex_to_firestore(self, belpex:pd.DataFrame):
     """
     Adds the BELPEX prices to Firestore for the specified meter_id.
