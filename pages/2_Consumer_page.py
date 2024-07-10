@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import pytz
 import time
-from features.pricefetching.DataRetrieval import fetch_electricity_prices, add_belpex_to_firestore
+from features.solarpower.models import fetch_electricity_prices, add_belpex_to_firestore
 from core.firestore_init import load_key, authenticate_to_firestore
 from routes.menu import menu_with_redirect
 st.set_page_config(page_title="Dashboard", page_icon="🌍")
