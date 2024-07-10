@@ -1,10 +1,10 @@
 import pandas as pd
+from features.solarpower.controllers.controller_solarpower import ControllerSolarPower
 import streamlit as st
 import time
 import numpy as np
 from core.css import apply_custom_css
 from routes.menu import menu_with_redirect
-from solarpowermodel.solarpowermodel import SolarPowerModel
 st.set_page_config(page_title="Plotting Demo", page_icon="📈")
 # Hide Streamlit's default menu and footer using custom CSS
 menu_with_redirect()
@@ -37,9 +37,5 @@ progress_bar.empty()
 st.button("Re-run")
 
 
-model = SolarPowerModel()
-model.set_load_df(pd.DataFrame({
-    'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00'],
-    'Load_kW': [100, 200]
-}))
-st.write(model.get_dataset())
+controller= ControllerSolarPower()
+st.write(controller.get_gridflow())

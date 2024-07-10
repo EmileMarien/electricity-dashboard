@@ -3,3 +3,4 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 from features.solarpower.models.pricefetching.pricefetching import fetch_electricity_prices
+from features.solarpower.models.syntheticprofilefetching.syntheticprofilefetching import SLP_xls_to_pd, SPP_xls_to_pd

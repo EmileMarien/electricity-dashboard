@@ -1,10 +1,6 @@
-import pytz
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from datetime import datetime
-from google.cloud import firestore
-from solarpowermodel.solarpowermodel import SolarPowerModel
 def fetch_electricity_prices():
     """
     Fetches the electricity prices from the Elexys website and returns as a DataFrame.
@@ -53,9 +49,21 @@ def fetch_electricity_prices():
     # Create a DataFrame
     df = pd.DataFrame({
         'DateTime': datetimes,
-        'Price': prices
+        'Belpex': prices
     })
+
+
+    # Function to convert Belpex column to numerical data
+    def convert_to_numeric(value):
+        return float(value.replace('€', '').replace(',', '.').strip())
+
+    # Apply the function to the Belpex column
+    df['Belpex'] = df['Belpex'].apply(convert_to_numeric)
     
+    # set datetimeindex
+    df['DateTime'] = pd.to_datetime(df['DateTime'])
+    df.set_index('DateTime', inplace=True)
+
     return df
 
 

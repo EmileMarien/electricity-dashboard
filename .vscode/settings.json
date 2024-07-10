@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "./features/powercalculations"
+        "./features/powercalculations",
+        "./features/solarpower/models"
     ]
 }
