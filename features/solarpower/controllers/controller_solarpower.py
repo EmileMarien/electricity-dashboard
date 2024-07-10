@@ -1,5 +1,6 @@
 
 
+import pandas as pd
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 
 
