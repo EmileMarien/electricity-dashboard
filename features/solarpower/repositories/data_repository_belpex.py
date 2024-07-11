@@ -16,13 +16,17 @@ class DataRepositoryBelpex():
     self.collection.document('belpex').set(belpex.to_dict())
     return None
 
-      
   def get_belpex(self):
-      """
+    belpex_dict = self.collection.document('belpex').get().to_dict()
+    return pd.DataFrame.from_dict(belpex_dict)
+  
+  """
+  def get_belpex(self):
+      
       Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'
       
       :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
-      """
+      
       # Reference the document
       doc_ref = self.collection.document('belpex')
       doc = doc_ref.get()
@@ -38,7 +42,7 @@ class DataRepositoryBelpex():
           return df
       else:
           return ValueError(f"Document '{doc_ref.id}' does not exist in Firestore")
-
+"""
 """
   final CollectionReference collection =
       FirebaseFirestore.instance.collection('unitType');

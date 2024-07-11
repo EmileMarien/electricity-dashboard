@@ -35,8 +35,8 @@ class DataRepositorySLP:
         :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
         :return: str indicating the number of new datapoints added to Firestore
         """
+        """
         data_to_add = []
-        utc_plus_2 = pytz.timezone('Europe/Brussels')  # Define the timezone for the timestamps
 
         for index, row in SLP.iterrows():
             if index.minute == 0:  # Only add data for full hours
@@ -44,10 +44,15 @@ class DataRepositorySLP:
                 # Prepare the data to add
                 data = {
                     'DateTime': timestamp,
-                    'Load_kW': row['Load_SLP_kW']
+                    'Load_kW': row['Load_kW']
                 }
                 data_to_add.append(data)
-
+                """
+        # Only add data for full hours
+        self.collection.document('SLP').set(SLP.loc[SLP.index.minute == 0].to_dict())
+        return None
+        
+        """
         # Update Firestore with new datapoints in chunks
         if data_to_add:
             chunk_size = 10000  # Maximum number of elements per chunk
@@ -58,6 +63,8 @@ class DataRepositorySLP:
                 doc_ref.set({
                     'datapoints': firestore.ArrayUnion(chunk)
                 }, merge=True)
+        """
+
 
         return f"Added {len(data_to_add)} new datapoints to Firestore under 'syntheticprofiles/SLP'"
 
@@ -67,6 +74,9 @@ class DataRepositorySLP:
         Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'
         
         :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
+        """
+        slp_dict = self.collection.document('SLP').get().to_dict()
+        return pd.DataFrame.from_dict(slp_dict)
         """
         # Reference the document
         doc_ref = self.collection.document('SLP_2022')
@@ -82,7 +92,7 @@ class DataRepositorySLP:
                 df.set_index('DateTime', inplace=True)
             return df
         else:
-            return ValueError(f"Document '{doc_ref.id}' does not exist in Firestore")
+            return ValueError(f"Document '{doc_ref.id}' does not exist in Firestore")"""
 
 
 """
