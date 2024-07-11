@@ -25,9 +25,20 @@ class SolarPowerState():
         return SLP
     
     def load_model(self):
-        self.solarpowermodel=self.data_repository_solarmodel.get_model()
+        self.solarpowermodel=self.data_repository_solarmodel.get_model(reference_id=self.solarpowermodel.get_reference_id() if self.solarpowermodel.get_reference_id() is not None else 'muFpAMmhxutpRvwnG1M4')
     
     def upload_model(self):
-        return self.data_repository_solarmodel.add_model(model=self.solarpowermodel)
+        id=self.data_repository_solarmodel.add_model(model=self.solarpowermodel)
+        if self.solarpowermodel.get_reference_id() is None:
+            self.solarpowermodel.set_reference_id(id)
+        return None
+    
+    def update_belpex(self):
+        self.solarpowermodel.append_belpex_df(self.data_repository_belpex.get_belpex())
+        self.data_repository_solarmodel.update_model(self.solarpowermodel,fields_to_update={'pd':self.solarpowermodel.pd.to_dict()})
+
+    def update_SLP(self):
+        self.solarpowermodel.append_load_df(self.data_repository_SLP.get_SLP().rename(columns={'timestamp':'DateTime','value':'Load_kW'})
+        self.data_repository_solarmodel.update_model(self.solarpowermodel,fields_to_update={'pd':self.solarpowermodel.pd.to_dict()})
 
         

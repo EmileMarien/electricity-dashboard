@@ -18,7 +18,7 @@ def SLP_xls_to_pd(file_path: str) -> pd.DataFrame:
     if df['UTC'].dtype != 'datetime64[ns]':
         raise Exception("DateTime column is not of type datetime")
     df=df[['UTC','EN']]
-    df.rename(columns={'UTC':'DateTime','EN':'Load_SLP_kW'},inplace=True)
+    df.rename(columns={'UTC':'DateTime','EN':'Load_kW'},inplace=True)
     # Set the DateTime column as the index
     df.set_index('DateTime', inplace=True)
 
@@ -47,7 +47,7 @@ def SPP_xls_to_pd(file_path: str) -> pd.DataFrame:
     if df['UTC'].dtype != 'datetime64[ns]':
         raise Exception("DateTime column is not of type datetime")
     df=df[['UTC','5414488001704']]
-    df.rename(columns={'UTC':'DateTime','5414488001704':'PV_Power_SPP_kW'},inplace=True)
+    df.rename(columns={'UTC':'DateTime','5414488001704':'PV_Power_kW'},inplace=True)
     # Set the DateTime column as the index
     df.set_index('DateTime', inplace=True)
 

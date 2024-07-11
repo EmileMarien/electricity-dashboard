@@ -34,3 +34,8 @@ class ControllerSolarPower:
 
     def upload_model(self):
         return self.state.upload_model()
+    
+    def get_SLP_belpex(self):
+        self.state.update_belpex()
+        self.state.update_SLP()
+        return self.state.data_repository_SLP.get_SLP()

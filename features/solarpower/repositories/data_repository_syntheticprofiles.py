@@ -43,8 +43,8 @@ class DataRepositorySLP:
                 timestamp = index
                 # Prepare the data to add
                 data = {
-                    'timestamp': timestamp,
-                    'value': row['Load_SLP_kW']
+                    'DateTime': timestamp,
+                    'Load_kW': row['Load_SLP_kW']
                 }
                 data_to_add.append(data)
 

@@ -28,6 +28,23 @@ class DataRepositorySolarModel():
       self.collection.document(model.get_reference_id()).set(model.to_dict())
       return model.get_reference_id()
   
+  def update_model(self,model:SolarPowerModel,fields_to_update:dict=dict()):
+      """
+      Updates a model in the firestore database
+
+      Args:
+
+      model: SolarPowerModel
+      fields_to_update: dict
+      """
+      
+      if fields_to_update=={}:
+          self.collection.document(model.get_reference_id()).set(model.to_dict())
+      
+      else:
+        self.collection.document(model.get_reference_id()).update(fields_to_update)
+      return None
+  
   def get_model(self,reference_id:str):
       model=SolarPowerModel.from_snapshot(self.collection.document(reference_id).get()) #If using to_dict, the reference_id is not included and nested dictionaries are not converted to objects
       return model

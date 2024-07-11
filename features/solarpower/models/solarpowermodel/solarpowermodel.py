@@ -117,7 +117,7 @@ class SolarPowerModel():
     from .utils._setters import append_belpex_df
     from .utils._setters import append_irradiance_df
     from .utils._setters import append_load_df
-
+    from .utils._setters import set_reference_id
 
 
     @staticmethod
