@@ -2,11 +2,13 @@
 
 import pandas as pd
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
+from features.solarpower.states.solarpowerstate import SolarPowerState
 
 
 class ControllerSolarPower:
     def __init__(self):
-        self.model = SolarPowerModel()
+        self.model = SolarPowerModel() #TODO: model should not be accessible from here
+        self.state = SolarPowerState()
         
     def get_gridflow(self):
         self.model.set_load_df(pd.DataFrame({
@@ -23,3 +25,6 @@ class ControllerSolarPower:
         }))
         self.model.update_power_flow()
         return self.model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex'])
+    
+    def refresh_SLP(self):
+        self.state.set_SLP()
