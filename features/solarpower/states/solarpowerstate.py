@@ -9,7 +9,7 @@ from features.solarpower.repositories.data_repository_solarmodel import DataRepo
 from features.solarpower.repositories.data_repository_syntheticprofiles import DataRepositorySLP
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 from features.solarpower.models.syntheticprofilefetching.syntheticprofilefetching import SLP_xls_to_pd
-from pricefetching import pricefetching
+from features.solarpower.models.pricefetching.pricefetching import fetch_electricity_prices
 
 
 class SolarPowerState():
@@ -35,7 +35,7 @@ class SolarPowerState():
         return None
     
     def update_belpex(self):
-        prices=pricefetching.fetch_electricity_prices()
+        prices=fetch_electricity_prices()
         self.data_repository_belpex.update(prices)
 
         self.solarpowermodel.append_belpex_df(prices)
