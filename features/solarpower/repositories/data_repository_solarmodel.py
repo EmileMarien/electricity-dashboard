@@ -3,7 +3,7 @@ import pandas as pd
 from google.cloud import firestore
 import pytz
 
-from solarpowermodel.solarpowermodel import SolarPowerModel
+from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 #TODO: first, add and update model to/in firestore
 #TODO: think about which functions to add in state (update powerflow when setting new data, etc)
 
