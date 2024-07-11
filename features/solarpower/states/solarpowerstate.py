@@ -20,3 +20,4 @@ class SolarPowerState():
     def set_SLP(self):
         SLP=SPP_xls_to_pd('data/slp_enu_cons.xls')
         self.data_repository_SLP.add_SLP(SLP=SLP)
+        return SLP

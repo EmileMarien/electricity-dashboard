@@ -27,4 +27,4 @@ class ControllerSolarPower:
         return self.model.get_columns(columns=['Load_kW', 'PV_Power_kW', 'Belpex'])
     
     def refresh_SLP(self):
-        self.state.set_SLP()
+        return self.state.set_SLP()
