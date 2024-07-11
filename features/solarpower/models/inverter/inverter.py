@@ -188,3 +188,14 @@ class Inverter:
     def from_snapshot(snapshot: DocumentSnapshot):
         data = snapshot.to_dict()
         return Inverter(**data, reference_id=snapshot.id)    
+
+    def to_dict(self):
+        return {
+            "inverter_cost": self.inverter_cost,
+            "inverter_size_AC": self.inverter_size_AC,
+            "inverter_maxsolar_DC": self.inverter_maxsolar_DC,
+            "inverter_lifetime": self.inverter_lifetime,
+            "inverter_efficiency": self.inverter_efficiency,
+            "inverter_maxbattery_DC": self.inverter_maxbattery_DC,
+            "reference_id": self.reference_id
+        }

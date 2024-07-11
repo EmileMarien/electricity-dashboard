@@ -1,7 +1,8 @@
+import json
 import unittest
 import pandas as pd
 from context import SolarPowerModel
-from context import fetch_electricity_prices, SolarPowerState
+from context import fetch_electricity_prices
 from features.solarpower.models.battery.battery import Battery
 from google.cloud.firestore_v1.base_document import DocumentSnapshot
 from google.cloud.firestore_v1.document import DocumentReference
@@ -87,13 +88,17 @@ class TestSolarPowerModel(unittest.TestCase):
 
     def test_databasefunctions(self):
         model=SolarPowerModel(battery=Battery(battery_type="LG RESU Prime 16"))
-        json=model.__dict__
+        model.set_load_df(pd.DataFrame({
+            'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00'],
+            'Load_kW': [100, 200]
+        }))
+        json_file=model.__dict__
         #print(json)
         # Creating a new instance of the SolarPowerModel
         new_model = SolarPowerModel.__new__(SolarPowerModel)
 
         # Updating the new instance's __dict__ with the saved state
-        new_model.__dict__.update(json)
+        new_model.__dict__.update(json_file)
         self.assertEqual(model.__dict__, new_model.__dict__)
         # Now the new_model should be an exact copy of the original model
         #print(new_model.__dict__)
@@ -102,10 +107,12 @@ class TestSolarPowerModel(unittest.TestCase):
         self.assertEqual(model.battery.__dict__, new_model.battery.__dict__)
 
         self.assertEqual(model.reference_id, None)
+        model.from_dict(model.to_dict())
+
         #model_with_id=model.from_snapshot(snapshot=DocumentSnapshot(reference=DocumentReference(id="123"), data={"battery_type":"LG RESU Prime 16"}, exists=True,read_time=None,create_time=None,update_time=None))
         #self.assertEqual(model_with_id.reference_id,"123") TODO: check with real firestore link
     
-    def test_solarpowerstate():
+    #def test_solarpowerstate():
         #state=SolarPowerState()
         #state.set_SLP()
 

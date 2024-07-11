@@ -111,3 +111,15 @@ class SolarPanel:
     def from_snapshot(snapshot: DocumentSnapshot):
         data = snapshot.to_dict()
         return SolarPanel(**data, reference_id=snapshot.id)
+    
+    def to_dict(self):
+        return {
+            "solar_panel_cost": self.solar_panel_cost,
+            "solar_panel_count": self.solar_panel_count,
+            "solar_panel_lifetime": self.solar_panel_lifetime,
+            "panel_surface": self.panel_surface,
+            "annual_degradation": self.annual_degradation,
+            "panel_efficiency": self.panel_efficiency,
+            "temperature_coefficient": self.temperature_coefficient,
+            "reference_id": self.reference_id
+        }

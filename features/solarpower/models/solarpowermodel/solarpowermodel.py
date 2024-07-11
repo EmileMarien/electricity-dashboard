@@ -129,4 +129,56 @@ class SolarPowerModel():
         :return: SolarPowerModel object
         """
         data = snapshot.to_dict()
+
+        # Handle nested dictionaries
+        battery_data = data.get('battery')  # Retrieve nested 'battery' dictionary
+
+        # Convert nested 'battery' dictionary to a Battery object if present
+        if battery_data:
+            battery = Battery(**battery_data)
+            data['battery'] = battery  # Replace dictionary with Battery object
+
+        inverter_data = data.get('inverter')  # Retrieve nested 'inverter' dictionary
+
+        # Convert nested 'inverter' dictionary to an Inverter object if present
+        if inverter_data:
+            inverter = Inverter(**inverter_data)
+            data['inverter'] = inverter
+        
+        solarpanel_data = data.get('solarpanel')  # Retrieve nested 'solarpanel' dictionary
+
+        # Convert nested 'solarpanel' dictionary to a SolarPanel object if present
+        if solarpanel_data:
+            solarpanel = SolarPanel(**solarpanel_data)
+            data['solarpanel'] = solarpanel
+
+        # Create SolarPowerModel object with all data
         return SolarPowerModel(**data, reference_id=snapshot.id)
+        
+    def to_dict(self):
+        """
+        Convert the SolarPowerModel object to a dictionary
+        
+        :return: dict
+        """
+        return {
+            'solarpanel': self.solarpanel.to_dict(),
+            'inverter': self.inverter.to_dict(),
+            'battery': self.battery.to_dict(),
+            'reference_id': self.reference_id,
+            "pd": self.pd.to_dict(),
+        }
+
+    @staticmethod
+    def from_dict(data: dict):
+        """
+        Convert a dictionary to a SolarPowerModel object
+        
+        :param data: dict
+        """
+        solarpanel = SolarPanel(**data['solarpanel'])
+        inverter = Inverter(**data['inverter'])
+        battery = Battery(**data['battery'])
+        reference_id = data['reference_id']
+        pd = pd.DataFrame(data['pd'])
+        return SolarPowerModel(solarpanel=solarpanel, inverter=inverter, battery=battery, reference_id=reference_id, pd=pd)

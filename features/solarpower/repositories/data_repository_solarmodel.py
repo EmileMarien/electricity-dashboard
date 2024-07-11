@@ -23,13 +23,11 @@ class DataRepositorySolarModel():
       reference_id: str
       """
       if model.get_reference_id() is None:
-          return self.collection.add(model.__dict__)
+          return self.collection.add(model.to_dict())
 
-      self.collection.document(model.get_reference_id()).set(model.__dict__)
+      self.collection.document(model.get_reference_id()).set(model.to_dict())
       return model.get_reference_id()
   
   def get_model(self,reference_id:str):
-      model_dict=self.collection.document(reference_id).get().to_dict()
-      model=SolarPowerModel()
-      model.__dict__=model_dict
+      model=SolarPowerModel.from_snapshot(self.collection.document(reference_id).get()) #If using to_dict, the reference_id is not included and nested dictionaries are not converted to objects
       return model

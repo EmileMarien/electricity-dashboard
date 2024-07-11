@@ -4,26 +4,27 @@ from google.cloud.firestore_v1.document import DocumentReference
 from google.cloud.firestore_v1.base_document import DocumentSnapshot
 
 class Battery:
-    def __init__(self, battery_type=None, battery_cost=None, battery_lifetime=None, battery_capacity=None, battery_inverter=None,battery_Roundtrip_Efficiency=None, battery_PeakPower=None, battery_Degradation=None, battery_count=None,reference_id=None):
+    def __init__(self, battery_type=None, battery_cost=None, battery_lifetime=None, battery_capacity=None, battery_inverter=None,battery_roundtrip_efficiency=None, battery_peak_power=None, battery_degradation=None, battery_count=None,reference_id=None):
         """
         battery_cost: cost of a single battery
         battery_lifetime: lifetime of a single battery
         battery_capacity: capacity of a single battery
-        battery_inverter: inverter choice for battery
-        battery_Roundtrip_Efficiency: roundtrip efficiency of a single battery
-        battery_PeakPower: peak power of a single battery
-        battery_Degradation: degradation of a single battery
-        battery_count: number of batteries
-        battery_type: type of battery, choose from the following: "LG RESU 2.9", "LG RESU 5.9", "LG RESU Prime 9.6", "LG RESU Prime 16"
+        battery_inverter: inverter of a single battery
+        battery_roundtrip_efficiency: roundtrip efficiency of a single battery
+        battery_peak_power: peak power of a single battery
+
+        battery_degradation: degradation of a single battery
+
         """
+
         if battery_type is None:
             self.battery_cost = battery_cost
             self.battery_lifetime = battery_lifetime
             self.battery_capacity = battery_capacity
             self.battery_inverter = battery_inverter
-            self.battery_roundtrip_efficiency = battery_Roundtrip_Efficiency
-            self.battery_peak_power = battery_PeakPower
-            self.battery_degradation = battery_Degradation
+            self.battery_roundtrip_efficiency = battery_roundtrip_efficiency
+            self.battery_peak_power = battery_peak_power
+            self.battery_degradation = battery_degradation
             self.battery_count = battery_count
         else:
 
@@ -108,3 +109,16 @@ class Battery:
     def from_snapshot(snapshot: DocumentSnapshot):
         data = snapshot.to_dict()
         return Battery(**data, reference_id=snapshot.id)
+
+    def to_dict(self):
+        return {
+            "battery_cost": self.battery_cost,
+            "battery_lifetime": self.battery_lifetime,
+            "battery_capacity": self.battery_capacity,
+            "battery_inverter": self.battery_inverter,
+            "battery_roundtrip_efficiency": self.battery_roundtrip_efficiency,
+            "battery_peak_power": self.battery_peak_power,
+            "battery_degradation": self.battery_degradation,
+            "battery_count": self.battery_count,
+            "reference_id": self.reference_id
+        }
