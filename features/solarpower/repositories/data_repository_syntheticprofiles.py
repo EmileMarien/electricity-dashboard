@@ -49,7 +49,7 @@ class DataRepositorySLP:
                 data_to_add.append(data)
                 """
         # Only add data for full hours
-        self.collection.document('SLP').set(SLP.loc[SLP.index.minute == 0].to_dict())
+        self.collection.document('SLP').set(SLP.to_dict())
         return None
         
         """

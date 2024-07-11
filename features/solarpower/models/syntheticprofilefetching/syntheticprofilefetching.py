@@ -22,7 +22,7 @@ def SLP_xls_to_pd(file_path: str) -> pd.DataFrame:
     # Set the DateTime column as the index
     df.set_index('DateTime', inplace=True)
 
-    return df
+    return df.loc[df.index.minute==0]
 
 def SPP_xls_to_pd(file_path: str) -> pd.DataFrame:
     """
@@ -51,4 +51,4 @@ def SPP_xls_to_pd(file_path: str) -> pd.DataFrame:
     # Set the DateTime column as the index
     df.set_index('DateTime', inplace=True)
 
-    return df   
+    return df.loc[df.index.minute==0]
