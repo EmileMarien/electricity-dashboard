@@ -50,6 +50,7 @@ class DataRepositorySLP:
                 """
         # Only add data for full hours
         assert SLP is not None, "SLP is empty"
+        print(SLP)
         self.collection.document('SLP_2022').set(SLP.to_dict())
         return None
         
