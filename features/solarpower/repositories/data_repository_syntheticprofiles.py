@@ -43,9 +43,8 @@ class DataRepositorySLP:
         for index, row in SLP.iterrows():
             
             timestamp= index
-            price_str = row['Load_SLP_kW']
             """
-            
+            TODO: check if necessary
             # Parse timestamp (adjust according to your specific datetime format)
             timestamp_naive = datetime.strptime(timestamp_str, '%d/%m/%Y %H:%M:%S')
 
@@ -58,7 +57,7 @@ class DataRepositorySLP:
             # Prepare the data to add
             data = {
                 'timestamp': timestamp,
-                'value': float(price_str.replace(',', '.').strip().replace('€', ''))  # Assuming price needs to be stored as a float
+                'value': row['Load_SLP_kW']
             }
             data_to_add.append(data)
 
