@@ -13,7 +13,7 @@ from firebase_admin import credentials, firestore
 class DataRepositorySLP:
     def __init__(self,firestore_reference:firestore.Client):
         self.db=firestore_reference 
-        self.collection = firestore.client().collection('core').document('syntheticprofiles').collection('SLP')
+        self.collection = self.db.collection('core').document('syntheticprofiles').collection('SLP')
     
     """
     def get_stream(self):
