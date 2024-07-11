@@ -39,17 +39,18 @@ class DataRepositorySLP:
         utc_plus_2 = pytz.timezone('Europe/Brussels')  # Define the timezone for the timestamps
 
         for index, row in SLP.iterrows():
-            timestamp = index
-            # Prepare the data to add
-            data = {
-                'timestamp': timestamp,
-                'value': row['Load_SLP_kW']
-            }
-            data_to_add.append(data)
+            if index.minute == 0:  # Only add data for full hours
+                timestamp = index
+                # Prepare the data to add
+                data = {
+                    'timestamp': timestamp,
+                    'value': row['Load_SLP_kW']
+                }
+                data_to_add.append(data)
 
         # Update Firestore with new datapoints in chunks
         if data_to_add:
-            chunk_size = 5000  # Maximum number of elements per chunk
+            chunk_size = 10000  # Maximum number of elements per chunk
             for i in range(0, len(data_to_add), chunk_size):
                 chunk = data_to_add[i:i + chunk_size]
                 # Reference a specific document, e.g., 'SLP_2022_chunk_{i // chunk_size}'
