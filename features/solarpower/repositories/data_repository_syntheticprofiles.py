@@ -54,7 +54,7 @@ class DataRepositorySLP:
             for i in range(0, len(data_to_add), chunk_size):
                 chunk = data_to_add[i:i + chunk_size]
                 # Reference a specific document, e.g., 'SLP_2022_chunk_{i // chunk_size}'
-                doc_ref = self.collection.document(f'SLP_2022_chunk_{i // chunk_size}')
+                doc_ref = self.collection.document(f'SLP_2022') 
                 doc_ref.set({
                     'datapoints': firestore.ArrayUnion(chunk)
                 }, merge=True)
@@ -63,14 +63,26 @@ class DataRepositorySLP:
 
 
     def get_SLP(self):
-        try:
-            document_snapshot = self.collection.get()
-            if document_snapshot.exists:
-                return document_snapshot.to_dict()
-            return None  # Return None if user with given ID doesn't exist
-        except Exception as e:
-            print(f"Error getting user by ID: {e}")
-            return None
+        """
+        Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'
+        
+        :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
+        """
+        # Reference the document
+        doc_ref = self.collection.document('SLP_2022')
+        doc = doc_ref.get()
+
+        if doc.exists:
+            data = doc.to_dict().get('datapoints', [])
+            # Create a DataFrame from the data
+            df = pd.DataFrame(data)
+            # Ensure that the 'timestamp' is the index and it is in DateTime format
+            if 'timestamp' in df.columns:
+                df['DateTime'] = pd.to_datetime(df['timestamp'])
+                df.set_index('DateTime', inplace=True)
+            return df
+        else:
+            return ValueError(f"Document '{doc_ref.id}' does not exist in Firestore")
 
 
 """
