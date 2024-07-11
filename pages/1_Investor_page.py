@@ -36,16 +36,24 @@ st.write(
 # Streamlit widgets automatically run the script from top to bottom. Since
 # this button is not connected to any other logic, it just causes a plain
 # rerun.
-st.button("Re-run")
+
 
 
 controller= ControllerSolarPower()
-st.write(controller.get_gridflow())
 
-#Display the last 15 gridflow and load values
-st.write(controller.get_gridflow().tail(15))
+# Write SLP to firestore
+if st.button("Refresh SLP"):
+    st.write(controller.refresh_SLP())
 
 # only upload if button is clicked
 if st.button("Upload model"):
     st.write(controller.upload_model())
+
+if st.button("update model"):
+    st.write(controller.update_model())
+
+st.write(controller.get_SLP_belpex().tail(15))
+
+#Display the last 15 gridflow and load values
+st.write(controller.get_gridflow().tail(15))
 

@@ -9,6 +9,7 @@ from features.solarpower.repositories.data_repository_solarmodel import DataRepo
 from features.solarpower.repositories.data_repository_syntheticprofiles import DataRepositorySLP
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 from features.solarpower.models.syntheticprofilefetching.syntheticprofilefetching import SLP_xls_to_pd
+from pricefetching import pricefetching
 
 
 class SolarPowerState():
@@ -34,11 +35,23 @@ class SolarPowerState():
         return None
     
     def update_belpex(self):
-        self.solarpowermodel.append_belpex_df(self.data_repository_belpex.get_belpex())
-        self.data_repository_solarmodel.update_model(self.solarpowermodel,fields_to_update={'pd':self.solarpowermodel.pd.to_dict()})
+        prices=pricefetching.fetch_electricity_prices()
+        self.data_repository_belpex.update(prices)
+
+        self.solarpowermodel.append_belpex_df(prices)
+
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={'pd':self.solarpowermodel.pd.to_dict()})
 
     def update_SLP(self):
-        self.solarpowermodel.append_load_df(self.data_repository_SLP.get_SLP().rename(columns={'timestamp':'DateTime','value':'Load_kW'})
-        self.data_repository_solarmodel.update_model(self.solarpowermodel,fields_to_update={'pd':self.solarpowermodel.pd.to_dict()})
+        self.solarpowermodel.append_load_df(self.data_repository_SLP.get_SLP(),SLP=True)
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={'pd':self.solarpowermodel.pd.to_dict()})
+    
+    def get_columns(self,columns):
+        return self.solarpowermodel.get_columns(columns=columns)
+    
+    def change_model(self,Battery=None,Inverter=None,SolarPanel=None):
+        self.solarpowermodel.refresh_power_flow(Battery=Battery,Inverter=Inverter,SolarPanel=SolarPanel)
+
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={'battery':self.solarpowermodel.battery.to_dict(),'inverter':self.solarpowermodel.inverter.to_dict(),'solarpanel':self.solarpowermodel.solarpanel.to_dict(),'pd':self.solarpowermodel.pd.to_dict()})
 
         

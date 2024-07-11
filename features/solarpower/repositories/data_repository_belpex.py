@@ -11,54 +11,12 @@ class DataRepositoryBelpex():
       self.collection=self.db.collection('prices')
   
 
-  @staticmethod
-  def add_belpex_to_firestore(self, belpex:pd.DataFrame):
-    """
-    Adds the BELPEX prices to Firestore for the specified meter_id.
 
-    Args:
-        belpex (pd.DataFrame): DataFrame containing BELPEX prices.
-        meter_id (str): The ID of the meter to add the prices to.
-        db: Firestore client instance.
+  def update(self, belpex:pd.DataFrame):
+    self.collection.document('belpex').set(belpex.to_dict())
+    return None
 
-    Returns:
-        str: A message indicating the number of data points added.
-    """
-
-    #latest_DateTime= get_latest_belpex_DateTime_from_firestore(db)
-    data_to_add = []
-    # Define the timezone for the DateTimes
-    utc_plus_2 = pytz.timezone('Europe/Brussels')  # Adjust to the specific timezone name for UTC+2 if needed
-
-    for index, row in belpex.iterrows():
-        DateTime_str = row['DateTime']
-        price_str = row['Price']
-
-        # Parse DateTime (adjust according to your specific datetime format)
-        DateTime_naive = datetime.strptime(DateTime_str, '%d/%m/%Y %H:%M:%S')
-
-        # Localize the naive datetime object to UTC+2
-        DateTime_utc_plus_2 = utc_plus_2.localize(DateTime_naive)
-
-        # Convert to UTC
-        DateTime_utc = DateTime_utc_plus_2.astimezone(pytz.utc)
-
-        # Prepare the data to add
-        data = {
-            'DateTime': DateTime_utc,
-            'Belpex': float(price_str.replace(',', '.').strip().replace('€', ''))  # Assuming price needs to be stored as a float
-        }
-        data_to_add.append(data)
-
-    # Update Firestore with new datapoints
-    if data_to_add:
-        prices_ref = self.collection.document('belpex')
-        prices_ref.update({
-            'datapoints': firestore.ArrayUnion(data_to_add)
-        })
-
-    return f"Added {len(data_to_add)} new datapoints to Firestore under 'prices/belpex'"
-
+      
   def get_belpex(self):
       """
       Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'

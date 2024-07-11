@@ -28,7 +28,8 @@ class DataRepositorySolarModel():
       self.collection.document(model.get_reference_id()).set(model.to_dict())
       return model.get_reference_id()
   
-  def update_model(self,model:SolarPowerModel,fields_to_update:dict=dict()):
+  
+  def update(self,model:SolarPowerModel,fields_to_update:dict=dict()):
       """
       Updates a model in the firestore database
 

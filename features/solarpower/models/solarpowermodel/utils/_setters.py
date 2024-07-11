@@ -61,7 +61,7 @@ def set_load_slp_df(self, set:str,yearly_average:int):
 
 
 
-def append_load_df(self, df_load: pd.DataFrame):      
+def append_load_df(self, df_load: pd.DataFrame,SLP:bool=False):      
     assert 'Load_kW' in df_load.columns 
     if not df_load.index.name == 'DateTime':
         assert 'DateTime' in df_load.columns
@@ -70,21 +70,21 @@ def append_load_df(self, df_load: pd.DataFrame):
         df_load.index = pd.to_datetime(df_load.index)
 
 
-    #  previous data is not changed
-    # Ensure we only add values at indices already present in self.pd and df_load
-    #common_indices = self.pd.index.intersection(df_load.index)
+    if SLP: #add values from df_load to self.pd that have same hour, minute, day and month as its index
+        missing_indices = self.pd.loc[self.pd['Load_kW'].isnull()].index
+        for index in missing_indices:
+            load_value = df_load.loc[(df_load.index.hour == index.hour) & (df_load.index.day == index.day) & (df_load.index.month == index.month) & (df_load.index.minute == index.minute), 'Load_kW']
+            if not load_value.empty:
+                self.pd.loc[index, 'Load_kW'] = load_value.iloc[0]
 
-    # Update self.pd with the values from df_load at the common indices
-    #self.pd.loc[common_indices, 'Load_kW'] = df_load.loc[common_indices, 'DirectIrradiance']
-
-    # Identify missing indices in df1 that are present in df2 and add them
-    missing_indices = df_load.index.difference(self.pd['Load_kW'].index)
-    missing_data = df_load.loc[missing_indices]
-    #print(missing_data)
-    #print(self.pd)
-    # Append the missing data to df1
-    if not missing_data.empty:
-        self.pd = pd.concat([self.pd,missing_data]).sort_index()
+    else:
+        missing_indices = df_load.index.difference(self.pd['Load_kW'].index)
+        missing_data = df_load.loc[missing_indices]
+        #print(missing_data)
+        #print(self.pd)
+        # Append the missing data to df1
+        if not missing_data.empty:
+            self.pd = pd.concat([self.pd,missing_data]).sort_index()
 
     # Set the previous data to nan
     #missing_indices_2=self.pd.index.difference(df_load.index)

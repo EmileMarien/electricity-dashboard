@@ -17,7 +17,7 @@ from google.cloud.firestore_v1.document import DocumentReference
 from google.cloud.firestore_v1.base_document import DocumentSnapshot
 
 class SolarPowerModel():
-    def __init__(self, solarpanel=None, inverter=None, battery=None,reference_id=None):
+    def __init__(self, solarpanel=None, inverter=None, battery=None,reference_id=None, dataframe: pd.DataFrame = pd.DataFrame()):
         if solarpanel is None:
             solarpanel = SolarPanel(solar_panel_type="Jinko")
         if inverter is None:
@@ -25,25 +25,51 @@ class SolarPowerModel():
         if battery is None:
             battery = Battery(battery_type="LG RESU 2.9")
 
-        self.pd=pd.DataFrame()
-        # Initialize the columns that will be used for the calculations
-        self.pd['DateTime'] = None
-        #Set a datetime index
-        self.pd.set_index('DateTime', inplace=True)
-        self.pd['Load_kW'] = None
-        self.pd['DirectIrradiance'] = None    # [W]  
-        self.pd['PV_Power_kW'] = None  # [kW]
-        self.pd['GridFlow'] = None           # [kW], if neg, then subtracted from grid, if pos the added to the grid
-        self.pd['GridFlow_Load'] = None
-        self.pd['BatteryCharge'] = None       # [kW]
-        self.pd['NettoProduction'] = None # Netto production is the difference between the PV generated power and the load
-        self.pd['EVLoad'] = None # [kW]
-        self.pd['PowerLoss'] = None # [kW]
-        self.pd['BatteryFlow'] = None
-        self.pd['DualTariff'] = None
-        self.pd['DualTariff_Load'] = None
-        self.pd['DynamicTariff'] = None
-        self.pd['DynamicTariff_Load'] = None
+        # Initialize the dataframe
+        if dataframe.empty:
+            self.pd=dataframe
+            # Initialize the columns that will be used for the calculations
+            self.pd['DateTime'] = None
+            #Set a datetime index
+            self.pd.set_index('DateTime', inplace=True)
+            self.pd['Load_kW'] = None
+            self.pd['DirectIrradiance'] = None    # [W]  
+            self.pd['PV_Power_kW'] = None  # [kW]
+            self.pd['GridFlow'] = None           # [kW], if neg, then subtracted from grid, if pos the added to the grid
+            self.pd['GridFlow_Load'] = None
+            self.pd['BatteryCharge'] = None       # [kW]
+            self.pd['NettoProduction'] = None # Netto production is the difference between the PV generated power and the load
+            self.pd['EVLoad'] = None # [kW]
+            self.pd['PowerLoss'] = None # [kW]
+            self.pd['BatteryFlow'] = None
+            self.pd['DualTariff'] = None
+            self.pd['DualTariff_Load'] = None
+            self.pd['DynamicTariff'] = None
+            self.pd['DynamicTariff_Load'] = None
+        else:
+            #check if datetimeformat
+            if 'DateTime' in dataframe.columns:
+                assert dataframe['DateTime'].dtype == 'datetime64[ns]', "DateTime column must be of type datetime64[ns]"
+                dataframe.set_index('DateTime', inplace=True)
+            else:
+                assert dataframe.index.dtype == 'datetime64[ns]', "DateTime index must be of type datetime"
+
+            assert 'Load_kW' in dataframe.columns, "DataFrame must have a 'Load_kW' column"
+            assert 'DirectIrradiance' in dataframe.columns, "DataFrame must have a 'DirectIrradiance' column"
+            assert 'PV_Power_kW' in dataframe.columns, "DataFrame must have a 'PV_Power_kW' column"
+            assert 'GridFlow' in dataframe.columns, "DataFrame must have a 'GridFlow' column"
+            assert 'GridFlow_Load' in dataframe.columns, "DataFrame must have a 'GridFlow_Load' column"
+            assert 'BatteryCharge' in dataframe.columns, "DataFrame must have a 'BatteryCharge' column"
+            assert 'NettoProduction' in dataframe.columns, "DataFrame must have a 'NettoProduction' column"
+            assert 'EVLoad' in dataframe.columns, "DataFrame must have a 'EVLoad' column"
+            assert 'PowerLoss' in dataframe.columns, "DataFrame must have a 'PowerLoss' column"
+            assert 'BatteryFlow' in dataframe.columns, "DataFrame must have a 'BatteryFlow' column"
+            assert 'DualTariff' in dataframe.columns, "DataFrame must have a 'DualTariff' column"
+            assert 'DualTariff_Load' in dataframe.columns, "DataFrame must have a 'DualTariff_Load' column"
+            assert 'DynamicTariff' in dataframe.columns, "DataFrame must have a 'DynamicTariff' column"
+            assert 'DynamicTariff_Load' in dataframe.columns, "DataFrame must have a 'DynamicTariff_Load' column"
+
+            self.pd=dataframe
 
         self.solarpanel=solarpanel
         self.T_STC=25
@@ -180,5 +206,5 @@ class SolarPowerModel():
         inverter = Inverter(**data['inverter'])
         battery = Battery(**data['battery'])
         reference_id = data['reference_id']
-        pd = pd.DataFrame(data['pd'])
-        return SolarPowerModel(solarpanel=solarpanel, inverter=inverter, battery=battery, reference_id=reference_id, pd=pd)
+        dataframe = pd.DataFrame(data['pd'])
+        return SolarPowerModel(solarpanel=solarpanel, inverter=inverter, battery=battery, reference_id=reference_id, dataframe=dataframe)

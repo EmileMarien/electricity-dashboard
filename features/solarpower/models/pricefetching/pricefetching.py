@@ -60,20 +60,14 @@ def fetch_electricity_prices():
     # Apply the function to the Belpex column
     df['Belpex'] = df['Belpex'].apply(convert_to_numeric)
     
-    # set datetimeindex
-    df['DateTime'] = pd.to_datetime(df['DateTime'])
+    # Convert DateTime column to datetime, assuming the original timezone is known, for example, 'Europe/Brussels'
+    df['DateTime'] = pd.to_datetime(df['DateTime'], dayfirst=True)  # Adjust `dayfirst` based on the date format
+    df['DateTime'] = df['DateTime'].dt.tz_localize('Europe/Brussels').dt.tz_convert('UTC')
+
+    # Set DateTime as index
     df.set_index('DateTime', inplace=True)
 
     return df
 
 
-"""
-model=SolarPowerModel()
-model.set_load_df()
-model.set_belpex_df()
-model.PV_generated_power_SPP()
-model.power_flow()
-model.dual_tariff()
-model.dynamic_tariff()
-model.get_grid_cost_total()
-"""
+

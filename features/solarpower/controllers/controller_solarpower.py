@@ -36,6 +36,9 @@ class ControllerSolarPower:
         return self.state.upload_model()
     
     def get_SLP_belpex(self):
+        return self.state.get_columns(columns=['SLP', 'Belpex'])
+    
+    def update_model(self):
         self.state.update_belpex()
         self.state.update_SLP()
-        return self.state.data_repository_SLP.get_SLP()
+        return None

@@ -22,8 +22,11 @@ def refresh_power_flow(self, new_inverter:Inverter, new_battery:Battery):
         None
     """ 
     # Set the new inverter and battery
-    self.inverter=new_inverter
-    self.battery=new_battery
+    if new_inverter is not None:
+        self.inverter = new_inverter
+    if new_battery is not None:
+        self.battery = new_battery
+
     # Get the maximum values from the inverter and battery
     max_AC_power_output=self.inverter.get_inverter_size_AC() #TODO: check if this is correct
     max_DC_batterypower=self.inverter.get_inverter_maxbattery_DC() #TODO: check if this is correct

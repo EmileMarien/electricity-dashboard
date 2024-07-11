@@ -1,5 +1,6 @@
 import json
 import unittest
+import numpy as np
 import pandas as pd
 from context import SolarPowerModel
 from context import fetch_electricity_prices
@@ -115,6 +116,18 @@ class TestSolarPowerModel(unittest.TestCase):
     #def test_solarpowerstate():
         #state=SolarPowerState()
         #state.set_SLP()
+    def test_SLP_fillin(self):
+        model=SolarPowerModel()
+        model.set_load_df(pd.DataFrame({
+            'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00'],
+            'Load_kW': [100, np.nan]
+        }))
+        model.append_load_df(pd.DataFrame({
+            'DateTime': ['2020-01-01 01:00:00', '2020-01-01 02:00:00', '2020-01-01 03:00:00'],
+            'Load_kW': [200, 300, 400]
+        }),SLP=True)
+        print(model.get_columns(columns=['Load_kW']))
+        self.assertEqual(model.get_columns(columns=['Load_kW']).shape, (2, 1))
 
 if __name__ == '__main__':
     unittest.main()
