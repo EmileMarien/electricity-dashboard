@@ -21,8 +21,9 @@ def SLP_xls_to_pd(file_path: str) -> pd.DataFrame:
     df.rename(columns={'UTC':'DateTime','EN':'Load_kW'},inplace=True)
     # Set the DateTime column as the index
     df.set_index('DateTime', inplace=True)
-
-    return df.loc[df.index.minute==0]
+    # set datetime index
+    df.index = pd.to_datetime(df.index)
+    return df.asfreq('H')
 
 def SPP_xls_to_pd(file_path: str) -> pd.DataFrame:
     """
@@ -51,4 +52,4 @@ def SPP_xls_to_pd(file_path: str) -> pd.DataFrame:
     # Set the DateTime column as the index
     df.set_index('DateTime', inplace=True)
 
-    return df.loc[df.index.minute==0]
+    return df.asfreq('H')
