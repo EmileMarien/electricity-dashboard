@@ -14,7 +14,9 @@ class DataRepositorySLP:
     def __init__(self,firestore_reference:firestore.Client):
         self.db=firestore_reference 
         self.collection = self.db.collection('core').document('syntheticprofiles').collection('SLP')
-    
+
+
+
     """
     def get_stream(self):
         return self.collection.stream()
@@ -27,13 +29,19 @@ class DataRepositorySLP:
         return map(map_user, self.collection.stream())
     """
     def add_SLP(self, SLP: pd.DataFrame):
+        """
+        Adds the synthetic load profile to Firestore under 'syntheticprofiles/SLP'
+        
+        :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_kW' column
+        :return: str indicating the number of new datapoints added to Firestore
+        """
         #latest_timestamp= get_latest_belpex_timestamp_from_firestore(db)
         data_to_add = []
         # Define the timezone for the timestamps
         utc_plus_2 = pytz.timezone('Europe/Brussels')  # Adjust to the specific timezone name for UTC+2 if needed
 
         for index, row in SLP.iterrows():
-            timestamp_str = row['DateTime']
+            timestamp_str = index
             price_str = row['Load_kW']
 
             # Parse timestamp (adjust according to your specific datetime format)
