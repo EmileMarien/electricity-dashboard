@@ -32,7 +32,7 @@ class DataRepositorySLP:
         """
         Adds the synthetic load profile to Firestore under 'syntheticprofiles/SLP'
         
-        :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_kW' column
+        :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
         :return: str indicating the number of new datapoints added to Firestore
         """
         #latest_timestamp= get_latest_belpex_timestamp_from_firestore(db)
@@ -42,7 +42,7 @@ class DataRepositorySLP:
 
         for index, row in SLP.iterrows():
             timestamp_str = index
-            price_str = row['Load_kW']
+            price_str = row['Load_SLP_kW']
 
             # Parse timestamp (adjust according to your specific datetime format)
             timestamp_naive = datetime.strptime(timestamp_str, '%d/%m/%Y %H:%M:%S')
