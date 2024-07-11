@@ -28,6 +28,6 @@ class SolarPowerState():
         self.solarpowermodel=self.data_repository_solarmodel.get_model()
     
     def upload_model(self):
-        self.data_repository_solarmodel.add_model(model=self.solarpowermodel)
+        return self.data_repository_solarmodel.add_model(model=self.solarpowermodel)
 
         

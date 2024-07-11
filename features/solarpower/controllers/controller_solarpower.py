@@ -33,4 +33,4 @@ class ControllerSolarPower:
         self.state.load_model()
 
     def upload_model(self):
-        self.state.upload_model()
+        return self.state.upload_model()

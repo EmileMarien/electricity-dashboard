@@ -13,8 +13,20 @@ class DataRepositorySolarModel():
       self.collection = self.db.collection('solarmodel').document('solarmodel').collection('solarmodel')
 
   def add_model(self,model:SolarPowerModel):
-      model_dict=model.__dict__
-      self.collection.document(model.get_reference_id()).set(model_dict)
+      """
+      Adds a model to the firestore database
+      
+      Args:
+      model: SolarPowerModel
+      
+      Returns:
+      reference_id: str
+      """
+      if model.get_reference_id() is None:
+          return self.collection.add(model.__dict__)
+
+      self.collection.document(model.get_reference_id()).set(model.__dict__)
+      return model.get_reference_id()
   
   def get_model(self,reference_id:str):
       model_dict=self.collection.document(reference_id).get().to_dict()
