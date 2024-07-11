@@ -41,9 +41,11 @@ class DataRepositorySLP:
         utc_plus_2 = pytz.timezone('Europe/Brussels')  # Adjust to the specific timezone name for UTC+2 if needed
 
         for index, row in SLP.iterrows():
-            timestamp_str = index
+            
+            timestamp= index
             price_str = row['Load_SLP_kW']
-
+            """
+            
             # Parse timestamp (adjust according to your specific datetime format)
             timestamp_naive = datetime.strptime(timestamp_str, '%d/%m/%Y %H:%M:%S')
 
@@ -52,10 +54,10 @@ class DataRepositorySLP:
 
             # Convert to UTC
             timestamp_utc = timestamp_utc_plus_2.astimezone(pytz.utc)
-
+            """
             # Prepare the data to add
             data = {
-                'timestamp': timestamp_utc,
+                'timestamp': timestamp,
                 'value': float(price_str.replace(',', '.').strip().replace('€', ''))  # Assuming price needs to be stored as a float
             }
             data_to_add.append(data)
