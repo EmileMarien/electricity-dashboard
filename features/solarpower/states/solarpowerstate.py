@@ -6,8 +6,8 @@
 from features.solarpower.repositories.data_repository_belpex import DataRepositoryBelpex
 from features.solarpower.repositories.data_repository_solarmodel import DataRepositorySolarModel
 from features.solarpower.repositories.data_repository_syntheticprofiles import DataRepositorySLP
-from solarpowermodel.solarpowermodel import SolarPowerModel
-from syntheticprofilefetching.syntheticprofilefetching import SPP_xls_to_pd
+from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
+from features.solarpower.models.syntheticprofilefetching.syntheticprofilefetching import SPP_xls_to_pd
 
 
 class SolarPowerState():
