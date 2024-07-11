@@ -39,4 +39,4 @@ st.button("Re-run")
 
 controller= ControllerSolarPower()
 st.write(controller.get_gridflow())
-controller.refresh_SLP()
+controller.upload_model()

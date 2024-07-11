@@ -2,6 +2,12 @@
 from typing import List
 import pandas as pd
 
+def get_reference_id(self):
+    """
+    Returns the reference ID of the model
+    """
+    return self.reference_id
+
 def get_irradiance(self):
     """
     Returns the irradiance data

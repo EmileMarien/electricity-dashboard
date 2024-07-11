@@ -96,6 +96,7 @@ class SolarPowerModel():
     from .utils._getters import get_total_injection_and_consumption
     from .utils._getters import get_average_per_minute_day
     from .utils._getters import get_total_cost
+    from .utils._getters import get_reference_id
 
     from .utils._export import export_dataframe_to_excel
 

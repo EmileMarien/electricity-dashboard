@@ -28,3 +28,9 @@ class ControllerSolarPower:
     
     def refresh_SLP(self):
         return self.state.set_SLP()
+    
+    def load_model(self):
+        self.state.load_model()
+
+    def upload_model(self):
+        self.state.upload_model()

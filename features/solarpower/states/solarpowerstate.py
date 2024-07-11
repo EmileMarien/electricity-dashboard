@@ -23,3 +23,11 @@ class SolarPowerState():
         SLP=SLP_xls_to_pd('data/slp_enu_cons.xls')
         self.data_repository_SLP.add_SLP(SLP=SLP)
         return SLP
+    
+    def load_model(self):
+        self.solarpowermodel=self.data_repository_solarmodel.get_model()
+    
+    def upload_model(self):
+        self.data_repository_solarmodel.add_model(model=self.solarpowermodel)
+
+        
