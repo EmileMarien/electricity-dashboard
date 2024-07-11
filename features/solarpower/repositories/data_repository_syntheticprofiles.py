@@ -63,7 +63,7 @@ class DataRepositorySLP:
 
         # Update Firestore with new datapoints
         if data_to_add:
-            self.collection.update({
+            self.collection.document('SLP_2022').update({
                 'datapoints': firestore.ArrayUnion(data_to_add)
             })
 
