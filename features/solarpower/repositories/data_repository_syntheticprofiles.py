@@ -35,25 +35,11 @@ class DataRepositorySLP:
         :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
         :return: str indicating the number of new datapoints added to Firestore
         """
-        #latest_timestamp= get_latest_belpex_timestamp_from_firestore(db)
         data_to_add = []
-        # Define the timezone for the timestamps
-        utc_plus_2 = pytz.timezone('Europe/Brussels')  # Adjust to the specific timezone name for UTC+2 if needed
+        utc_plus_2 = pytz.timezone('Europe/Brussels')  # Define the timezone for the timestamps
 
         for index, row in SLP.iterrows():
-            
-            timestamp= index
-            """
-            TODO: check if necessary
-            # Parse timestamp (adjust according to your specific datetime format)
-            timestamp_naive = datetime.strptime(timestamp_str, '%d/%m/%Y %H:%M:%S')
-
-            # Localize the naive datetime object to UTC+2
-            timestamp_utc_plus_2 = utc_plus_2.localize(timestamp_naive)
-
-            # Convert to UTC
-            timestamp_utc = timestamp_utc_plus_2.astimezone(pytz.utc)
-            """
+            timestamp = index
             # Prepare the data to add
             data = {
                 'timestamp': timestamp,
@@ -61,13 +47,19 @@ class DataRepositorySLP:
             }
             data_to_add.append(data)
 
-        # Update Firestore with new datapoints
+        # Update Firestore with new datapoints in chunks
         if data_to_add:
-            self.collection.document('SLP_2022').update({
-                'datapoints': firestore.ArrayUnion(data_to_add)
-            })
+            chunk_size = 5000  # Maximum number of elements per chunk
+            for i in range(0, len(data_to_add), chunk_size):
+                chunk = data_to_add[i:i + chunk_size]
+                # Reference a specific document, e.g., 'SLP_2022_chunk_{i // chunk_size}'
+                doc_ref = self.collection.document(f'SLP_2022_chunk_{i // chunk_size}')
+                doc_ref.set({
+                    'datapoints': firestore.ArrayUnion(chunk)
+                }, merge=True)
 
-        return f"Added {len(data_to_add)} new datapoints to Firestore under 'prices/belpex'"
+        return f"Added {len(data_to_add)} new datapoints to Firestore under 'syntheticprofiles/SLP'"
+
 
     def get_SLP(self):
         try:
