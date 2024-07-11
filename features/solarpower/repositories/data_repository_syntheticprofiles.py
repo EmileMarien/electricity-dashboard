@@ -50,7 +50,6 @@ class DataRepositorySLP:
                 """
         # Only add data for full hours
         assert SLP is not None, "SLP is empty"
-        assert SLP.index.freq == 'H', "Data must be hourly"
         self.collection.document('SLP_2022').set(SLP.to_dict())
         return None
         
