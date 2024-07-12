@@ -36,15 +36,15 @@ class DataRepositorySLP:
         :return: str indicating the number of new datapoints added to Firestore
         """
         data_to_add = []
-
+        i=0
         for index, row in SLP.iterrows():
             if index.minute == 0:  # Only add data for full hours
                 timestamp = index
                 # Prepare the data to add
                 data = {
-                    timestamp: row['Load_kW']
+                    i: row['Load_kW']
                 }
-                print(data)
+                i+=1
                 data_to_add.append(data)
         # Only add data for full hours
         #assert SLP is not None, "SLP is empty"
