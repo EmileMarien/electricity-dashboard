@@ -35,22 +35,20 @@ class DataRepositorySLP:
         :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
         :return: str indicating the number of new datapoints added to Firestore
         """
-        data_to_add = []
+        data_to_add = {}
 
         for index, row in SLP.iterrows():
             if index.minute == 0:  # Only add data for full hours
                 # Convert the timestamp to a string
                 timestamp = index.strftime('%Y-%m-%d %H:%M:%S')
                 # Prepare the data to add
-                data = {
-                    timestamp: row['Load_kW']
-                }
-                data_to_add.append(data)
+                data_to_add[timestamp] = row['Load_kW']
+        self.collection.document('SLP').set(data_to_add)
         # Only add data for full hours
         #assert SLP is not None, "SLP is empty"
         #SLP=self.collection.document('SLP_2022').set(SLP.to_dict().get('Load_kW'))
-        
-        # Update Firestore with new datapoints in chunks
+        """
+               # Update Firestore with new datapoints in chunks
         if data_to_add:
             chunk_size = 10000  # Maximum number of elements per chunk
             for i in range(0, len(data_to_add), chunk_size):
@@ -60,6 +58,8 @@ class DataRepositorySLP:
                 doc_ref.set({
                     'datapoints': firestore.ArrayUnion(chunk)
                 }, merge=True)
+        """
+ 
 
 
         return f"Added {len(data_to_add)} new datapoints to Firestore under 'syntheticprofiles/SLP'"
