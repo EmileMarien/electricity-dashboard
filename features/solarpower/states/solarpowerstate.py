@@ -42,11 +42,11 @@ class SolarPowerState():
 
         self.solarpowermodel.append_belpex_df(prices)
 
-        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"pd": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S')).to_dict(orient='index')})
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S')).to_dict(orient='index')})
 
     def update_SLP(self):
         self.solarpowermodel.append_load_df(self.data_repository_SLP.get_SLP(),SLP=True)
-        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"pd": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S')).to_dict(orient='index')})            
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S')).to_dict(orient='index')})            
 
     
     def get_columns(self,columns):
