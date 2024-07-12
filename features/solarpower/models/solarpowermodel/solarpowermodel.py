@@ -180,6 +180,9 @@ class SolarPowerModel():
             solarpanel = SolarPanel(**solarpanel_data)
             data['solarpanel'] = solarpanel
 
+        # convert dataframe to pd.DataFrame
+        data['dataframe'] = pd.DataFrame(data['dataframe'])
+
         # Create SolarPowerModel object with all data
         # Pass all data including reference_id conditionally
         if 'reference_id' not in data or data['reference_id'] is None:
@@ -213,4 +216,5 @@ class SolarPowerModel():
         battery = Battery(**data['battery'])
         reference_id = data['reference_id']
         dataframe = pd.DataFrame(data['dataframe'])
+        
         return SolarPowerModel(solarpanel=solarpanel, inverter=inverter, battery=battery, reference_id=reference_id, dataframe=dataframe)
