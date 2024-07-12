@@ -212,5 +212,5 @@ class SolarPowerModel():
         inverter = Inverter(**data['inverter'])
         battery = Battery(**data['battery'])
         reference_id = data['reference_id']
-        dataframe = pd.DataFrame(data['pd'])
+        dataframe = pd.DataFrame(data['dataframe'])
         return SolarPowerModel(solarpanel=solarpanel, inverter=inverter, battery=battery, reference_id=reference_id, dataframe=dataframe)
