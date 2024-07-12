@@ -57,3 +57,9 @@ st.write(controller.get_SLP_belpex().tail(15))
 #Display the last 15 gridflow and load values
 st.write(controller.get_gridflow().tail(15))
 
+# Drop down to select inverter
+inverter=st.selectbox('Select inverter',['SMA','Fronius','Goodwe'])
+controller.change_model(Inverter=inverter)
+
+
+

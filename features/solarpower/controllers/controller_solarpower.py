@@ -42,3 +42,6 @@ class ControllerSolarPower:
         self.state.update_belpex()
         self.state.update_SLP()
         return None
+    
+    def change_model(self, Battery=None, Inverter=None, SolarPanel=None):
+        return self.state.change_model(Battery=Battery, Inverter=Inverter, SolarPanel=SolarPanel)
