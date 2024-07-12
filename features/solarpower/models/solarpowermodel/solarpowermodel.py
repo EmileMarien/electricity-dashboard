@@ -46,6 +46,7 @@ class SolarPowerModel():
             self.pd['DualTariff_Load'] = None
             self.pd['DynamicTariff'] = None
             self.pd['DynamicTariff_Load'] = None
+            self.pd['Belpex'] = None
         else:
             #check if datetimeformat
             if 'DateTime' in dataframe.columns:
@@ -68,7 +69,7 @@ class SolarPowerModel():
             assert 'DualTariff_Load' in dataframe.columns, "DataFrame must have a 'DualTariff_Load' column"
             assert 'DynamicTariff' in dataframe.columns, "DataFrame must have a 'DynamicTariff' column"
             assert 'DynamicTariff_Load' in dataframe.columns, "DataFrame must have a 'DynamicTariff_Load' column"
-
+            assert 'Belpex' in dataframe.columns, "DataFrame must have a 'Belpex' column"
             self.pd=dataframe
 
         self.solarpanel=solarpanel
