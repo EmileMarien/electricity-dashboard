@@ -182,7 +182,7 @@ class SolarPowerModel():
 
         # convert dataframe to pd.DataFrame
         data['dataframe'] = pd.DataFrame(data['dataframe'])
-
+        data['dataframe'].index = pd.to_datetime(data['dataframe'].index)
         # Create SolarPowerModel object with all data
         # Pass all data including reference_id conditionally
         if 'reference_id' not in data or data['reference_id'] is None:
