@@ -181,7 +181,11 @@ class SolarPowerModel():
             data['solarpanel'] = solarpanel
 
         # Create SolarPowerModel object with all data
-        return SolarPowerModel(**data, reference_id=snapshot.id)
+        # Pass all data including reference_id conditionally
+        if 'reference_id' not in data or data['reference_id'] is None:
+            return SolarPowerModel(**data, reference_id=snapshot.id)
+        else:
+            return SolarPowerModel(**data)
         
     def to_dict(self):
         """
