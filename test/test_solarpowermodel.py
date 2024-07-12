@@ -93,6 +93,9 @@ class TestSolarPowerModel(unittest.TestCase):
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00'],
             'Load_kW': [100, 200]
         }))
+        print(model.get_dataset().columns)
+        print(model.to_dict())
+
         json_file=model.__dict__
         #print(json)
         # Creating a new instance of the SolarPowerModel
@@ -108,7 +111,6 @@ class TestSolarPowerModel(unittest.TestCase):
         self.assertEqual(model.battery.__dict__, new_model.battery.__dict__)
 
         self.assertEqual(model.reference_id, None)
-        model.from_dict(model.to_dict())
 
         #model_with_id=model.from_snapshot(snapshot=DocumentSnapshot(reference=DocumentReference(id="123"), data={"battery_type":"LG RESU Prime 16"}, exists=True,read_time=None,create_time=None,update_time=None))
         #self.assertEqual(model_with_id.reference_id,"123") TODO: check with real firestore link

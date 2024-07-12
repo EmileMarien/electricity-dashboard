@@ -29,9 +29,7 @@ class SolarPowerModel():
         if dataframe.empty:
             self.pd=dataframe
             # Initialize the columns that will be used for the calculations
-            self.pd['DateTime'] = None
-            #Set a datetime index
-            self.pd.set_index('DateTime', inplace=True)
+
             self.pd['Load_kW'] = None
             self.pd['DirectIrradiance'] = None    # [W]  
             self.pd['PV_Power_kW'] = None  # [kW]
@@ -47,6 +45,9 @@ class SolarPowerModel():
             self.pd['DynamicTariff'] = None
             self.pd['DynamicTariff_Load'] = None
             self.pd['Belpex'] = None
+            #Set a datetime index with name 'DateTime'
+            self.pd.index.name = 'DateTime'
+            self.pd.index = pd.to_datetime(self.pd.index)
         else:
             #check if datetimeformat
             if 'DateTime' in dataframe.columns:
@@ -193,7 +194,7 @@ class SolarPowerModel():
             'inverter': self.inverter.to_dict(),
             'battery': self.battery.to_dict(),
             'reference_id': self.reference_id,
-            "pd": self.pd.to_dict(),
+            "pd": self.pd.rename(index=lambda x: x.strftime('%Y-%m-%d')).to_dict(orient='index')
         }
 
     @staticmethod
