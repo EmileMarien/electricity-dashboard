@@ -19,11 +19,13 @@ class SolarPowerState():
         self.data_repository_belpex=DataRepositoryBelpex(firestore_reference=firestor_reference)
         self.data_repository_solarmodel=DataRepositorySolarModel(firestore_reference=firestor_reference)
         self.data_repository_SLP=DataRepositorySLP(firestore_reference=firestor_reference)
+        self.solarpowermodel.set_reference_id('test')
     
     def set_SLP(self):
         SLP=SLP_xls_to_pd('data/slp_enu_cons.xls')
         self.data_repository_SLP.add_SLP(SLP=SLP)
         return None
+    
     
     def load_model(self):
         self.solarpowermodel=self.data_repository_solarmodel.get_model(reference_id=self.solarpowermodel.get_reference_id() if self.solarpowermodel.get_reference_id() is not None else 'muFpAMmhxutpRvwnG1M4')
