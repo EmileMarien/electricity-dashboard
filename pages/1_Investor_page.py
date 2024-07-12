@@ -40,7 +40,7 @@ st.write(
 
 
 controller= ControllerSolarPower()
-
+controller.load_model()
 # Write SLP to firestore
 if st.button("Refresh SLP"):
     controller.refresh_SLP()
