@@ -23,6 +23,9 @@ def SLP_xls_to_pd(file_path: str) -> pd.DataFrame:
     df.set_index('DateTime', inplace=True)
     # set datetime index
     df.index = pd.to_datetime(df.index)
+
+    # make it timezone aware
+    df.index = df.index.tz_localize('UTC')
     return df.asfreq('H')
 
 def SPP_xls_to_pd(file_path: str) -> pd.DataFrame:

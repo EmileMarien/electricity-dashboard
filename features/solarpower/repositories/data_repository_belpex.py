@@ -18,7 +18,7 @@ class DataRepositoryBelpex():
     for index, row in belpex.iterrows():
         if index.minute == 0:  # Only add data for full hours
             # Convert the timestamp to a string
-            timestamp = index.strftime('%Y-%m-%d %H:%M:%S')
+            timestamp = index.strftime('%Y-%m-%d %H:%M:%S %Z')
             # Prepare the data to add
             data_to_add[timestamp] = row['Belpex']
     self.collection.document('belpex').set(data_to_add)
