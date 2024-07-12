@@ -181,7 +181,7 @@ class SolarPowerModel():
             data['solarpanel'] = solarpanel
 
         # convert dataframe to pd.DataFrame
-        data['dataframe'] = pd.DataFrame(data['dataframe'])
+        data['dataframe'] = pd.DataFrame_from_dict(data['dataframe'],orient='index')
         data['dataframe'].index = pd.to_datetime(data['dataframe'].index)
         # Create SolarPowerModel object with all data
         # Pass all data including reference_id conditionally
