@@ -44,35 +44,18 @@ class DataRepositorySLP:
                 # Prepare the data to add
                 data_to_add[timestamp] = row['Load_kW']
         self.collection.document('SLP').set(data_to_add)
-        # Only add data for full hours
-        #assert SLP is not None, "SLP is empty"
-        #SLP=self.collection.document('SLP_2022').set(SLP.to_dict().get('Load_kW'))
-        """
-               # Update Firestore with new datapoints in chunks
-        if data_to_add:
-            chunk_size = 10000  # Maximum number of elements per chunk
-            for i in range(0, len(data_to_add), chunk_size):
-                chunk = data_to_add[i:i + chunk_size]
-                # Reference a specific document, e.g., 'SLP_2022_chunk_{i // chunk_size}'
-                doc_ref = self.collection.document(f'SLP_2022') 
-                doc_ref.set({
-                    'datapoints': firestore.ArrayUnion(chunk)
-                }, merge=True)
-        """
- 
-
 
         return f"Added {len(data_to_add)} new datapoints to Firestore under 'syntheticprofiles/SLP'"
 
 
-    def get_SLP(self):
+    #def get_SLP(self):
         """
         Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'
         
         :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
         """
-        slp_dict = self.collection.document('SLP').get().to_dict()
-        return pd.DataFrame.from_dict(slp_dict)
+    #    slp_dict = self.collection.document('SLP').get().to_dict()
+    #    return pd.DataFrame.from_dict(slp_dict)
         """
         # Reference the document
         doc_ref = self.collection.document('SLP_2022')
@@ -90,7 +73,17 @@ class DataRepositorySLP:
         else:
             return ValueError(f"Document '{doc_ref.id}' does not exist in Firestore")"""
 
-
+    def get_SLP(self):
+        """
+        Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'
+        
+        :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
+        """
+        slp_dict = self.collection.document('SLP').get().to_dict()
+        slp_df = pd.DataFrame(list(slp_dict.items()), columns=['DateTime', 'Load_kW'])
+        slp_df['DateTime'] = pd.to_datetime(slp_df['DateTime'])
+        slp_df.set_index('DateTime', inplace=True)
+        return slp_df
 """
 class DataRepositoryUser:
     def __init__(self):

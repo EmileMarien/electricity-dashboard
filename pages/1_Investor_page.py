@@ -43,7 +43,7 @@ controller= ControllerSolarPower()
 
 # Write SLP to firestore
 if st.button("Refresh SLP"):
-    st.write(controller.refresh_SLP())
+    controller.refresh_SLP()
 
 # only upload if button is clicked
 if st.button("Upload model"):

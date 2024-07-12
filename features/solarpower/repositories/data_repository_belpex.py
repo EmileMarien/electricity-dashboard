@@ -13,8 +13,15 @@ class DataRepositoryBelpex():
 
 
   def update(self, belpex:pd.DataFrame):
-    self.collection.document('belpex').set(belpex.to_dict())
-    return None
+    data_to_add = {}
+
+    for index, row in belpex.iterrows():
+        if index.minute == 0:  # Only add data for full hours
+            # Convert the timestamp to a string
+            timestamp = index.strftime('%Y-%m-%d %H:%M:%S')
+            # Prepare the data to add
+            data_to_add[timestamp] = row['Belpex']
+    self.collection.document('belpex').set(data_to_add)
 
   def get_belpex(self):
     belpex_dict = self.collection.document('belpex').get().to_dict()
