@@ -44,6 +44,7 @@ class DataRepositorySLP:
                 data = {
                     timestamp: row['Load_kW']
                 }
+                print(data)
                 data_to_add.append(data)
         # Only add data for full hours
         #assert SLP is not None, "SLP is empty"
