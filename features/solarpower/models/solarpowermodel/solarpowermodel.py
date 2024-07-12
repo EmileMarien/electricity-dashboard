@@ -194,7 +194,7 @@ class SolarPowerModel():
             'inverter': self.inverter.to_dict(),
             'battery': self.battery.to_dict(),
             'reference_id': self.reference_id,
-            "pd": self.pd.rename(index=lambda x: x.strftime('%Y-%m-%d')).to_dict(orient='index')
+            "pd": self.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S')).to_dict(orient='index')
         }
 
     @staticmethod
