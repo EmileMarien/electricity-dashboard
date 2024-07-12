@@ -35,23 +35,19 @@ class DataRepositorySLP:
         :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
         :return: str indicating the number of new datapoints added to Firestore
         """
-        """
-        data_to_add = []
+        
 
         for index, row in SLP.iterrows():
             if index.minute == 0:  # Only add data for full hours
                 timestamp = index
                 # Prepare the data to add
-                data = {
-                    'DateTime': timestamp,
-                    'Load_kW': row['Load_kW']
-                }
-                data_to_add.append(data)
-                """
+                data = row['Load_kW']
+                self.collection.document('SLP_2022').set({timestamp: data})
+
+                
         # Only add data for full hours
         assert SLP is not None, "SLP is empty"
-        SLP=self.collection.document('SLP_2022').set(SLP.to_dict().get('Load_kW'))
-        self.collection.document('SLP_2022').set(SLP)
+        #SLP=self.collection.document('SLP_2022').set(SLP.to_dict().get('Load_kW'))
         return None
         
         """
