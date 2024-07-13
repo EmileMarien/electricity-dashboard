@@ -1,11 +1,11 @@
 
 
 import pandas as pd
-from battery.battery import Battery
+from features.solarpower.models.battery.battery import Battery
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 from features.solarpower.states.solarpowerstate import SolarPowerState
-from inverter.inverter import Inverter
-from solarpanel.solarpanel import SolarPanel
+from features.solarpower.models.inverter.inverter import Inverter
+from features.solarpower.models.solarpanel.solarpanel import SolarPanel
 
 
 class ControllerSolarPower:
