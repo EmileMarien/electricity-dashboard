@@ -3,7 +3,7 @@
 
 
 
-from battery.battery import Battery
+from features.solarpower.models.battery.battery import Battery
 from core.firestore_init import authenticate_to_firestore, load_key
 from features.solarpower.repositories.data_repository_belpex import DataRepositoryBelpex
 from features.solarpower.repositories.data_repository_solarmodel import DataRepositorySolarModel
@@ -11,8 +11,8 @@ from features.solarpower.repositories.data_repository_syntheticprofiles import D
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 from features.solarpower.models.syntheticprofilefetching.syntheticprofilefetching import SLP_xls_to_pd, SPP_xls_to_pd
 from features.solarpower.models.pricefetching.pricefetching import fetch_electricity_prices
-from inverter.inverter import Inverter
-from solarpanel.solarpanel import SolarPanel
+from features.solarpower.models.inverter.inverter import Inverter
+from features.solarpower.models.solarpanel.solarpanel import SolarPanel
 
 
 class SolarPowerState():
@@ -60,7 +60,7 @@ class SolarPowerState():
     def update_SPP(self):
         self.solarpowermodel.append_pv_power_df(self.data_repository_SPP.get_SPP(),SPP=True)
         self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})
-        
+
     def update_calculations(self):
         self.solarpowermodel.update_power_flow()
         self.solarpowermodel.update_dual_tariff()
