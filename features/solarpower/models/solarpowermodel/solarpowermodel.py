@@ -126,6 +126,9 @@ class SolarPowerModel():
     from .utils._getters import get_average_per_minute_day
     from .utils._getters import get_total_cost
     from .utils._getters import get_reference_id
+    from .utils._getters import get_battery
+    from .utils._getters import get_solarpanel
+    from .utils._getters import get_inverter
 
     from .utils._export import export_dataframe_to_excel
 

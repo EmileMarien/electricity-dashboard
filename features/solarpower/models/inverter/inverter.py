@@ -17,16 +17,7 @@ class Inverter:
         inverter_efficiency: efficiency of a single inverter
         inverter_type: type of inverter, choose from the following: "Sungrow_3", "Sungrow_3.6", "Sungrow_4", "Sungrow_5", "Fronius_3", "Fronius_3.6", "Fronius_4", "Fronius_4.6", "Fronius_5", "Sungrow SG2.0RS-S", "Sungrow SG2.5RS-S", "Sungrow SG3.0RS-S", "Sungrow SG3.0RS", "Sungrow SG3.6RS", "Sungrow SG4.0RS", "Sungrow SG5.0RS"
         """
-        if inverter_type is None:
-            self.inverter_cost = inverter_cost
-            self.inverter_size_AC = inverter_size_AC
-            self.inverter_maxsolar_DC = inverter_maxsolar_DC
-            self.inverter_lifetime = inverter_lifetime
-            self.inverter_efficiency = inverter_efficiency
-            self.inverter_maxbattery_DC = inverter_maxbattery_DC
-        else:
-            # Define different types of batteries
-            inverter_types = {
+        inverter_types = {
                 "no inverter": {
                     "inverter_cost": 0,
                     "inverter_size_AC": 100000,
@@ -164,6 +155,16 @@ class Inverter:
                     "inverter_efficiency": 0.972,  
                 },
             }
+        if inverter_type not in inverter_types.keys:
+            self.inverter_type = inverter_type
+            self.inverter_cost = inverter_cost
+            self.inverter_size_AC = inverter_size_AC
+            self.inverter_maxsolar_DC = inverter_maxsolar_DC
+            self.inverter_lifetime = inverter_lifetime
+            self.inverter_efficiency = inverter_efficiency
+            self.inverter_maxbattery_DC = inverter_maxbattery_DC
+        else:
+            # Define different types of inverters
         
             self.inverter_cost = inverter_types[inverter_type]["inverter_cost"]
             self.inverter_size_AC = inverter_types[inverter_type]["inverter_size_AC"]
@@ -171,6 +172,7 @@ class Inverter:
             self.inverter_maxsolar_DC = inverter_types[inverter_type]["inverter_maxsolar_DC"]
             self.inverter_lifetime = inverter_types[inverter_type]["inverter_lifetime"]
             self.inverter_efficiency = inverter_types[inverter_type]["inverter_efficiency"]
+            self.inverter_type=inverter_type
 
         self.reference_id = reference_id
     # Imported methods
@@ -181,6 +183,7 @@ class Inverter:
     from .utils._getters import get_inverter_lifetime
     from .utils._getters import get_inverter_efficiency
     from .utils._getters import get_inverter_maxbattery_DC
+    from .utils._getters import get_inverter_type
 
 
 

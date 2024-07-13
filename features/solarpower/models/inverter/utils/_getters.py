@@ -15,3 +15,6 @@ def get_inverter_efficiency(self):
 
 def get_inverter_maxbattery_DC(self):
     return self.inverter_maxbattery_DC
+
+def get_inverter_type(self):
+    return self.inverter_type

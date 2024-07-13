@@ -54,5 +54,10 @@ def SPP_xls_to_pd(file_path: str) -> pd.DataFrame:
     df.rename(columns={'UTC':'DateTime','5414488001704':'PV_Power_kW'},inplace=True)
     # Set the DateTime column as the index
     df.set_index('DateTime', inplace=True)
+    
+    # set datetime index
+    df.index = pd.to_datetime(df.index)
 
+    # make it timezone aware
+    df.index = df.index.tz_localize('UTC')
     return df.asfreq('H')

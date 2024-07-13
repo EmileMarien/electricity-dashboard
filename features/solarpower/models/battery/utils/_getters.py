@@ -21,3 +21,6 @@ def get_battery_degradation(self):
 
 def get_battery_count(self):
     return self.battery_count
+
+def get_battery_type(self):
+    return self.battery_type

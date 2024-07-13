@@ -32,7 +32,7 @@ class DataRepositorySLP:
         """
         Adds the synthetic load profile to Firestore under 'syntheticprofiles/SLP'
         
-        :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
+        :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_kW' column
         :return: str indicating the number of new datapoints added to Firestore
         """
         data_to_add = {}
@@ -48,42 +48,72 @@ class DataRepositorySLP:
         return f"Added {len(data_to_add)} new datapoints to Firestore under 'syntheticprofiles/SLP'"
 
 
-    #def get_SLP(self):
-        """
-        Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'
-        
-        :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
-        """
-    #    slp_dict = self.collection.document('SLP').get().to_dict()
-    #    return pd.DataFrame.from_dict(slp_dict)
-        """
-        # Reference the document
-        doc_ref = self.collection.document('SLP_2022')
-        doc = doc_ref.get()
-
-        if doc.exists:
-            data = doc.to_dict().get('datapoints', [])
-            # Create a DataFrame from the data
-            df = pd.DataFrame(data)
-            # Ensure that the 'timestamp' is the index and it is in DateTime format
-            if 'timestamp' in df.columns:
-                df['DateTime'] = pd.to_datetime(df['timestamp'])
-                df.set_index('DateTime', inplace=True)
-            return df
-        else:
-            return ValueError(f"Document '{doc_ref.id}' does not exist in Firestore")"""
-
     def get_SLP(self):
         """
         Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'
         
-        :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_SLP_kW' column
+        :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'Load_kW' column
         """
         slp_dict = self.collection.document('SLP').get().to_dict()
         slp_df = pd.DataFrame(list(slp_dict.items()), columns=['DateTime', 'Load_kW'])
         slp_df['DateTime'] = pd.to_datetime(slp_df['DateTime'])
         slp_df.set_index('DateTime', inplace=True)
         return slp_df
+
+
+class DataRepositorySPP: #TODO: fix this by changing SLP to SPP
+    def __init__(self,firestore_reference:firestore.Client):
+        self.db=firestore_reference 
+        self.collection = self.db.collection('core').document('syntheticprofiles').collection('SPP')
+
+
+
+    """
+    def get_stream(self):
+        return self.collection.stream()
+
+    def get_users_stream(self):
+        def map_user(snapshot):
+            return 
+            #return User.from_snapshot(snapshot)
+
+        return map(map_user, self.collection.stream())
+    """
+    def add_SPP(self, SPP: pd.DataFrame):
+        """
+        Adds the synthetic load profile to Firestore under 'syntheticprofiles/SLP'
+        
+        :param SLP: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'PV_Power_kW' column
+        :return: str indicating the number of new datapoints added to Firestore
+        """
+        data_to_add = {}
+
+        for index, row in SPP.iterrows():
+            if index.minute == 0:  # Only add data for full hours
+                # Convert the timestamp to a string
+                timestamp = index.strftime('%Y-%m-%d %H:%M:%S')
+                # Prepare the data to add
+                data_to_add[timestamp] = row['PV_Power_kW']
+        self.collection.document('SPP').set(data_to_add)
+
+        return f"Added {len(data_to_add)} new datapoints to Firestore under 'syntheticprofiles/SLP'"
+
+
+
+    def get_SPP(self):
+        """
+        Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'
+        
+        :return: pd.DataFrame containing the synthetic load profile with DateTimeindex and 'PV_Power_kW' column
+        """
+        spp_dict = self.collection.document('SPP').get().to_dict()
+        spp_df = pd.DataFrame(list(spp_dict.items()), columns=['DateTime', 'PV_Power_kW'])
+        spp_df['DateTime'] = pd.to_datetime(spp_df['DateTime'])
+        spp_df.set_index('DateTime', inplace=True)
+        return spp_df
+
+
+
 """
 class DataRepositoryUser:
     def __init__(self):

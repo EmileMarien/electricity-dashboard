@@ -16,8 +16,60 @@ class Battery:
         battery_degradation: degradation of a single battery
 
         """
-
-        if battery_type is None:
+        # Define different types of batteries
+        battery_types = {
+            "no battery": {
+                "battery_inverter": 1,  # if this is 0 switch off inverter choice, if this is 1 switch on
+                "battery_cost": 0,
+                "battery_lifetime": 0,
+                "battery_capacity": 0,
+                "battery_Roundtrip_Efficiency": 0,
+                "battery_PeakPower": 0,
+                "battery_Degradation": 0,
+                "battery_count": 0
+            },
+            "LG RESU 2.9": {
+                "battery_inverter": 1,
+                "battery_cost": 2349 * 1.25,
+                "battery_lifetime": 10,
+                "battery_capacity": 2.9,
+                "battery_Roundtrip_Efficiency": 95,
+                "battery_PeakPower": 3,
+                "battery_Degradation": 4,
+                "battery_count": 1
+            },
+            "LG RESU 5.9": {
+                "battery_inverter": 1,
+                "battery_cost": 3327.5 * 1.25,
+                "battery_lifetime": 10,
+                "battery_capacity": 5.9,
+                "battery_Roundtrip_Efficiency": 95,
+                "battery_PeakPower": 4.2,
+                "battery_Degradation": 4,
+                "battery_count": 1
+            },
+            "LG RESU Prime 9.6": {
+                "battery_inverter": 1,
+                "battery_cost": 6497 * 1.25,  # in Eur, times for installation cost
+                "battery_lifetime": 10,  # in years
+                "battery_capacity": 9.6,  # in kWh
+                "battery_Roundtrip_Efficiency": 97.5,  # in percent
+                "battery_PeakPower": 5,  # in kW, rated power
+                "battery_Degradation": 3,  # in percent per year
+                "battery_count": 1
+            },
+            "LG RESU Prime 16": {
+                "battery_inverter": 1,
+                "battery_cost": 8987 * 1.25,
+                "battery_lifetime": 10,
+                "battery_capacity": 16,
+                "battery_Roundtrip_Efficiency": 97.5,
+                "battery_PeakPower": 7,
+                "battery_Degradation": 3,
+                "battery_count": 1
+            }
+        }
+        if battery_type not in battery_types.keys:
             self.battery_cost = battery_cost
             self.battery_lifetime = battery_lifetime
             self.battery_capacity = battery_capacity
@@ -26,61 +78,10 @@ class Battery:
             self.battery_peak_power = battery_peak_power
             self.battery_degradation = battery_degradation
             self.battery_count = battery_count
+            self.battery_type=battery_type
         else:
 
-            # Define different types of batteries
-            battery_types = {
-                "no battery": {
-                    "battery_inverter": 1,  # if this is 0 switch off inverter choice, if this is 1 switch on
-                    "battery_cost": 0,
-                    "battery_lifetime": 0,
-                    "battery_capacity": 0,
-                    "battery_Roundtrip_Efficiency": 0,
-                    "battery_PeakPower": 0,
-                    "battery_Degradation": 0,
-                    "battery_count": 0
-                },
-                "LG RESU 2.9": {
-                    "battery_inverter": 1,
-                    "battery_cost": 2349 * 1.25,
-                    "battery_lifetime": 10,
-                    "battery_capacity": 2.9,
-                    "battery_Roundtrip_Efficiency": 95,
-                    "battery_PeakPower": 3,
-                    "battery_Degradation": 4,
-                    "battery_count": 1
-                },
-                "LG RESU 5.9": {
-                    "battery_inverter": 1,
-                    "battery_cost": 3327.5 * 1.25,
-                    "battery_lifetime": 10,
-                    "battery_capacity": 5.9,
-                    "battery_Roundtrip_Efficiency": 95,
-                    "battery_PeakPower": 4.2,
-                    "battery_Degradation": 4,
-                    "battery_count": 1
-                },
-                "LG RESU Prime 9.6": {
-                    "battery_inverter": 1,
-                    "battery_cost": 6497 * 1.25,  # in Eur, times for installation cost
-                    "battery_lifetime": 10,  # in years
-                    "battery_capacity": 9.6,  # in kWh
-                    "battery_Roundtrip_Efficiency": 97.5,  # in percent
-                    "battery_PeakPower": 5,  # in kW, rated power
-                    "battery_Degradation": 3,  # in percent per year
-                    "battery_count": 1
-                },
-                "LG RESU Prime 16": {
-                    "battery_inverter": 1,
-                    "battery_cost": 8987 * 1.25,
-                    "battery_lifetime": 10,
-                    "battery_capacity": 16,
-                    "battery_Roundtrip_Efficiency": 97.5,
-                    "battery_PeakPower": 7,
-                    "battery_Degradation": 3,
-                    "battery_count": 1
-                }
-            }
+
             self.battery_cost = battery_types[battery_type]["battery_cost"]
             self.battery_lifetime = battery_types[battery_type]["battery_lifetime"]
             self.battery_capacity = battery_types[battery_type]["battery_capacity"]
@@ -90,11 +91,12 @@ class Battery:
     
             self.battery_degradation = battery_types[battery_type]["battery_Degradation"]
             self.battery_count = battery_types[battery_type]["battery_count"]
+            self.battery_type=battery_type
 
         self.reference_id = reference_id
 
 
-    
+    from .utils._getters import get_battery_type   
     from .utils._getters import get_battery_inverter
     from .utils._getters import get_battery_cost
     from .utils._getters import get_battery_lifetime

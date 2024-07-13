@@ -10,11 +10,9 @@ st.set_page_config(page_title="Plotting Demo", page_icon="📈")
 menu_with_redirect()
 apply_custom_css()
 
-st.markdown("# Portfolio Simulation")
-st.sidebar.header("Portfolio Simulation")
-st.write(
-    """An example of future evolution of your portfolio value"""
-)
+st.markdown("# Model overview")
+st.sidebar.header("Model overview")
+
 
 #progress_bar = st.sidebar.progress(0)
 #status_text = st.sidebar.empty()
@@ -39,30 +37,44 @@ st.write(
 
 
 
-#controller=ControllerSolarPower()
-# check if controller in session state
-if "controller" not in st.session_state:
-    st.session_state.controller = ControllerSolarPower()
 
 # Write SLP to firestore
-if st.button("Refresh SLP"):
-    st.session_state.controller.refresh_SLP()
+#if st.button("Refresh SLP"):
+#    st.session_state.controller.refresh_SLP()
 
 # only upload if button is clicked
-if st.button("Upload model"):
-    st.write(st.session_state.controller.upload_model())     #todo: why does this not update the new values set by updtate_belpex and update_SLP? controller is not updated in the state
+#if st.button("Upload model"):
+#    st.write(st.session_state.controller.upload_model())     #todo: why does this not update the new values set by updtate_belpex and update_SLP? controller is not updated in the state
 
 if st.button("update model"):
     st.write(st.session_state.controller.update_model())
 
+
+
+# check if controller in session state
+if "controller" not in st.session_state:
+    st.session_state.controller = ControllerSolarPower()
+
+st.header("Model components")
+st.write("Your current home system contains following equipment:")
+st.write("Inverter: ", st.session_state.controller.get_invertername()) #TODO: check if possible to let pop up the parameters if this is clicked
+st.write("Battery: ", st.session_state.controller.get_batteryname())
+st.write("Solarpanel: ", st.session_state.controller.get_solarpanelname())
+if st.button("Edit model"):
+    with st.form("Edit model"):
+        new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'])
+        new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'])
+        #status = st.selectbox("Status", ["Active", "Inactive"])
+        submitted = st.form_submit_button("Update model")
+
+        if submitted:
+            st.session_state.controller.change_model(inverter_type=new_inverter,battery_type=new_battery)
+        else:
+            st.error("Please fill in all fields")
+
+
+st.header("Recent readings")
 st.write(st.session_state.controller.get_SLP_belpex().tail(15))
 
 #Display the last 15 gridflow and load values
 st.write(st.session_state.controller.get_gridflow().tail(15))
-
-# Drop down to select inverter
-inverter=st.selectbox('Select inverter',['Sungrow_3','Fronius_3','Sungrow_5'])
-st.session_state.controller.change_model(inverter_type=inverter)
-
-
-

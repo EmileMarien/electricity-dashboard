@@ -26,3 +26,6 @@ def get_total_solar_panel_cost(self):
 
 def get_total_panel_surface(self):
     return self.total_panel_surface
+
+def get_solarpanel_type(self):
+    return self.get_solar_panel_type

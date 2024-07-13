@@ -32,6 +32,9 @@ class ControllerSolarPower:
     def refresh_SLP(self):
         return self.state.set_SLP()
     
+    def refresh_SPP(self):
+        return self.state.set_SPP()
+    
     def load_model(self):
         self.state.load_model()
 
@@ -44,10 +47,20 @@ class ControllerSolarPower:
     def update_model(self):
         self.state.update_belpex()
         self.state.update_SLP()
+        self.state.update_calculations()
         return None
     
-    def change_model(self, battery=None, inverter_type=None, solar_panel_type=None):
+    def change_model(self, battery_type=None, inverter_type=None, solar_panel_type=None):
         inverter=Inverter(inverter_type=inverter_type)
         solarpanel=SolarPanel(solar_panel_type=solar_panel_type)
-        battery=Battery(battery_type=battery)
+        battery=Battery(battery_type=battery_type)
         return self.state.change_model(battery=battery, inverter=inverter, solarpanel=solarpanel)
+    
+    def get_solarpanelname(self):
+        return self.state.solarpowermodel.get_solarpanel().get_solarpanel_type()
+    
+    def get_batteryname(self):
+        return self.state.solarpowermodel.get_battery().get_battery_type()
+    
+    def get_invertername(self):
+        return self.state.solarpowermodel.get_inverter().get_inverter_type()

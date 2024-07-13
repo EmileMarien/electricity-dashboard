@@ -359,3 +359,12 @@ def get_npv(battery_cost, total_solar_panel_cost, inverter_cost, discount_rate, 
     print("Total cost savings:", cost_savings)
     npv = -investment_cost + cost_savings
     return npv
+
+def get_solarpanel(self):
+    return self.solarpanel
+
+def get_battery(self):
+    return self.battery
+
+def get_inverter(self):
+    return self.inverter
