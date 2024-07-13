@@ -39,27 +39,30 @@ st.write(
 
 
 
-controller= ControllerSolarPower()
-controller.load_model()
+#controller=ControllerSolarPower()
+# check if controller in session state
+if "controller" not in st.session_state:
+    st.session_state.controller = ControllerSolarPower()
+
 # Write SLP to firestore
 if st.button("Refresh SLP"):
-    controller.refresh_SLP()
+    st.session_state.controller.refresh_SLP()
 
 # only upload if button is clicked
 if st.button("Upload model"):
-    st.write(controller.upload_model())
+    st.write(st.session_state.controller.upload_model())     #todo: why does this not update the new values set by updtate_belpex and update_SLP? controller is not updated in the state
 
 if st.button("update model"):
-    st.write(controller.update_model())
+    st.write(st.session_state.controller.update_model())
 
-st.write(controller.get_SLP_belpex().tail(15))
+st.write(st.session_state.controller.get_SLP_belpex().tail(15))
 
 #Display the last 15 gridflow and load values
-st.write(controller.get_gridflow().tail(15))
+st.write(st.session_state.controller.get_gridflow().tail(15))
 
 # Drop down to select inverter
 inverter=st.selectbox('Select inverter',['SMA','Fronius','Goodwe'])
-controller.change_model(Inverter=inverter)
+st.session_state.controller.change_model(Inverter=inverter)
 
 
 
