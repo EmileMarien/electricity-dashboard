@@ -54,7 +54,7 @@ class SolarPowerState():
         self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})
 
     def update_SLP(self):
-        self.solarpowermodel.append_load_df(self.data_repository_SLP.get_SLP(),SLP=True)
+        self.solarpowermodel.append_load_df(self.data_repository_SLP.get_SLP(),SLP=True)    #TODO: change to set_load_df
         self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})            
 
     def update_SPP(self):

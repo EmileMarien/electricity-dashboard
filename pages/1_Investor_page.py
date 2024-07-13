@@ -49,8 +49,8 @@ if "controller" not in st.session_state:
 
 
 # only upload if button is clicked
-#if st.button("Upload model"):
-#    st.write(st.session_state.controller.upload_model())     #todo: why does this not update the new values set by updtate_belpex and update_SLP? controller is not updated in the state
+if st.button("Load model"):
+    st.write(st.session_state.controller.load_model())     #todo: why does this not update the new values set by updtate_belpex and update_SLP? controller is not updated in the state
 
 if st.button("update model"):
     st.write(st.session_state.controller.update_model())

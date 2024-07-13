@@ -55,7 +55,7 @@ class ControllerSolarPower:
         inverter=Inverter(inverter_type=inverter_type)
         solarpanel=SolarPanel(solar_panel_type=solar_panel_type)
         battery=Battery(battery_type=battery_type)
-        return self.state.change_model(battery=battery, inverter=inverter, solarpanel=solarpanel)
+        return self.state.change_model(battery=battery, inverter=inverter, solarpanel=solarpanel)   #TODO: model parameters are not really changed after pushing the button
     
     def get_solarpanelname(self):
         return self.state.solarpowermodel.get_solarpanel().get_solarpanel_type()
