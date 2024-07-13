@@ -39,8 +39,8 @@ st.sidebar.header("Model overview")
 
 
 # Write SLP to firestore
-#if st.button("Refresh SLP"):
-#    st.session_state.controller.refresh_SLP()
+if st.button("Refresh SPP"):
+    st.session_state.controller.refresh_SPP()
 
 # only upload if button is clicked
 #if st.button("Upload model"):
