@@ -65,6 +65,7 @@ class SolarPowerState():
         self.solarpowermodel.update_power_flow()
         self.solarpowermodel.update_dual_tariff()
         self.solarpowermodel.update_dynamic_tariff()
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})
         return "calculations updated"
 
     def get_columns(self,columns):

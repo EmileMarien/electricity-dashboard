@@ -46,9 +46,7 @@ st.sidebar.header("Model overview")
 if "controller" not in st.session_state:
     st.session_state.controller = ControllerSolarPower()
 
-# Write SLP to firestore
-if st.button("Refresh SPP"):
-    st.session_state.controller.refresh_SPP()
+
 
 # only upload if button is clicked
 #if st.button("Upload model"):
