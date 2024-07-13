@@ -69,7 +69,7 @@ class Battery:
                 "battery_count": 1
             }
         }
-        if battery_type not in battery_types.keys:
+        if battery_type not in battery_types.keys():
             self.battery_cost = battery_cost
             self.battery_lifetime = battery_lifetime
             self.battery_capacity = battery_capacity

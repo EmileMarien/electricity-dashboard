@@ -155,7 +155,7 @@ class Inverter:
                     "inverter_efficiency": 0.972,  
                 },
             }
-        if inverter_type not in inverter_types.keys:
+        if inverter_type not in inverter_types.keys():
             self.inverter_type = inverter_type
             self.inverter_cost = inverter_cost
             self.inverter_size_AC = inverter_size_AC
