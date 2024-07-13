@@ -19,11 +19,17 @@ from google.cloud.firestore_v1.base_document import DocumentSnapshot
 class SolarPowerModel():
     def __init__(self, solarpanel=None, inverter=None, battery=None,reference_id=None, dataframe: pd.DataFrame = pd.DataFrame()):
         if solarpanel is None:
-            solarpanel = SolarPanel(solar_panel_type="Jinko")
+            self.solarpanel = SolarPanel(solar_panel_type="Jinko")
+        else:
+            self.solarpanel = solarpanel
         if inverter is None:
-            inverter = Inverter(inverter_type="Sungrow_3")
+            self.inverter = Inverter(inverter_type="Sungrow_3")
+        else:
+            self.inverter = inverter
         if battery is None:
-            battery = Battery(battery_type="LG RESU 2.9")
+            self.battery = Battery(battery_type="LG RESU 2.9")
+        else:
+            self.battery = battery
 
         # Initialize the dataframe
         if dataframe.empty:
@@ -74,10 +80,7 @@ class SolarPowerModel():
             assert 'Belpex' in dataframe.columns, "DataFrame must have a 'Belpex' column"
             self.pd=dataframe
 
-        self.solarpanel=solarpanel
         self.T_STC=25
-        self.inverter=inverter
-        self.battery=battery
 
         self.tariff_dual_peak=0.1701
         self.tariff_dual_offpeak=0.146

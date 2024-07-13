@@ -300,11 +300,12 @@ def append_pv_power_df(self,df_pv_power:pd.DataFrame,SPP:bool=False):
 
 
     if SPP: #add values from df_load to self.pd that have same hour, minute, day and month as its index
+        multiplier= self.solarpanel.get_panel_efficiency()*self.solarpanel.get_panel_surface()*self.solarpanel.get_solar_panel_count()
         missing_indices = self.pd.loc[self.pd['PV_Power_kW'].isnull()].index
         for index in missing_indices:
             load_value = df_pv_power.loc[(df_pv_power.index.hour == index.hour) & (df_pv_power.index.day == index.day) & (df_pv_power.index.month == index.month) & (df_pv_power.index.minute == index.minute), 'PV_Power_kW']
             if not load_value.empty:
-                self.pd.loc[index, 'PV_Power_kW'] = load_value.iloc[0]
+                self.pd.loc[index, 'PV_Power_kW'] = load_value.iloc[0]*multiplier
     else: 
         missing_indices = df_pv_power.index.difference(self.pd['PV_Power_kW'].index)
         missing_data = df_pv_power.loc[missing_indices]

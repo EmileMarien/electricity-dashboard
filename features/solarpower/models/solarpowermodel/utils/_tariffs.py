@@ -186,9 +186,6 @@ def update_dual_tariff(self):
         injection_tariff (float): The tariff rate for injected energy.
     """
     
-    # Check if 'GridFlow' does not contain None values
-    assert self.pd['GridFlow'].dtype == 'float64', "GridFlow should be a float64"
-    
     # Create masks for rows where 'DualTariff' and 'DualTariff_Load' are NaN
     mask_dual_tariff = self.pd['DualTariff'].isna()
     mask_dual_tariff_load = self.pd['DualTariff_Load'].isna()
