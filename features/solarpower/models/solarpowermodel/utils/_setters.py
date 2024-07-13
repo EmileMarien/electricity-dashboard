@@ -290,7 +290,7 @@ def set_pv_power_df(self,df_pv_power:pd.DataFrame):
     return None
 
 
-def append_pv_power_df(self,df_pv_power:pd.DataFrame):
+def append_pv_power_df(self,df_pv_power:pd.DataFrame,SPP:bool=False):
     assert 'PV_Power_kW' in df_pv_power.columns
     if not df_pv_power.index.name == 'DateTime':
         assert 'DateTime' in df_pv_power.columns
@@ -298,25 +298,23 @@ def append_pv_power_df(self,df_pv_power:pd.DataFrame):
     if not df_pv_power.index.dtype == 'datetime64[ns]':
         df_pv_power.index = pd.to_datetime(df_pv_power.index)
 
-    # Ensure we only add values at indices already present in self.pd and df_pv_power
-    #common_indices = self.pd.index.intersection(df_pv_power.index)
 
-    # Update self.pd with the values from df_pv_power at the common indices
-    #self.pd.loc[common_indices, 'PV_Power_kW'] = df_pv_power.loc[common_indices, 'PV_Power_kW']
+    if SPP: #add values from df_load to self.pd that have same hour, minute, day and month as its index
+        missing_indices = self.pd.loc[self.pd['PV_Power_kW'].isnull()].index
+        for index in missing_indices:
+            load_value = df_pv_power.loc[(df_pv_power.index.hour == index.hour) & (df_pv_power.index.day == index.day) & (df_pv_power.index.month == index.month) & (df_pv_power.index.minute == index.minute), 'PV_Power_kW']
+            if not load_value.empty:
+                self.pd.loc[index, 'PV_Power_kW'] = load_value.iloc[0]
+    else: 
+        missing_indices = df_pv_power.index.difference(self.pd['PV_Power_kW'].index)
+        missing_data = df_pv_power.loc[missing_indices]
+        #print(missing_data)
+        #print(self.pd)
 
-    # Identify missing indices in df1 that are present in df2 and add them
-    missing_indices = df_pv_power.index.difference(self.pd['PV_Power_kW'].index)
-    missing_data = df_pv_power.loc[missing_indices]
-    #print(missing_data)
-    #print(self.pd)
+        # Append the missing data to df1
+        if not missing_data.empty:
+            self.pd = pd.concat([self.pd,missing_data]).sort_index()
 
-    # Append the missing data to df1
-    if not missing_data.empty:
-        self.pd = pd.concat([self.pd,missing_data]).sort_index()
-
-    # Set the previous data to nan
-    missing_indices_2=self.pd.index.difference(df_pv_power.index)
-    self.pd.loc[missing_indices_2, 'PV_Power_kW'] = None
     return None
 
 def set_pv_power_spp_df(self,set:str,peak_power:int):

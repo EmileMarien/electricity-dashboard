@@ -98,8 +98,6 @@ class DataRepositorySPP: #TODO: fix this by changing SLP to SPP
 
         return f"Added {len(data_to_add)} new datapoints to Firestore under 'syntheticprofiles/SLP'"
 
-
-
     def get_SPP(self):
         """
         Retrieves the synthetic load profile from Firestore under 'syntheticprofiles/SLP'

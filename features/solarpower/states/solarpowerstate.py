@@ -7,7 +7,7 @@ from battery.battery import Battery
 from core.firestore_init import authenticate_to_firestore, load_key
 from features.solarpower.repositories.data_repository_belpex import DataRepositoryBelpex
 from features.solarpower.repositories.data_repository_solarmodel import DataRepositorySolarModel
-from features.solarpower.repositories.data_repository_syntheticprofiles import DataRepositorySLP
+from features.solarpower.repositories.data_repository_syntheticprofiles import DataRepositorySLP, DataRepositorySPP
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 from features.solarpower.models.syntheticprofilefetching.syntheticprofilefetching import SLP_xls_to_pd, SPP_xls_to_pd
 from features.solarpower.models.pricefetching.pricefetching import fetch_electricity_prices
@@ -22,6 +22,7 @@ class SolarPowerState():
         self.data_repository_belpex=DataRepositoryBelpex(firestore_reference=firestor_reference)
         self.data_repository_solarmodel=DataRepositorySolarModel(firestore_reference=firestor_reference)
         self.data_repository_SLP=DataRepositorySLP(firestore_reference=firestor_reference)
+        self.data_repository_SPP=DataRepositorySPP(firestore_reference=firestor_reference)
         self.solarpowermodel.set_reference_id('test')
     
     def set_SLP(self):
@@ -50,12 +51,16 @@ class SolarPowerState():
 
         self.solarpowermodel.append_belpex_df(prices)
 
-        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S')).to_dict(orient='index')})
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})
 
     def update_SLP(self):
         self.solarpowermodel.append_load_df(self.data_repository_SLP.get_SLP(),SLP=True)
-        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S')).to_dict(orient='index')})            
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})            
 
+    def update_SPP(self):
+        self.solarpowermodel.append_pv_power_df(self.data_repository_SPP.get_SPP(),SPP=True)
+        self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})
+        
     def update_calculations(self):
         self.solarpowermodel.update_power_flow()
         self.solarpowermodel.update_dual_tariff()
@@ -71,7 +76,7 @@ class SolarPowerState():
         Checks if the provided components differ from the current installed ones and if so, refreshes the model and updates database
         """
         if solarpanel.get_solarpanel_type()!=self.solarpowermodel.solarpanel.get_solarpanel_type() and solarpanel is not None:
-            self.solarpowermodel.refresh_PV_Power_kW(new_solarpanel=solarpanel)
+            self.solarpowermodel.refresh_PV_Power_kW(new_solarpanel=solarpanel,SLP_data=self.data_repository_SLP.get_SLP())
             updated=True
         else:
             self.solarpowermodel.update_PV_Power_kW() #TODO: change so SLP can also be used!!

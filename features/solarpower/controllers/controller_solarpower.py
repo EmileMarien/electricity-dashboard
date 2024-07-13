@@ -47,6 +47,7 @@ class ControllerSolarPower:
     def update_model(self):
         self.state.update_belpex()
         self.state.update_SLP()
+        self.state.update_SPP()
         self.state.update_calculations()
         return None
     
