@@ -38,6 +38,14 @@ st.sidebar.header("Model overview")
 
 
 
+
+
+
+
+# check if controller in session state
+if "controller" not in st.session_state:
+    st.session_state.controller = ControllerSolarPower()
+
 # Write SLP to firestore
 if st.button("Refresh SPP"):
     st.session_state.controller.refresh_SPP()
@@ -48,12 +56,6 @@ if st.button("Refresh SPP"):
 
 if st.button("update model"):
     st.write(st.session_state.controller.update_model())
-
-
-
-# check if controller in session state
-if "controller" not in st.session_state:
-    st.session_state.controller = ControllerSolarPower()
 
 st.header("Model components")
 st.write("Your current home system contains following equipment:")
