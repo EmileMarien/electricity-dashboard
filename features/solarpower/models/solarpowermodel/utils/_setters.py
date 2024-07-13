@@ -255,7 +255,7 @@ def set_belpex_xlsx(self,file_path_BelpexFilter:str):
     self.pd = pd.concat(belpex_df, self.pd, join="outer") #TODO: check how to merge both
     return None
 
-def set_pv_power_df(self,df_pv_power:pd.DataFrame):
+def set_pv_power_df(self,df_pv_power:pd.DataFrame): #TODO: add SPP possibility and make use of solarpanel power
     assert 'PV_Power_kW' in df_pv_power.columns
     if not df_pv_power.index.name == 'DateTime':
         assert 'DateTime' in df_pv_power.columns
