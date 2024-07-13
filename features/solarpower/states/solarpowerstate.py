@@ -52,13 +52,13 @@ class SolarPowerState():
     def get_columns(self,columns):
         return self.solarpowermodel.get_columns(columns=columns)
     
-    def change_model(self,Battery=None,Inverter=None,SolarPanel=None):
-        if SolarPanel!=self.solarpowermodel.solarpanel and SolarPanel is not None:
-            self.solarpowermodel.refresh_PV_Power_kW(new_solarpanel=SolarPanel)
+    def change_model(self,battery=None,inverter=None,solarpanel=None):
+        if solarpanel!=self.solarpowermodel.solarpanel and solarpanel is not None:
+            self.solarpowermodel.refresh_PV_Power_kW(new_solarpanel=solarpanel)
         else:
             self.solarpowermodel.update_PV_Power_kW()
-        if Battery!=self.solarpowermodel.battery or Inverter!=self.solarpowermodel.inverter:
-            self.solarpowermodel.refresh_power_flow(new_battery=Battery,new_inverter=Inverter)
+        if battery!=self.solarpowermodel.battery or inverter!=self.solarpowermodel.inverter:
+            self.solarpowermodel.refresh_power_flow(new_battery=battery,new_inverter=inverter)
 
             self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={'battery':self.solarpowermodel.battery.to_dict(),'inverter':self.solarpowermodel.inverter.to_dict(),'solarpanel':self.solarpowermodel.solarpanel.to_dict(),'pd':self.solarpowermodel.pd.to_dict()})
         return None
