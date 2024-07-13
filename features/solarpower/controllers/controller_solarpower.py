@@ -50,4 +50,4 @@ class ControllerSolarPower:
         inverter=Inverter(inverter_type=inverter_type)
         solarpanel=SolarPanel(solar_panel_type=solar_panel_type)
         battery=Battery(battery_type=battery)
-        return self.state.change_model(Battery=battery, inverter=inverter, SolarPanel=solarpanel)
+        return self.state.change_model(battery=battery, inverter=inverter, solarpanel=solarpanel)
