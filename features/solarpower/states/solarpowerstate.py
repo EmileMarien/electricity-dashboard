@@ -32,7 +32,7 @@ class SolarPowerState():
 
     def set_SPP(self):
         SPP=SPP_xls_to_pd('data/SPP_2022_(Ex-ante_and_Ex-post)_v1_0_prod.xlsx')
-        self.data_repository_SLP.add_SPP(SPP=SPP)
+        self.data_repository_SPP.add_SPP(SPP=SPP)
         return None
        
     
