@@ -61,7 +61,7 @@ st.write(st.session_state.controller.get_SLP_belpex().tail(15))
 st.write(st.session_state.controller.get_gridflow().tail(15))
 
 # Drop down to select inverter
-inverter=st.selectbox('Select inverter',['SMA','Fronius','Goodwe'])
+inverter=st.selectbox('Select inverter',['Sungrow_3','Fronius_3','Sungrow_5'])
 st.session_state.controller.change_model(inverter_type=inverter)
 
 
