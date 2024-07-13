@@ -71,7 +71,7 @@ class SolarPanel:
                 "temperature_coefficient": -0.0035
             }
         }
-        if solar_panel_type not in solar_panel_types.keys:
+        if solar_panel_type not in solar_panel_types.keys():
             self.solar_panel_cost = solar_panel_cost
             self.solar_panel_count = solar_panel_count
             self.solar_panel_lifetime = solar_panel_lifetime
