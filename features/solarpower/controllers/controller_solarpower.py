@@ -1,8 +1,11 @@
 
 
 import pandas as pd
+from battery.battery import Battery
 from features.solarpower.models.solarpowermodel.solarpowermodel import SolarPowerModel
 from features.solarpower.states.solarpowerstate import SolarPowerState
+from inverter.inverter import Inverter
+from solarpanel.solarpanel import SolarPanel
 
 
 class ControllerSolarPower:
@@ -43,5 +46,8 @@ class ControllerSolarPower:
         self.state.update_SLP()
         return None
     
-    def change_model(self, Battery=None, Inverter=None, SolarPanel=None):
-        return self.state.change_model(Battery=Battery, Inverter=Inverter, SolarPanel=SolarPanel)
+    def change_model(self, battery=None, inverter_type=None, solar_panel_type=None):
+        inverter=Inverter(inverter_type=inverter_type)
+        solarpanel=SolarPanel(solar_panel_type=solar_panel_type)
+        battery=Battery(battery_type=battery)
+        return self.state.change_model(Battery=battery, inverter=inverter, SolarPanel=solarpanel)
