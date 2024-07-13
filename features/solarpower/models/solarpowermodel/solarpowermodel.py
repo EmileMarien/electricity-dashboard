@@ -45,6 +45,7 @@ class SolarPowerModel():
             self.pd['DynamicTariff'] = None
             self.pd['DynamicTariff_Load'] = None
             self.pd['Belpex'] = None
+            self.pd['T_RV_degC'] = None
             #Set a datetime index with name 'DateTime'
             self.pd.index.name = 'DateTime'
             self.pd.index = pd.to_datetime(self.pd.index)
