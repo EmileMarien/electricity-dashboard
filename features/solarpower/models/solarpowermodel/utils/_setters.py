@@ -61,7 +61,7 @@ def set_load_slp_df(self, set:str,yearly_average:int):
 
 
 
-def append_load_df(self, df_load: pd.DataFrame,SLP:bool=False):      
+def append_load_df(self, df_load: pd.DataFrame,SLP:bool=False,yearly_average:int=1000):      
     assert 'Load_kW' in df_load.columns 
     if not df_load.index.name == 'DateTime':
         assert 'DateTime' in df_load.columns
@@ -75,7 +75,7 @@ def append_load_df(self, df_load: pd.DataFrame,SLP:bool=False):
         for index in missing_indices:
             load_value = df_load.loc[(df_load.index.hour == index.hour) & (df_load.index.day == index.day) & (df_load.index.month == index.month) & (df_load.index.minute == index.minute), 'Load_kW']
             if not load_value.empty:
-                self.pd.loc[index, 'Load_kW'] = load_value.iloc[0]
+                self.pd.loc[index, 'Load_kW'] = load_value.iloc[0]*yearly_average
 
     else:
         missing_indices = df_load.index.difference(self.pd['Load_kW'].index)
