@@ -217,7 +217,7 @@ def battery(row,load_to_battery:float,old_capacity:float,max_charge: int = 8, ma
 
     return load_from_battery,new_capacity
 
-def EV(row,load_to_EV:float,old_capacity:float,EV_type:str='B2G',max_EV_power: int = 3.7, max_EV_charge=82.3,freq:int=60):
+def EV(row,load_to_EV:float,old_capacity:float,EV_type:str='no_EV',max_EV_power: int = 3.7, max_EV_charge=82.3,freq:int=60):
     """
     Calculate load after the EV and the new EV capacity using the old capacity and load
     
