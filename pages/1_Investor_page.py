@@ -60,14 +60,25 @@ st.write("Your current home system contains following equipment:")
 st.write("Inverter: ", st.session_state.controller.get_invertername()) #TODO: check if possible to let pop up the parameters if this is clicked
 st.write("Battery: ", st.session_state.controller.get_batteryname())
 st.write("Solarpanel: ", st.session_state.controller.get_solarpanelname())
+with st.form("my_form"):
+   st.write("Inside the form")
+   slider_val = st.slider("Form slider")
+   checkbox_val = st.checkbox("Form checkbox")
+
+   # Every form must have a submit button.
+   submitted = st.form_submit_button("Submit")
+   if submitted:
+       st.write("slider", slider_val, "checkbox", checkbox_val)
+
+st.write("Outside the form")
 if st.button("Edit model"):
     with st.form(key="Edit model"):
         new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'],key='new_inverter')
         new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'],key='new_battery')
-        #status = st.selectbox("Status", ["Active", "Inactive"])
-        submit_button = st.form_submit_button(label='Update model', on_click=st.session_state.controller.change_model(inverter_type=new_inverter,battery_type=new_battery))
+        submit_button = st.form_submit_button(label='Update model', on_click=st.session_state.controller.change_model(inverter_type=st.session_state.new_inverter,battery_type=st.session_state.new_battery))
 
 
+#status = st.selectbox("Status", ["Active", "Inactive"])
 
 
 st.header("Recent readings")
