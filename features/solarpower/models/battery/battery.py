@@ -122,6 +122,6 @@ class Battery:
             "battery_peak_power": self.battery_peak_power,
             "battery_degradation": self.battery_degradation,
             "battery_count": self.battery_count,
-            "reference_id": self.reference_id
+            "reference_id": self.reference_id,
             "battery_type": self.battery_type
         }
