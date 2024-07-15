@@ -61,16 +61,17 @@ st.write("Inverter: ", st.session_state.controller.get_invertername()) #TODO: ch
 st.write("Battery: ", st.session_state.controller.get_batteryname())
 st.write("Solarpanel: ", st.session_state.controller.get_solarpanelname())
 if st.button("Edit model"):
-    with st.form("Edit model"):
-        new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'])
-        new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'])
+    with st.form(key="Edit model"):
+        new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'],key='new_inverter')
+        new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'],key='new_battery')
         #status = st.selectbox("Status", ["Active", "Inactive"])
-        submitted = st.form_submit_button("Update model")
 
-        if submitted:
-            st.session_state.controller.change_model(inverter_type=new_inverter,battery_type=new_battery)
-        else:
-            st.error("Please fill in all fields")
+        submit_button = st.form_submit_button(label='Update model', on_click=st.session_state.controller.change_model(inverter_type=new_inverter,battery_type=new_battery))
+
+
+
+
+
 
 
 st.header("Recent readings")
