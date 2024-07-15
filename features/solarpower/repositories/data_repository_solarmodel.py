@@ -39,11 +39,11 @@ class DataRepositorySolarModel():
     fields_to_update: dict
     """
       
-    #if fields_to_update=={}:
-    self.collection.document(model.get_reference_id()).set(model.to_dict())
+    if fields_to_update=={}:
+        self.collection.document(model.get_reference_id()).set(model.to_dict())
       
-      #else:
-      #  self.collection.document(model.get_reference_id()).update(fields_to_update)
+    else:
+        self.collection.document(model.get_reference_id()).update(fields_to_update)
     return None
   
   def get_model(self,reference_id:str):
