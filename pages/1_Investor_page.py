@@ -72,10 +72,10 @@ with st.form("my_form"):
 
 st.write("Outside the form")
 if st.button("Edit model"):
-    with st.form(key="Edit model"):
+    with st.form("Edit model"):
         new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'],key='new_inverter')
         new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'],key='new_battery')
-        submit_button = st.form_submit_button(label='Update model', on_click=st.session_state.controller.change_model(inverter_type=st.session_state.new_inverter,battery_type=st.session_state.new_battery))
+        submit_button = st.form_submit_button('Update model', on_click=st.session_state.controller.change_model(inverter_type=st.session_state.new_inverter,battery_type=st.session_state.new_battery))
 
 
 #status = st.selectbox("Status", ["Active", "Inactive"])
