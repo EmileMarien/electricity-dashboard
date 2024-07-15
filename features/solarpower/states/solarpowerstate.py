@@ -76,7 +76,7 @@ class SolarPowerState():
         """
         Checks if the provided components differ from the current installed ones and if so, refreshes the model and updates database
         """
-        if !(solarpanel is None or solarpanel.get_solarpanel_type()==self.solarpowermodel.solarpanel.get_solarpanel_type()):
+        if not (solarpanel is None or solarpanel.get_solarpanel_type()==self.solarpowermodel.solarpanel.get_solarpanel_type()):
             #self.solarpowermodel.refresh_PV_Power_kW(new_solarpanel=solarpanel,SLP_data=self.data_repository_SLP.get_SLP())
             self.solarpowermodel.solarpanel=solarpanel #TODO: check how to do differently
             self.solarpowermodel.update_PV_Power_kW()
