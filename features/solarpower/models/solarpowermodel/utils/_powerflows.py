@@ -33,7 +33,7 @@ def refresh_power_flow(self, new_inverter:Inverter, new_battery:Battery):
     max_PV_input=self.inverter.get_inverter_maxsolar_DC() #TODO: check if this is correct
     max_EV_power=self.battery.get_battery_peak_power() #TODO: check if this is correct
     max_EV_charge=self.battery.get_battery_capacity() #TODO: check if this is correct
-    EV_type=self.battery.get_battery_type() #TODO: check if this is correct
+    EV_type='no_EV' #TODO: check if this is correct
     battery_roundtrip_efficiency=self.battery.get_battery_roundtrip_efficiency() #TODO: check if this is correct
     battery_peak_power=self.battery.get_battery_peak_power() #TODO: check if this is correct
     max_charge=self.battery.get_battery_capacity() #TODO: check if this is correct
