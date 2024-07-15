@@ -61,7 +61,8 @@ class SolarPowerModel():
                 assert dataframe['DateTime'].dtype == 'datetime64[ns]', "DateTime column must be of type datetime64[ns]"
                 dataframe.set_index('DateTime', inplace=True)
             else:
-                assert dataframe.index.dtype == 'datetime64[ns]', "DateTime index must be of type datetime"
+                assert dataframe.index.dtype == 'datetime64[ns]', f"DateTime index must be of type datetime but is: {dataframe.index.dtype}"
+
 
             assert 'Load_kW' in dataframe.columns, "DataFrame must have a 'Load_kW' column"
             assert 'DirectIrradiance' in dataframe.columns, "DataFrame must have a 'DirectIrradiance' column"
