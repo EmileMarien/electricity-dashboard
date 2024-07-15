@@ -52,9 +52,9 @@ class ControllerSolarPower:
         return None
     
     def change_model(self, battery_type=None, inverter_type=None, solar_panel_type=None):
-        inverter=Inverter(inverter_type=inverter_type)
-        solarpanel=SolarPanel(solar_panel_type=solar_panel_type)
-        battery=Battery(battery_type=battery_type)
+        inverter=Inverter(inverter_type=inverter_type) if inverter_type is not None else None
+        solarpanel=SolarPanel(solar_panel_type=solar_panel_type) if solar_panel_type is not None else None
+        battery=Battery(battery_type=battery_type) if battery_type is not None else None
         return self.state.change_model(battery=battery, inverter=inverter, solarpanel=solarpanel)   #TODO: model parameters are not really changed after pushing the button
     
     def get_solarpanelname(self):
