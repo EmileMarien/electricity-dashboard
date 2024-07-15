@@ -65,11 +65,7 @@ if st.button("Edit model"):
         new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'],key='new_inverter')
         new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'],key='new_battery')
         #status = st.selectbox("Status", ["Active", "Inactive"])
-
         submit_button = st.form_submit_button(label='Update model', on_click=st.session_state.controller.change_model(inverter_type=new_inverter,battery_type=new_battery))
-
-
-
 
 
 
