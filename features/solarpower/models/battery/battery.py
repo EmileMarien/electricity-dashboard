@@ -123,4 +123,5 @@ class Battery:
             "battery_degradation": self.battery_degradation,
             "battery_count": self.battery_count,
             "reference_id": self.reference_id
+            "battery_type": self.battery_type
         }

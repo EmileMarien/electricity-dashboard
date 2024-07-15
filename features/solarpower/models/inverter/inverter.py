@@ -201,4 +201,5 @@ class Inverter:
             "inverter_efficiency": self.inverter_efficiency,
             "inverter_maxbattery_DC": self.inverter_maxbattery_DC,
             "reference_id": self.reference_id
+            "inverter_type": self.inverter_type
         }

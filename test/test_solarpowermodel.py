@@ -5,6 +5,7 @@ import pandas as pd
 from context import SolarPowerModel
 from context import fetch_electricity_prices
 from features.solarpower.models.battery.battery import Battery
+
 from google.cloud.firestore_v1.base_document import DocumentSnapshot
 from google.cloud.firestore_v1.document import DocumentReference
 

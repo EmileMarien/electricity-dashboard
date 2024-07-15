@@ -124,5 +124,6 @@ class SolarPanel:
             "annual_degradation": self.annual_degradation,
             "panel_efficiency": self.panel_efficiency,
             "temperature_coefficient": self.temperature_coefficient,
-            "reference_id": self.reference_id
+            "reference_id": self.reference_id,
+            "solar_panel_type": self.solar_panel_type
         }
