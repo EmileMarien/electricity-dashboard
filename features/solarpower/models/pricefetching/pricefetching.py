@@ -1,6 +1,35 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+def fetch_electricity_prices_xlsx():
+    """
+    Fetches the electricity prices from the xlsx file and returns as a DataFrame.
+
+    Args:
+        file_path (str): The path to the xlsx file.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the electricity prices with timestamps.
+    """
+    file_path = 'data/Belpex.xlsx'
+    assert file_path.endswith('.xlsx'), 'The file must be an Excel file'
+    belpex_df = pd.read_excel(file_path)
+    # Assert that 'Load_kW' and 'DateTime' columns are present in the Excel file
+    assert 'DateTime' in belpex_df.columns, "'DateTime' column not found in the Irradiance Excel file"
+    assert 'Belpex' in belpex_df.columns, "'Belpex' column not found in the Irradiance Excel file"
+    # Convert 'DateTime' column to datetime
+    # Convert DateTime column to datetime, assuming the original timezone is known, for example, 'Europe/Brussels'
+    belpex_df['DateTime'] = pd.to_datetime(belpex_df['DateTime'], dayfirst=True)  # Adjust `dayfirst` based on the date format
+    belpex_df['DateTime'] = belpex_df['DateTime'].dt.tz_localize('Europe/Brussels').dt.tz_convert('UTC')
+
+    # Set DateTime as index
+    belpex_df.set_index('DateTime', inplace=True)
+    return belpex_df
+
 def fetch_electricity_prices():
     """
     Fetches the electricity prices from the Elexys website and returns as a DataFrame.

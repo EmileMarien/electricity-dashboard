@@ -2,8 +2,6 @@
 
 import pandas as pd
 
-#TODO: how to merge? don't forget to set datetimeindex
-
 def set_reference_id(self, reference_id: str):
 
     self.reference_id = reference_id

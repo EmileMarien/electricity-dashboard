@@ -60,23 +60,15 @@ st.write("Your current home system contains following equipment:")
 st.write("Inverter: ", st.session_state.controller.get_invertername()) #TODO: check if possible to let pop up the parameters if this is clicked
 st.write("Battery: ", st.session_state.controller.get_batteryname())
 st.write("Solarpanel: ", st.session_state.controller.get_solarpanelname())
-with st.form("my_form"):
-   st.write("Inside the form")
-   slider_val = st.slider("Form slider")
-   checkbox_val = st.checkbox("Form checkbox")
+st.write("Peak power: ", st.session_state.controller.get_peak_power())
 
-   # Every form must have a submit button.
-   submitted = st.form_submit_button("Submit")
-   if submitted:
-       st.write("slider", slider_val, "checkbox", checkbox_val)
-
-st.write("Outside the form")
 if st.button("Edit model"):
     with st.form("Edit model"):
         new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'],key='new_inverter')
         new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'],key='new_battery')
-        submit_button = st.form_submit_button('Update model', on_click=st.session_state.controller.change_model(inverter_type=st.session_state.new_inverter,battery_type=st.session_state.new_battery))
-
+        submitted = st.form_submit_button('Update model', on_click=st.session_state.controller.change_model(inverter_type=st.session_state.new_inverter,battery_type=st.session_state.new_battery))
+        if submitted:
+            st.write("Model updated")
 
 #status = st.selectbox("Status", ["Active", "Inactive"])
 
@@ -84,5 +76,7 @@ if st.button("Edit model"):
 st.header("Recent readings")
 st.write(st.session_state.controller.get_SLP_belpex().tail(15))
 
-#Display the last 15 gridflow and load values
-st.write(st.session_state.controller.get_gridflow().tail(15))
+st.header("Performance metrics")
+st.write("Total production: ", st.session_state.controller.get_total_production())
+st.write("Total consumption: ", st.session_state.controller.get_total_consumption())
+st.write("Total savings: ", st.session_state.controller.get_total_savings())
