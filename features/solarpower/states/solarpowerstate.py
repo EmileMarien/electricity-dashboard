@@ -53,7 +53,7 @@ class SolarPowerState():
         return None
     
     def update_belpex(self):
-        prices=fetch_electricity_prices_xlsx()
+        prices=fetch_electricity_prices()
         self.data_repository_belpex.update(prices)
 
         self.solarpowermodel.append_belpex_df(prices)
