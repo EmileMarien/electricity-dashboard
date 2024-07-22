@@ -18,10 +18,11 @@ class TestSolarPowerModel(unittest.TestCase):
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00'],
             'Load_kW': [100, 200]
         }))
+        model.yearly_consumption_energy=300
         #print(model.get_columns(columns=['Load_kW']))
         self.assertEqual(model.get_columns(columns=['Load_kW']).shape, (2, 1))
 
-        model.set_average_consumption_power(200)
+        model.set_yearly_consumption_energy(200)
         print(model.get_columns(columns=['Load_kW']))
         model.set_irradiance_df(pd.DataFrame({
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00', '2022-01-01 02:00:00'],
