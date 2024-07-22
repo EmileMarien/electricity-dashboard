@@ -25,11 +25,16 @@ class DataRepositoryBelpex():
 
   def get_belpex(self):
     belpex_dict = self.collection.document('belpex').get().to_dict()
-    data=pd.DataFrame.from_dict(belpex_dict)
-    data = pd.DataFrame.from_dict(data['dataframe'],orient='index')
-    data.index = pd.to_datetime(data['dataframe'].index)
-    return data
+    belpex_df = pd.DataFrame(list(belpex_dict.items()), columns=['DateTime', 'Belpex'])
+    belpex_df['DateTime'] = pd.to_datetime(belpex_df['DateTime'])
+    belpex_df.set_index('DateTime', inplace=True)
+
+    #data=pd.DataFrame.from_dict(belpex_dict)
+    #data = pd.DataFrame.from_dict(data['dataframe'],orient='index')
+    #data.index = pd.to_datetime(data['dataframe'].index)
+    return belpex_df
   
+
   """
   def get_belpex(self):
       
