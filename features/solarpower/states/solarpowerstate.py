@@ -14,6 +14,7 @@ from features.solarpower.models.pricefetching.pricefetching import fetch_electri
 from features.solarpower.models.inverter.inverter import Inverter
 from features.solarpower.models.solarpanel.solarpanel import SolarPanel
 
+#TODO: this should be the api
 
 class SolarPowerState():
     def __init__(self):
@@ -71,27 +72,41 @@ class SolarPowerState():
     def get_columns(self,columns):
         return self.solarpowermodel.get_columns(columns=columns)
     
-    def change_model(self,battery:Battery=None,inverter:Inverter=None,solarpanel:SolarPanel=None):
-        updated=False
+    def change_model(self,battery_type=None, inverter_type=None, solarpanel_type=None, peak_production_power=None, yearly_consumption_energy=None, solarpanel_count=None):
         """
         Checks if the provided components differ from the current installed ones and if so, refreshes the model and updates database
         """
-        if not (solarpanel is None or solarpanel.get_solarpanel_type()==self.solarpowermodel.solarpanel.get_solarpanel_type()):
-            #self.solarpowermodel.refresh_PV_Power_kW(new_solarpanel=solarpanel,SLP_data=self.data_repository_SLP.get_SLP())
-            self.solarpowermodel.solarpanel=solarpanel #TODO: check how to do differently
-            self.solarpowermodel.update_PV_Power_kW()
+        if not yearly_consumption_energy is None:
+            self.solarpowermodel.set_yearly_consumption_energy(yearly_consumption_energy)
             updated=True
+
+        if not solarpanel_type is None:
+            solarpanel=SolarPanel(solarpanel_type=solarpanel_type)
+            self.solarpowermodel.set_solarpanel(solarpanel)
+            updated=True
+            
+        if not peak_production_power is None or not solarpanel_count is None:
+            new_peak_power_panel=peak_production_power if peak_production_power is not None else self.solarpowermodel.get_peak_power_panel()
+            new_solarpanel_count=solarpanel_count if solarpanel_count is not None else self.solarpowermodel.get_solar_panel_count()
+            self.solarpowermodel.set_production_power(new_peak_power_panel,new_solarpanel_count)
+            updated=True
+
+        if not battery_type is None or battery_type!=self.solarpowermodel.battery.get_battery_type():
+            new_battery=Battery(battery_type=battery_type)    
         else:
-            self.solarpowermodel.update_PV_Power_kW() #TODO: change so SLP can also be used!!
+            new_battery=self.solarpowermodel.get_battery()
 
-        if battery.get_battery_type()!=self.solarpowermodel.battery.get_battery_type() or inverter.get_inverter_type()!=self.solarpowermodel.inverter.get_inverter_type() or updated:
-            new_battery= battery if ((battery is not None) or (battery.get_battery_type()!=self.solarpowermodel.battery.get_battery_type())) else self.solarpowermodel.get_battery()
+        if not inverter_type is None or inverter_type!=self.solarpowermodel.inverter.get_inverter_type():
+            new_inverter=Inverter(inverter_type=inverter_type)
+        else:
+            new_inverter=self.solarpowermodel.get_inverter()
 
-            new_inverter= inverter if ((inverter is not None) or (inverter.get_inverter_type()!=self.solarpowermodel.inverter.get_inverter_type())) else self.solarpowermodel.get_inverter()
 
-            self.solarpowermodel.refresh_power_flow(new_battery=new_battery,new_inverter=new_inverter)
+        self.solarpowermodel.refresh_power_flow(new_battery=new_battery,new_inverter=new_inverter)
+        self.solarpowermodel.update_dual_tariff()
+        self.solarpowermodel.update_dynamic_tariff()
+        self.data_repository_solarmodel.update(self.solarpowermodel)
 
-            self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={'battery':self.solarpowermodel.battery.to_dict(),'inverter':self.solarpowermodel.inverter.to_dict(),'solarpanel':self.solarpowermodel.solarpanel.to_dict(),'pd':self.solarpowermodel.pd.to_dict()})
         return None
 
         

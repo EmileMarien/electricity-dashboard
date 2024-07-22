@@ -31,6 +31,8 @@ class SolarPowerModel():
         else:
             self.battery = battery
 
+        self.yearly_consumption_energy = 1.0
+        self.peak_power_factor = 1.0
         # Initialize the dataframe
         if dataframe.empty:
             self.pd=dataframe
@@ -154,6 +156,8 @@ class SolarPowerModel():
     from .utils._setters import append_irradiance_df
     from .utils._setters import append_load_df
     from .utils._setters import set_reference_id
+    from .utils._setters import set_yearly_consumption_energy
+    from .utils._setters import set_production_power
 
 
     @staticmethod

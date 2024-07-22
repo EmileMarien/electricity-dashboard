@@ -24,7 +24,7 @@ def fetch_electricity_prices_xlsx():
     # Convert 'DateTime' column to datetime
     # Convert DateTime column to datetime, assuming the original timezone is known, for example, 'Europe/Brussels'
     belpex_df['DateTime'] = pd.to_datetime(belpex_df['DateTime'], dayfirst=True)  # Adjust `dayfirst` based on the date format
-    belpex_df['DateTime'] = belpex_df['DateTime'].dt.tz_localize('Europe/Brussels').dt.tz_convert('UTC')
+    belpex_df['DateTime'] = belpex_df['DateTime'].dt.tz_localize('Europe/Brussels',ambiguous=True).dt.tz_convert('UTC')
 
     # Set DateTime as index
     belpex_df.set_index('DateTime', inplace=True)

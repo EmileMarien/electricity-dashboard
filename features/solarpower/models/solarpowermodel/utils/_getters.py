@@ -230,6 +230,12 @@ def get_grid_cost_total(self,calculationtype:str="DualTariff"):
     cost_total=sum(cost_perhour)
     return cost_total
 
+def get_peak_power(self):
+    """
+    Returns the peak power in kW
+    """
+    return self.solarpanel.get_peak_power()
+
 def get_columns(self,columns:List[str]):
     """
     Returns the dataset with the specific columns

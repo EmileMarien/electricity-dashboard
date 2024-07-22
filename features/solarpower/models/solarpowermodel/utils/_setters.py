@@ -7,6 +7,20 @@ def set_reference_id(self, reference_id: str):
     self.reference_id = reference_id
     return None
 
+def set_yearly_consumption_energy(self, yearly_consumption_energy: float):
+
+    new_load = self.pd['Load_kW'] * yearly_consumption_energy / self.yearly_consumption_energy
+    self.yearly_consumption_energy = yearly_consumption_energy
+    set_load_df(self, pd.DataFrame({'Load_kW': new_load}))
+    return None
+
+def set_production_power(self, peak_power: float, solarpanel_count: int):
+
+    new_pv_power = self.pd['PV_Power_kW'] * peak_power*solarpanel_count / self.solarpanel.get_peak_power()
+    self.solarpanel.set_peak_power_panel(peak_power)
+    self.solarpanel.set_solar_panel_count(solarpanel_count)
+    return None
+
 def set_load_df(self, df_load: pd.DataFrame):
 
     assert 'Load_kW' in df_load.columns 
@@ -42,24 +56,9 @@ def set_load_df(self, df_load: pd.DataFrame):
             self.pd[column] = None
     return None
 
-def set_load_slp_df(self, set:str,yearly_average:int):
-    if set == 'SLP_2022':
-        SLP=pd.read_csv('SLP_2022.csv')
-        SLP['DateTime'] = pd.to_datetime(SLP['DateTime'])
-        SLP.set_index('DateTime', inplace=True)
-        SLP['Load_kW'] = SLP['Load_kW']*yearly_average
-        self.pd['Load_kW'] = SLP['Load_kW']           # add data independent of the year  
-    elif set == 'SLP_2023':
-        SLP=pd.read_csv('SLP_2023.csv')
-        SLP['DateTime'] = pd.to_datetime(SLP['DateTime'])
-        SLP.set_index('DateTime', inplace=True)
-        SLP['Load_kW'] = SLP['Load_kW']*yearly_average
-        self.pd['Load_kW'] = SLP['Load_kW']
-    return None
 
 
-
-def append_load_df(self, df_load: pd.DataFrame,SLP:bool=False,yearly_average:int=1000):      
+def append_load_df(self, df_load: pd.DataFrame,SLP:bool=False):      
     assert 'Load_kW' in df_load.columns 
     if not df_load.index.name == 'DateTime':
         assert 'DateTime' in df_load.columns
@@ -68,12 +67,12 @@ def append_load_df(self, df_load: pd.DataFrame,SLP:bool=False,yearly_average:int
         df_load.index = pd.to_datetime(df_load.index)
 
 
-    if SLP: #add values from df_load to self.pd that have same hour, minute, day and month as its index
+    if SLP: #add values from df_load to self.pd that have same hour, minute, day and month as its index, only new values are added
         missing_indices = self.pd.loc[self.pd['Load_kW'].isnull()].index
         for index in missing_indices:
             load_value = df_load.loc[(df_load.index.hour == index.hour) & (df_load.index.day == index.day) & (df_load.index.month == index.month) & (df_load.index.minute == index.minute), 'Load_kW']
             if not load_value.empty:
-                self.pd.loc[index, 'Load_kW'] = load_value.iloc[0]*yearly_average
+                self.pd.loc[index, 'Load_kW'] = load_value.iloc[0]*self.yearly_consumption_energy
 
     else:
         missing_indices = df_load.index.difference(self.pd['Load_kW'].index)
@@ -298,12 +297,12 @@ def append_pv_power_df(self,df_pv_power:pd.DataFrame,SPP:bool=False):
 
 
     if SPP: #add values from df_load to self.pd that have same hour, minute, day and month as its index
-        multiplier= self.solarpanel.get_panel_efficiency()*self.solarpanel.get_panel_surface()*self.solarpanel.get_solar_panel_count()
+        
         missing_indices = self.pd.loc[self.pd['PV_Power_kW'].isnull()].index
         for index in missing_indices:
             load_value = df_pv_power.loc[(df_pv_power.index.hour == index.hour) & (df_pv_power.index.day == index.day) & (df_pv_power.index.month == index.month) & (df_pv_power.index.minute == index.minute), 'PV_Power_kW']
             if not load_value.empty:
-                self.pd.loc[index, 'PV_Power_kW'] = load_value.iloc[0]*multiplier
+                self.pd.loc[index, 'PV_Power_kW'] = load_value.iloc[0]*self.solarpanel.get_peak_power()
     else: 
         missing_indices = df_pv_power.index.difference(self.pd['PV_Power_kW'].index)
         missing_data = df_pv_power.loc[missing_indices]

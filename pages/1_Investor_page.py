@@ -46,8 +46,6 @@ st.sidebar.header("Model overview")
 if "controller" not in st.session_state:
     st.session_state.controller = ControllerSolarPower()
 
-
-
 # only upload if button is clicked
 if st.button("Load model"):
     st.write(st.session_state.controller.load_model())     #todo: why does this not update the new values set by updtate_belpex and update_SLP? controller is not updated in the state
@@ -66,7 +64,11 @@ if st.button("Edit model"):
     with st.form("Edit model"):
         new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'],key='new_inverter')
         new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'],key='new_battery')
-        submitted = st.form_submit_button('Update model', on_click=st.session_state.controller.change_model(inverter_type=st.session_state.new_inverter,battery_type=st.session_state.new_battery))
+        new_solartype = st.selectbox('New solarpanel: ',['Sunpower_400','Sunpower_500','Sunpower_600'],key='new_solarpanel')
+        peak_production_power = st.number_input('Peak production power (kW)',min_value=0.0, max_value=100.0, value=5.0, step=0.1,key='peak_production_power')
+        yearly_consumption_energy= st.number_input('Yearly consumption energy (kWh)',min_value=0.0, max_value=100.0, value=2.0, step=0.1,key='yearly_consumption_energy')
+        new_solarpanel_count= st.number_input('Amount of solar panels: ',min_value=0, max_value=100, value=10, step=1,key='new_solarpanel_count')
+        submitted = st.form_submit_button('Update model', on_click=st.session_state.controller.change_model(inverter_type=st.session_state.new_inverter,battery_type=st.session_state.new_battery,peak_production_power=st.session_state.peak_production_power,yearly_consumption_energy=st.session_state.yearly_consumption_energy,solarpanel_type=st.session_state.new_solartype))
         if submitted:
             st.write("Model updated")
 

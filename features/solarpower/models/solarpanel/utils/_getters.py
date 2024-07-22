@@ -29,3 +29,9 @@ def get_total_panel_surface(self):
 
 def get_solarpanel_type(self):
     return self.solar_panel_type
+
+def get_peak_power_panel(self):
+    return self.peak_power_panel
+
+def get_peak_power(self):
+    return self.peak_power_panel* self.solar_panel_count if self.peak_power_panel is not None and self.solar_panel_count is not None else None
