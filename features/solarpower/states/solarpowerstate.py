@@ -26,6 +26,9 @@ class SolarPowerState():
         self.data_repository_SPP=DataRepositorySPP(firestore_reference=firestor_reference)
         self.solarpowermodel.set_reference_id('test')
     
+    def get_total_savings(self):
+        return self.solarpowermodel.get_total_savings()
+    
     def set_SLP(self):
         SLP=SLP_xls_to_pd('data/slp_enu_cons.xls')
         self.data_repository_SLP.add_SLP(SLP=SLP)
