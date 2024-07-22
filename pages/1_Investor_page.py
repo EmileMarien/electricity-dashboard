@@ -64,7 +64,7 @@ if st.button("Edit model"):
     with st.form("Edit model"):
         new_inverter = st.selectbox('New inverter: ',['Sungrow_3','Fronius_3','Sungrow_5'],key='new_inverter')
         new_battery = st.selectbox('New battery: ',['LG RESU 2.9','LG RESU 5.9','LG RESU Prime 9.6'],key='new_battery')
-        new_solartype = st.selectbox('New solarpanel: ',['Sunpower_400','Sunpower_500','Sunpower_600'],key='new_solarpanel')
+        new_solartype = st.selectbox('New solarpanel: ',['Canadian','Jinko'],key='new_solarpanel')
         peak_production_power = st.number_input('Peak production power (kW)',min_value=0.0, max_value=100.0, value=5.0, step=0.1,key='peak_production_power')
         yearly_consumption_energy= st.number_input('Yearly consumption energy (kWh)',min_value=0.0, max_value=100.0, value=2.0, step=0.1,key='yearly_consumption_energy')
         new_solarpanel_count= st.number_input('Amount of solar panels: ',min_value=0, max_value=100, value=10, step=1,key='new_solarpanel_count')

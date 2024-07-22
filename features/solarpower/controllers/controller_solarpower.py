@@ -45,7 +45,7 @@ class ControllerSolarPower:
         return self.state.get_columns(columns=['Load_kW', 'Belpex'])
     
     def get_peak_power(self):
-        return self.state.solarpowermodel.get_peak_power()
+        return self.state.get_peak_power()
     
     def update_model(self):
         self.state.update_belpex()

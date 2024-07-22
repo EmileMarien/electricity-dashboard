@@ -72,6 +72,9 @@ class SolarPowerState():
     def get_columns(self,columns):
         return self.solarpowermodel.get_columns(columns=columns)
     
+    def get_peak_power(self):
+        return self.solarpowermodel.solarpanel.get_peak_power()
+    
     def change_model(self,battery_type=None, inverter_type=None, solarpanel_type=None, peak_production_power=None, yearly_consumption_energy=None, solarpanel_count=None):
         """
         Checks if the provided components differ from the current installed ones and if so, refreshes the model and updates database
