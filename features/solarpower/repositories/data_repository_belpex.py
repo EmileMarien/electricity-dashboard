@@ -10,13 +10,10 @@ class DataRepositoryBelpex():
       self.db=firestore_reference 
       self.collection=self.db.collection('prices')
   
-
-
   def update(self, belpex:pd.DataFrame):
     data_to_add = {}
 
     for index, row in belpex.iterrows():
-        print(index)
         if index.minute == 0:  # Only add data for full hours
             # Convert the timestamp to a string
             timestamp = index.strftime('%Y-%m-%d %H:%M:%S %Z')
