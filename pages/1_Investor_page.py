@@ -80,5 +80,5 @@ st.write(st.session_state.controller.get_SLP_belpex().tail(15))
 
 st.header("Performance metrics")
 st.write("Total production: ", st.session_state.controller.get_total_production())
-st.write("Total consumption: ", st.session_state.controller.get_total_consumption())
+#st.write("Total consumption: ", st.session_state.controller.get_total_consumption())
 st.write("Total savings: ", st.session_state.controller.get_total_savings())

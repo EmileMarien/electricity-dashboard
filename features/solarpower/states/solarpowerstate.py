@@ -27,7 +27,10 @@ class SolarPowerState():
         self.solarpowermodel.set_reference_id('test')
     
     def get_total_savings(self):
-        return self.solarpowermodel.get_total_savings()
+        return self.solarpowermodel.get_total_cost()
+    
+    def get_total_production(self):
+        return self.solarpowermodel.get_energy_TOT(column_name='PV_Power_kW')
     
     def set_SLP(self):
         SLP=SLP_xls_to_pd('data/slp_enu_cons.xls')

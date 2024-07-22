@@ -67,5 +67,8 @@ class ControllerSolarPower:
     def get_invertername(self):
         return self.state.solarpowermodel.get_inverter().get_inverter_type()
     
-    def get_annual_savings(self):
+    def get_total_savings(self):
         return self.state.get_total_savings()
+    
+    def get_total_production(self):
+        return self.state.get_total_production()
