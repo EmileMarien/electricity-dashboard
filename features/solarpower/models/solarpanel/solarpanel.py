@@ -86,7 +86,7 @@ class SolarPanel:
             self.panel_efficiency = panel_efficiency
             self.temperature_coefficient = temperature_coefficient
             self.solar_panel_type=solar_panel_type
-            self.peak_power = peak_power_panel
+            self.peak_power_panel = peak_power_panel
         else:
 
             self.solar_panel_cost = solar_panel_types[solar_panel_type]["solar_panel_cost"]
@@ -97,7 +97,7 @@ class SolarPanel:
             self.panel_efficiency = solar_panel_types[solar_panel_type]["panel_efficiency"]
             self.temperature_coefficient = solar_panel_types[solar_panel_type]["temperature_coefficient"]
             self.solar_panel_type=solar_panel_type
-            self.peak_power = solar_panel_types[solar_panel_type]["peak_power_panel"]
+            self.peak_power_panel = solar_panel_types[solar_panel_type]["peak_power_panel"]
                         
  
             self.total_solar_panel_cost = self.solar_panel_cost * self.solar_panel_count if self.solar_panel_cost is not None and self.solar_panel_count is not None else None
