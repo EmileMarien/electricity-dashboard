@@ -60,6 +60,7 @@ class SolarPowerState():
         self.solarpowermodel.append_belpex_df(all_prices)
 
         self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})
+        return all_prices
 
     def update_SLP(self):
         self.solarpowermodel.append_load_df(self.data_repository_SLP.get_SLP(),SLP=True)    #TODO: change to set_load_df

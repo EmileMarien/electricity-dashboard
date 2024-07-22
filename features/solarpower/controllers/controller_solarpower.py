@@ -47,6 +47,9 @@ class ControllerSolarPower:
     def get_peak_power(self):
         return self.state.get_peak_power()
     
+    def update_belpex(self):
+        return self.state.update_belpex()
+    
     def update_model(self):
         self.state.update_belpex()
         self.state.update_SLP()

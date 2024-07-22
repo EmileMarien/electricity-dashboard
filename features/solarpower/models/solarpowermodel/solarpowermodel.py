@@ -32,7 +32,6 @@ class SolarPowerModel():
             self.battery = battery
 
         self.yearly_consumption_energy = 1.0
-        self.peak_power_factor = 1.0
         # Initialize the dataframe
         if dataframe.empty:
             self.pd=dataframe
@@ -195,6 +194,9 @@ class SolarPowerModel():
         # convert dataframe to pd.DataFrame
         data['dataframe'] = pd.DataFrame.from_dict(data['dataframe'],orient='index')
         data['dataframe'].index = pd.to_datetime(data['dataframe'].index)
+        # Set index name to 'DateTime'
+        data['dataframe'].index.name = 'DateTime'
+
         # Create SolarPowerModel object with all data
         # Pass all data including reference_id conditionally
         if 'reference_id' not in data or data['reference_id'] is None:

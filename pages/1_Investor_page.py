@@ -52,6 +52,9 @@ if st.button("Load model"):
 
 if st.button("update model"):
     st.write(st.session_state.controller.update_model())
+    
+if st.button("update belpex"):
+    st.write(st.session_state.controller.update_belpex())
 
 st.header("Model components")
 st.write("Your current home system contains following equipment:")

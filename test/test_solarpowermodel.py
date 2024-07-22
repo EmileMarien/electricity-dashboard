@@ -19,7 +19,7 @@ class TestSolarPowerModel(unittest.TestCase):
             'Load_kW': [100, 200]
         }))
         model.yearly_consumption_energy=300
-        #print(model.get_columns(columns=['Load_kW']))
+        print(model.get_columns(columns=['Load_kW']))
         self.assertEqual(model.get_columns(columns=['Load_kW']).shape, (2, 1))
 
         model.set_yearly_consumption_energy(200)
