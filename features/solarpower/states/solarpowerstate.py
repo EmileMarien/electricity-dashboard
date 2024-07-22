@@ -55,8 +55,9 @@ class SolarPowerState():
     def update_belpex(self):
         prices=fetch_electricity_prices()
         self.data_repository_belpex.update(prices)
+        all_prices=self.data_repository_belpex.get_belpex()
 
-        self.solarpowermodel.append_belpex_df(prices)
+        self.solarpowermodel.append_belpex_df(all_prices)
 
         self.data_repository_solarmodel.update(self.solarpowermodel,fields_to_update={"dataframe": self.solarpowermodel.pd.rename(index=lambda x: x.strftime('%Y-%m-%d %H:%M:%S %Z')).to_dict(orient='index')})
 
