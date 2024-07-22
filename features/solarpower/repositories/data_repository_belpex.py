@@ -16,6 +16,7 @@ class DataRepositoryBelpex():
     data_to_add = {}
 
     for index, row in belpex.iterrows():
+        print(index)
         if index.minute == 0:  # Only add data for full hours
             # Convert the timestamp to a string
             timestamp = index.strftime('%Y-%m-%d %H:%M:%S %Z')
