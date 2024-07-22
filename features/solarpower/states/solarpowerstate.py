@@ -93,7 +93,7 @@ class SolarPowerState():
             updated=True
 
         if not solarpanel_type is None:
-            solarpanel=SolarPanel(solarpanel_type=solarpanel_type)
+            solarpanel=SolarPanel(solar_panel_type=solarpanel_type)
             self.solarpowermodel.set_solarpanel(solarpanel)
             updated=True
             
