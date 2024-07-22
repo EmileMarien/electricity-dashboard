@@ -14,15 +14,27 @@ from google.cloud.firestore_v1.document import DocumentReference
 class TestSolarPowerModel(unittest.TestCase):
     def test_set_solar_power(self):
         model = SolarPowerModel()
-        model.set_load_df(pd.DataFrame({
+
+        # Create the DataFrame
+        df = pd.DataFrame({
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00'],
-            'Load_kW': [100, 200]
-        }))
-        model.yearly_consumption_energy=300
+            'Load_kW': [0.25, 0.75]
+        })
+
+        # Convert 'DateTime' column to datetime format
+        df['DateTime'] = pd.to_datetime(df['DateTime'])
+
+        # Set 'DateTime' column as the index
+        df.set_index('DateTime', inplace=True)
+
+        # Assuming model is an instance of your class and has the set_load_df method
+        model.set_load_df(df)
         print(model.get_columns(columns=['Load_kW']))
         self.assertEqual(model.get_columns(columns=['Load_kW']).shape, (2, 1))
 
         model.set_yearly_consumption_energy(200)
+        print(model.get_columns(columns=['Load_kW']))
+        model.set_yearly_consumption_energy(300)
         print(model.get_columns(columns=['Load_kW']))
         model.set_irradiance_df(pd.DataFrame({
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00', '2022-01-01 02:00:00'],
@@ -51,10 +63,18 @@ class TestSolarPowerModel(unittest.TestCase):
     
     def test_get_total_cost(self):
         model = SolarPowerModel()
-        model.set_load_df(pd.DataFrame({
+        df=pd.DataFrame({
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00', '2022-01-01 02:00:00'],
             'Load_kW': [100, 200, 300]
-        }))
+        })
+        # Convert 'DateTime' column to datetime format
+        df['DateTime'] = pd.to_datetime(df['DateTime'])
+
+        # Set 'DateTime' column as the index
+        df.set_index('DateTime', inplace=True)
+
+        # Assuming model is an instance of your class and has the set_load_df method
+        model.set_load_df(df)
         model.set_pv_power_df(pd.DataFrame({
             'DateTime': ['2022-01-01 00:00:00', '2022-01-01 01:00:00', '2022-01-01 02:00:00'],
             'PV_Power_kW': [100, 200, 300]

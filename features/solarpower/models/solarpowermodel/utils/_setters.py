@@ -24,9 +24,7 @@ def set_production_power(self, peak_power: float, solarpanel_count: int):
 def set_load_df(self, df_load: pd.DataFrame):
 
     assert 'Load_kW' in df_load.columns 
-    if not df_load.index.name == 'DateTime':
-        assert 'DateTime' in df_load.columns
-        df_load.set_index('DateTime', inplace=True)
+
     if not df_load.index.dtype == pd.DatetimeTZDtype(tz='UTC'):
         df_load.index = pd.to_datetime(df_load.index)
 
