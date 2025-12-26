@@ -12,4 +12,4 @@ package-dir = {"" = "packages"}
 
 [tool.setuptools.packages.find]
 where = ["packages"]
-include = ["elecmodel*", "epbconverter*", "platform_service*", "shelterbuilder*","elec_dashboard_components*"]
+include = ["elecmodel*", "buildingmodel*", "platform_service*","elec_dashboard_components*"]

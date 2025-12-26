@@ -3,8 +3,13 @@ import requests
 
 API_BASE = st.secrets.get("ELECMODEL_API", "http://localhost:8000")
 
-st.title("⚡ ELECmodel (via API)")
-
+st.title("⚡ Power Model")
+from ui.menu import menu_with_redirect
+st.set_page_config(page_title="ELECmodel", page_icon="🌍")
+from ui.css import apply_custom_css
+# Hide Streamlit's default menu and footer using custom CSS
+apply_custom_css()
+menu_with_redirect()
 ref_id = st.text_input("Model reference_id", value="demo")
 
 col1, col2, col3 = st.columns(3)

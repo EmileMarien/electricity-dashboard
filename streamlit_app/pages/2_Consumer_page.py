@@ -5,12 +5,12 @@ import numpy as np
 from datetime import datetime, timedelta
 import pytz
 import time
-from elecmodel.models.pricefetching.pricefetching import fetch_electricity_prices
-from elecmodel.repositories.data_repository_belpex import DataRepositoryBelpex
-from core.firestore_init import load_key, authenticate_to_firestore
-from routes.menu import menu_with_redirect
+from packages.elecmodel.elecmodel.models.pricefetching.pricefetching import fetch_electricity_prices
+from packages.elecmodel.elecmodel.repositories.belpex import DataRepositoryBelpex
+from packages.elecmodel.elecmodel.infrastructure.firestore_init import load_key, authenticate_to_firestore
+from ui.menu import menu_with_redirect
 st.set_page_config(page_title="Dashboard", page_icon="🌍")
-from core.css import apply_custom_css
+from ui.css import apply_custom_css
 # Hide Streamlit's default menu and footer using custom CSS
 apply_custom_css()
 menu_with_redirect()
