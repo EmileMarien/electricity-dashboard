@@ -16,15 +16,17 @@ from buildingmodel.buildingmodel.models.Project.utils.output import IfcExporter
 # Domain models
 from buildingmodel.buildingmodel.models.Project.project import Component
 
-# API schemas (you’ll need to add these to schemas.py)
+# API schemas (you'll need to add these to schemas.py)
 from buildingmodel.buildingmodel.api.schemas import (
     CreateProjectRequest,
     CreateProjectResponse,
     UpdateProjectParametersRequest,
     ProjectResponse,
     AddComponentRequest,
-    AddComponentsRequest,    SetComponentsRequest,
-    UpdateComponentPositionRequest,    ComponentResponse,
+    AddComponentsRequest,
+    SetComponentsRequest,
+    UpdateComponentPositionRequest,
+    ComponentResponse,
     MeetstaatResponse,
     LastenboekResponse,
     IfcExportResponse,

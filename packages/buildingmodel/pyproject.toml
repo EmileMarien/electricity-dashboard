@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "buildingmodel"
+version = "0.1.0"
+description = "Building model package for electricity dashboard"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "pydantic",
+    "google-cloud-firestore",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]

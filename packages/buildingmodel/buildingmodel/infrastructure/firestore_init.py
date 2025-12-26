@@ -1,16 +1,11 @@
 from __future__ import annotations
 import json
-from google.oauth2 import service_account
-import streamlit as st
 import os
+import tempfile
 from google.cloud import firestore
 import firebase_admin
 from firebase_admin import credentials
 
-
-import os, json, tempfile
-import firebase_admin
-from firebase_admin import credentials, firestore
 
 def get_firestore_client() -> firestore.Client:
     try:
@@ -39,22 +34,3 @@ def get_firestore_client() -> firestore.Client:
         firebase_admin.initialize_app(cred)
 
     return firestore.Client()
-
-
-def load_key_OLD():
-    try:
-        key_dict = json.loads(st.secrets["textkey"])
-        return key_dict
-    except KeyError:
-        st.error("Service account key not found in Streamlit secrets.")
-        return None
-
-def authenticate_to_firestore_OLD(key_dict): #TODO: remove?
-    try:
-        creds = service_account.Credentials.from_service_account_info(key_dict)
-        db = firestore.Client(credentials=creds, project="electricitydashboard")
-        #st.success("Successfully authenticated to Firestore.")
-        return db
-    except Exception as e:
-        st.error(f"Failed to authenticate to Firestore: {e}")
-        return None
