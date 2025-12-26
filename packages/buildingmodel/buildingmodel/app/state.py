@@ -1,42 +1,105 @@
+from __future__ import annotations
 from dataclasses import dataclass
+from typing import List, Optional, Dict, Any
 
-from buildingmodel.buildingmodel.models.Project import Project
+from buildingmodel.buildingmodel.models.Project.project import Project, Component
+from buildingmodel.buildingmodel.models.Project.utils.output import Meetstaat, MeetstaatLine, Lastenboek, LastenboekSection, IfcExporter
+from buildingmodel.buildingmodel.repositories.project import DataRepositoryProject
 
 @dataclass
 class BuildingModelApp:
-    #model_repo: object
-    #belpex_repo: object TODO: this is old, has to be replaced
+    project_repo: DataRepositoryProject
+    ifc_exporter: IfcExporter
 
-    def new_model(self, reference_id: str) -> Project:
-        m = Project()
-        m.set_reference_id(reference_id)
-        # Firestore repo API
-        self.model_repo.add_model(m)
-        return m
+    # ----------------------------
+    # Project lifecycle
+    # ----------------------------
+    def create_project(self, reference_id: Optional[str] = None, project_name: str = "test") -> Project:
+        p = Project(project_name=project_name)
+        if reference_id:
+            p.set_reference_id(reference_id)
+        new_id = self.project_repo.add_project(p)
+        # ensure we return id even if auto-generated
+        p.set_reference_id(new_id)
+        return p
 
-    def load_model(self, reference_id: str) -> Project:
-        # Firestore repo API
-        return self.model_repo.get_model(reference_id)
+    def load_project(self, reference_id: str) -> Project:
+        return self.project_repo.get_project(reference_id)
 
-    def save_model(self, model: Project) -> None:
-        # Firestore repo API
-        self.model_repo.update(model)
+    def save_project(self, project: Project) -> None:
+        self.project_repo.update(project)
 
-    def update_prices(self, reference_id: str) -> None:
-        m = self.load_model(reference_id)
-        prices_df = self.belpex_repo.fetch_latest_prices()
-        m.append_belpex_df(prices_df)
-        self.save_model(m)
+    # ----------------------------
+    # Project parameters
+    # ----------------------------
+    def set_project_parameters(
+        self,
+        reference_id: str,
+        *,
+        building_type: Optional[str] = None,
+        shape: Optional[str] = None,
+        area_m2: Optional[float] = None,
+        functions: Optional[List[str]] = None,
+    ) -> Project:
+        p = self.load_project(reference_id)
+        p.set_parameters(building_type=building_type, shape=shape, area_m2=area_m2, functions=functions)
+        self.save_project(p)
+        return p
 
-    def update_profiles(self, reference_id: str) -> None:
-        m = self.load_model(reference_id)
-        m.append_load_df(self.slp_repo.get_SLP(), SLP=True)
-        m.append_pv_power_df(self.spp_repo.get_SPP(), SPP=True)
-        self.save_model(m)
+    # ----------------------------
+    # Components
+    # ----------------------------
+    def add_component(self, reference_id: str, component: Component) -> Project:
+        p = self.load_project(reference_id)
+        p.add_component(component)
+        self.save_project(p)
+        return p
 
-    def update_calculations(self, reference_id: str) -> None:
-        m = self.load_model(reference_id)
-        m.update_power_flow()
-        m.update_dual_tariff()
-        m.update_dynamic_tariff()
-        self.save_model(m)
+    def add_components(self, reference_id: str, components: List[Component]) -> Project:
+        p = self.load_project(reference_id)
+        for c in components:
+            p.add_component(c)
+        self.save_project(p)
+        return p
+
+    def get_components(self, reference_id: str) -> List[Component]:
+        p = self.load_project(reference_id)
+        return p.get_components()
+
+    # ----------------------------
+    # Outputs
+    # ----------------------------
+    def compute_meetstaat(self, reference_id: str) -> Meetstaat:
+        p = self.load_project(reference_id)
+
+        # MVP: 1 line per component
+        lines = [
+            MeetstaatLine(
+                component_type=c.type,
+                label=c.label or c.type,
+                quantity=c.quantity,
+                unit=c.unit,
+                properties=c.properties,
+            )
+            for c in p.components
+        ]
+        return Meetstaat(lines=lines)
+
+    def compute_lastenboek(self, reference_id: str) -> Lastenboek:
+        p = self.load_project(reference_id)
+
+        sections = [
+            LastenboekSection(
+                title="Project parameters",
+                content=f"Bebouwing: {p.parameters.building_type}, Vorm: {p.parameters.shape}, Opp: {p.parameters.area_m2} m2, Functies: {', '.join(p.parameters.functions)}",
+            ),
+            LastenboekSection(
+                title="Componenten",
+                content="\n".join([f"- {c.label or c.type}: {c.quantity} {c.unit}" for c in p.components]) or "(geen)",
+            ),
+        ]
+        return Lastenboek(sections=sections)
+
+    def export_ifc(self, reference_id: str) -> Dict[str, Any]:
+        p = self.load_project(reference_id)
+        return self.ifc_exporter.export_project_minimal(p)

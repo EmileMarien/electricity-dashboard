@@ -1,19 +1,39 @@
-from fastapi import FastAPI
-from fastapi.responses import FileResponse
+# packages/buildingmodel/buildingmodel/api/main.py
+
+from __future__ import annotations
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
-from buildingmodel.buildingmodel.api.schemas import CreateModelRequest, ChangeComponentsRequest, HouseCatalogItem, HouseSceneState, HouseInsightsResponse
-from buildingmodel.buildingmodel.app.state import buildingmodelApp
+from buildingmodel.buildingmodel.infrastructure.firestore_init import get_firestore_client
 
-from models.Component import HouseComponentService
+# App service + infrastructure
+from buildingmodel.buildingmodel.app.state import BuildingModelApp
+from buildingmodel.buildingmodel.repositories.project import DataRepositoryProject
+from buildingmodel.buildingmodel.models.Project.utils.output import IfcExporter
 
-from buildingmodel.infrastructure.firestore_init import get_firestore_client
-from buildingmodel.buildingmodel.models.Component.component import HouseDesignService
+# Domain models
+from buildingmodel.buildingmodel.models.Project.project import Component
+
+# API schemas (you’ll need to add these to schemas.py)
+from buildingmodel.buildingmodel.api.schemas import (
+    CreateProjectRequest,
+    CreateProjectResponse,
+    UpdateProjectParametersRequest,
+    ProjectResponse,
+    AddComponentRequest,
+    AddComponentsRequest,
+    ComponentResponse,
+    MeetstaatResponse,
+    LastenboekResponse,
+    IfcExportResponse,
+)
 
 
 def build_app() -> FastAPI:
-    api = FastAPI(title="buildingmodel API", version="0.1.0")
-    
+    api = FastAPI(title="buildingmodel API", version="0.2.0")
+
     api.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -22,81 +42,133 @@ def build_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    # ----------------------------
+    # Wiring (Firestore + repo + exporter + app service)
+    # ----------------------------
     db = get_firestore_client()
+    project_repo = DataRepositoryProject(db)
+    ifc_exporter = IfcExporter(output_dir="generated_ifc")
+    app = BuildingModelApp(project_repo=project_repo, ifc_exporter=ifc_exporter)
 
-    app = buildingmodelApp()
-
-    # House Builder domain service
-    house_components = HouseComponentService()
-    house_design = HouseDesignService(components=house_components)
-
+    # ----------------------------
+    # Health
+    # ----------------------------
     @api.get("/health")
     def health():
         return {"ok": True}
 
-    @api.post("/models")
-    def create_model(req: CreateModelRequest):
-        m = app.new_model(req.reference_id)
-        return {"reference_id": m.get_reference_id()}
+    # ----------------------------
+    # Project lifecycle
+    # ----------------------------
+    @api.post("/projects", response_model=CreateProjectResponse)
+    def create_project(req: CreateProjectRequest):
+        p = app.create_project(reference_id=req.reference_id, project_name=req.project_name or "test")
+        return {"reference_id": p.get_reference_id()}
 
-    @api.post("/models/{reference_id}/update-data")
-    def update_data(reference_id: str):
-        app.update_prices(reference_id)
-        app.update_profiles(reference_id)
-        return {"status": "data_updated"}
-
-    @api.post("/models/{reference_id}/recompute")
-    def recompute(reference_id: str):
-        app.update_calculations(reference_id)
-        return {"status": "recomputed"}
-
-    @api.post("/models/{reference_id}/components")
-    def change_components(reference_id: str, req: ChangeComponentsRequest):
-        app.change_components(reference_id, **req.model_dump())
-        return {"status": "components_updated"}
-
-    @api.get("/models/{reference_id}/kpis")
-    def kpis(reference_id: str):
-        return app.kpis(reference_id)
-
+    @api.get("/projects/{reference_id}", response_model=ProjectResponse)
+    def get_project(reference_id: str):
+        try:
+            p = app.load_project(reference_id)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return p.to_dict()
 
     # ----------------------------
-    # House Builder endpoints
+    # Project parameters
     # ----------------------------
-    @api.get("/house/catalog")
-    def house_catalog():
-        return house_components.get_catalog()
+    @api.patch("/projects/{reference_id}/parameters", response_model=ProjectResponse)
+    def update_project_parameters(reference_id: str, req: UpdateProjectParametersRequest):
+        try:
+            p = app.set_project_parameters(
+                reference_id,
+                building_type=req.building_type,
+                shape=req.shape,
+                area_m2=req.area_m2,
+                functions=req.functions,
+            )
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return p.to_dict()
 
-    @api.post("/house/insights")
-    def house_insights(scene: dict):
-        return house_components.compute_insights(scene)
+    # ----------------------------
+    # Components
+    # ----------------------------
+    @api.post("/projects/{reference_id}/components", response_model=ProjectResponse)
+    def add_component(reference_id: str, req: AddComponentRequest):
+        try:
+            comp = Component.new(
+                type=req.type,
+                label=req.label or "",
+                quantity=req.quantity or 1.0,
+                unit=req.unit or "st",
+                properties=req.properties or {},
+            )
+            p = app.add_component(reference_id, comp)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return p.to_dict()
 
-    @api.post("/house/concept", response_model=HouseConceptResponse)
-    def house_concept(req: HouseConceptRequest):
-        payload = house_design.generate_concept(
-            building_type=req.building_type,
-            shape=req.shape,
-            area_m2=req.area_m2,
-            functions=req.functions,
-        )
+    @api.post("/projects/{reference_id}/components/batch", response_model=ProjectResponse)
+    def add_components(reference_id: str, req: AddComponentsRequest):
+        try:
+            comps = [
+                Component.new(
+                    type=c.type,
+                    label=c.label or "",
+                    quantity=c.quantity or 1.0,
+                    unit=c.unit or "st",
+                    properties=c.properties or {},
+                )
+                for c in req.components
+            ]
+            p = app.add_components(reference_id, comps)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return p.to_dict()
+
+    @api.get("/projects/{reference_id}/components", response_model=list[ComponentResponse])
+    def get_components(reference_id: str):
+        try:
+            comps = app.get_components(reference_id)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return [c.to_dict() for c in comps]
+
+    # ----------------------------
+    # Outputs: Meetstaat & Lastenboek
+    # ----------------------------
+    @api.get("/projects/{reference_id}/meetstaat", response_model=MeetstaatResponse)
+    def get_meetstaat(reference_id: str):
+        try:
+            meetstaat = app.compute_meetstaat(reference_id)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return meetstaat.to_dict()
+
+    @api.get("/projects/{reference_id}/lastenboek", response_model=LastenboekResponse)
+    def get_lastenboek(reference_id: str):
+        try:
+            lastenboek = app.compute_lastenboek(reference_id)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return lastenboek.to_dict()
+
+    # ----------------------------
+    # IFC export + file download
+    # ----------------------------
+    @api.post("/projects/{reference_id}/ifc", response_model=IfcExportResponse)
+    def export_ifc(reference_id: str):
+        try:
+            payload = app.export_ifc(reference_id)  # returns dict with file info
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
         return payload
 
-    @api.get("/house/ifc/{ifc_file_id}")
-    def house_ifc(ifc_file_id: str):
-        # HouseDesignService writes to disk. We reconstruct the expected filename.
-        # (In production, store this mapping in DB/object storage.)
-        directory = house_design._ensure_ifc_dir()
-        path = directory / f"housebuilder_{ifc_file_id}.ifc"
+    @api.get("/ifc/{filename}")
+    def download_ifc(filename: str):
+        # simple download endpoint (MVP). In production, store in object storage.
+        path = ifc_exporter._ensure_dir() / filename
         if not path.exists():
-            # try alternate pattern used by export_ifc_minimal (includes uuid in filename)
-            # scan quickly (MVP)
-            for p in directory.glob("housebuilder_*.ifc"):
-                if ifc_file_id in p.name:
-                    path = p
-                    break
-        if not path.exists():
-            # FastAPI will convert this to a 404 response
-            from fastapi import HTTPException
             raise HTTPException(status_code=404, detail="IFC file not found")
         return FileResponse(str(path), media_type="application/octet-stream", filename=path.name)
 
