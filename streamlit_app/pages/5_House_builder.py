@@ -42,6 +42,23 @@ def api_delete(path: str):
     r.raise_for_status()
     return r.json()
 
+# ----------------------------
+# 1) Health check (non-blocking)
+# ----------------------------
+if "api_available" not in st.session_state:
+    st.session_state.api_available = False
+
+try:
+    health = api_get("/health")
+    st.session_state.api_available = health.get("ok", False)
+    if not st.session_state.api_available:
+        st.warning("API health check returned unexpected response.")
+except Exception as e:
+    st.session_state.api_available = False
+    st.warning(f"⚠️ API niet bereikbaar ({API_BASE}/health). Start de server met: `uvicorn platform_service.platform_service.api.main:app --reload --port 8000`")
+    with st.expander("Error details"):
+        st.error(str(e))
+        
 # Initialize session state for input form
 if "show_input_form" not in st.session_state:
     st.session_state.show_input_form = False
@@ -152,23 +169,6 @@ if st.session_state.show_input_form:
             st.error(f"Unexpected error during project generation: {e}")
             import traceback
             st.write(f"Traceback: {traceback.format_exc()}")
-
-# ----------------------------
-# 1) Health check (non-blocking)
-# ----------------------------
-if "api_available" not in st.session_state:
-    st.session_state.api_available = False
-
-try:
-    health = api_get("/health")
-    st.session_state.api_available = health.get("ok", False)
-    if not st.session_state.api_available:
-        st.warning("API health check returned unexpected response.")
-except Exception as e:
-    st.session_state.api_available = False
-    st.warning(f"⚠️ API niet bereikbaar ({API_BASE}/health). Start de server met: `uvicorn platform_service.api.main:app --reload --port 8000`")
-    with st.expander("Error details"):
-        st.error(str(e))
 
 # ----------------------------
 # 2) Component catalog with 3D properties

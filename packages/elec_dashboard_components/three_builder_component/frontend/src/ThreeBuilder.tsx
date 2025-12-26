@@ -48,6 +48,17 @@ function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
 }
 
+// Grid module size (60cm)
+const GRID_MODULE = 0.6;
+
+// Snap threshold for component-to-component snapping
+const SNAP_THRESHOLD = 0.3;
+
+// Snap a value to the nearest grid line
+function snapToGrid(value: number): number {
+  return Math.round(value / GRID_MODULE) * GRID_MODULE;
+}
+
 // Default sizes for component types
 const DEFAULT_SIZES: Record<string, [number, number, number]> = {
   wall: [3, 2.8, 0.3],
@@ -79,6 +90,7 @@ function ThreeBuilderInner(props: ComponentProps) {
 
   const lastTokenRef = useRef<number>(-1);
   const readyRef = useRef(false);
+  const lastProjectIdRef = useRef<string | null>(null);
 
   // Streamlit component ready + height
   useEffect(() => {
@@ -96,16 +108,19 @@ function ThreeBuilderInner(props: ComponentProps) {
       setInstances(initialInstances);
       initializedRef.current = true;
     }
-  }, [initialInstances]);
+    // Only run once on mount - do NOT include initialInstances in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Reset when project changes (also reset instances to the passed initialInstances)
+  // Reset when project changes (only when projectId actually changes)
   useEffect(() => {
-    if (projectId !== null) {
+    if (projectId !== null && projectId !== lastProjectIdRef.current) {
+      lastProjectIdRef.current = projectId;
       setInstances(initialInstances);
       setSelectedId(null);
-      initializedRef.current = true;
     }
-  }, [projectId, initialInstances]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
 
   // Emit state back to Streamlit (throttled-ish via RAF)
   const emitRef = useRef<number | null>(null);
@@ -176,7 +191,7 @@ function ThreeBuilderInner(props: ComponentProps) {
         setSelectedId(null);
       }
 
-      const moveStep = e.shiftKey ? 0.1 : 0.5;
+      const moveStep = e.shiftKey ? 0.1 : 0.6;
 
       const move = (dx: number, dz: number) => {
         setInstances((prev) =>
@@ -253,12 +268,12 @@ function ThreeBuilderInner(props: ComponentProps) {
 
         <Grid
           infiniteGrid
-          cellSize={1}
+          cellSize={0.6}
           cellThickness={1}
-          cellColor="#aaaaaa"
-          sectionSize={5}
+          cellColor="#cccccc"
+          sectionSize={3}
           sectionThickness={2}
-          sectionColor="#666666"
+          sectionColor="#888888"
           fadeDistance={50}
           fadeStrength={1}
           position={[0, 0.01, 0]}
@@ -338,11 +353,66 @@ function InstancesLayer(props: {
     if (!draggingRef.current) return;
 
     const hit = getHitOnGround(e);
-
-    const newX = clamp(hit.x + draggingRef.current.offsetX, -25, 25);
-    const newZ = clamp(hit.z + draggingRef.current.offsetZ, -25, 25);
-
     const id = draggingRef.current.id;
+
+    // Raw position from drag
+    let newX = clamp(hit.x + draggingRef.current.offsetX, -25, 25);
+    let newZ = clamp(hit.z + draggingRef.current.offsetZ, -25, 25);
+
+    // Snap to grid first
+    newX = snapToGrid(newX);
+    newZ = snapToGrid(newZ);
+
+    // Get the dragged instance's size for edge snapping
+    const draggedInst = instances.find((i) => i.id === id);
+    const draggedDef = draggedInst ? catalogMap.get(draggedInst.definitionId) : null;
+    const draggedSize = draggedDef?.size || DEFAULT_SIZES[draggedInst?.definitionId || ""] || [1, 1, 1];
+    const draggedHalfW = draggedSize[0] / 2;
+    const draggedHalfD = draggedSize[2] / 2;
+
+    // Try to snap to other components (edge-to-edge)
+    for (const other of instances) {
+      if (other.id === id) continue;
+
+      const otherDef = catalogMap.get(other.definitionId);
+      const otherSize = otherDef?.size || DEFAULT_SIZES[other.definitionId] || [1, 1, 1];
+      const otherHalfW = otherSize[0] / 2;
+      const otherHalfD = otherSize[2] / 2;
+
+      const ox = other.position[0];
+      const oz = other.position[2];
+
+      // Check X-axis edge snapping (left/right edges)
+      const leftEdge = ox - otherHalfW;
+      const rightEdge = ox + otherHalfW;
+      const myLeftEdge = newX - draggedHalfW;
+      const myRightEdge = newX + draggedHalfW;
+
+      // Snap my right edge to other's left edge
+      if (Math.abs(myRightEdge - leftEdge) < SNAP_THRESHOLD) {
+        newX = leftEdge - draggedHalfW;
+      }
+      // Snap my left edge to other's right edge
+      else if (Math.abs(myLeftEdge - rightEdge) < SNAP_THRESHOLD) {
+        newX = rightEdge + draggedHalfW;
+      }
+
+      // Check Z-axis edge snapping (front/back edges)
+      const frontEdge = oz - otherHalfD;
+      const backEdge = oz + otherHalfD;
+      const myFrontEdge = newZ - draggedHalfD;
+      const myBackEdge = newZ + draggedHalfD;
+
+      // Snap my back edge to other's front edge
+      if (Math.abs(myBackEdge - frontEdge) < SNAP_THRESHOLD) {
+        newZ = frontEdge - draggedHalfD;
+      }
+      // Snap my front edge to other's back edge
+      else if (Math.abs(myFrontEdge - backEdge) < SNAP_THRESHOLD) {
+        newZ = backEdge + draggedHalfD;
+      }
+    }
+
     setInstances((prev) =>
       prev.map((inst) => (inst.id === id ? { ...inst, position: [newX, inst.position[1], newZ] } : inst))
     );

@@ -8,3 +8,6 @@ node_modules/
 dist/
 build/
 *.tsbuildinfo
+
+# But keep the three_builder_component dist for deployment
+!packages/elec_dashboard_components/three_builder_component/frontend/dist/
