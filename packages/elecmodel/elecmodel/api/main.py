@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from elecmodel.api.schemas import CreateModelRequest, ChangeComponentsRequest
 from elecmodel.app.state import ElecModelApp
@@ -11,6 +12,14 @@ from elecmodel.repositories.syntheticprofiles import DataRepositorySLP, DataRepo
 
 def build_app() -> FastAPI:
     api = FastAPI(title="elecmodel API", version="0.1.0")
+    
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     db = get_firestore_client()
 
