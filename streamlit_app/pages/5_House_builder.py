@@ -63,7 +63,7 @@ except Exception as e:
 if "show_input_form" not in st.session_state:
     st.session_state.show_input_form = False
 
-st.title("Shelter Builder")
+st.title("House Builder")
 
 # ----------------------------
 # Project laden
@@ -121,32 +121,25 @@ if st.session_state.show_input_form:
     functions = [x.strip() for x in functions_raw.splitlines() if x.strip()]
     
     if st.button("Genereer project", type="primary"):
-        st.write(f"Debug: API_BASE = {API_BASE}")
         try:
             # Step 1: Create project
             reference_id = f"project-{uuid.uuid4().hex[:8]}"
-            st.write(f"Debug: Creating project with reference_id: {reference_id}")
             create_payload = {
                 "reference_id": reference_id,
                 "project_name": project_name,
             }
-            st.write(f"Debug: Create payload: {create_payload}")
             create_resp = api_post("/projects", create_payload)
-            st.write(f"Debug: Create response: {create_resp}")
             ref_id = create_resp.get("reference_id", reference_id)
             st.session_state.project_reference_id = ref_id
 
             # Step 2: Set project parameters
-            st.write(f"Debug: Setting parameters for project {ref_id}")
             param_payload = {
                 "building_type": building_type,
                 "shape": shape,
                 "area_m2": float(area_m2),
                 "functions": functions,
             }
-            st.write(f"Debug: Parameters payload: {param_payload}")
             project = api_patch(f"/projects/{ref_id}/parameters", param_payload)
-            st.write(f"Debug: Parameters response: {project}")
             st.session_state.project_data = project
 
             # Reset instances for new project
@@ -159,16 +152,10 @@ if st.session_state.show_input_form:
 
         except requests.HTTPError as e:
             st.error(f"HTTP Error during project generation: {e.response.status_code} - {e.response.text}")
-            st.write(f"URL: {e.request.url}")
-            st.write(f"Method: {e.request.method}")
-            if hasattr(e.request, 'body') and e.request.body:
-                st.write(f"Request body: {e.request.body}")
         except requests.RequestException as e:
             st.error(f"Request Error during project generation: {e}")
         except Exception as e:
             st.error(f"Unexpected error during project generation: {e}")
-            import traceback
-            st.write(f"Traceback: {traceback.format_exc()}")
 
 # ----------------------------
 # 2) Component catalog with 3D properties

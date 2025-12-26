@@ -3,39 +3,61 @@ import streamlit as st
 # Function to apply custom CSS styles
 
 def apply_custom_css():
-
-    #.stApp {
-#    max-width: 800px; /* Adjust maximum width of the app */
-#    margin: 0 auto; /* Center align content */
-#    padding: 20px; /* Add padding for content */
-#    text-align: center; /* Center align text */
-#}
-# Apply inline style directly in Streamlit
     st.markdown(
         """
         <style>
-            body {
-                background-color: #C3E6CB !important; /* Important to override any conflicting styles */
-                font-family: Arial, sans-serif; /* Adjust font family as needed */
+            :root {
+                --bg: #f6f8fb;
+                --card-bg: #ffffff;
+                --text: #111827;
+                --muted: #6b7280;
+                --primary: #2563eb;
+                --primary-hover: #1d4ed8;
+                --border: #e5e7eb;
             }
 
-            .stApp h1 {
-                font-size: 2.5em; /* Adjust title font size */
-                margin-bottom: 10px; /* Add space below title */
+            html, body { background: var(--bg) !important; }
+            .stApp { color: var(--text); }
+
+            /* Typography */
+            h1, h2, h3, h4 { color: var(--text); letter-spacing: -0.02em; }
+            p, label, span { color: var(--text); }
+            .small-muted { color: var(--muted); font-size: 0.9rem; }
+
+            /* Cards */
+            .ui-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(17, 24, 39, 0.06);
+                padding: 24px;
             }
 
-            .stApp p {
-                font-size: 1em; /* Adjust subtitle font size */
-                margin-bottom: 20px; /* Add space below subtitle */
+            /* Buttons */
+            .stButton>button {
+                background: var(--primary);
+                color: white;
+                border: 1px solid var(--primary);
+                border-radius: 8px;
+                padding: 0.5rem 0.9rem;
+            }
+            .stButton>button:hover { background: var(--primary-hover); }
+
+            /* Sidebar */
+            div[data-testid="stSidebar"] {
+                background: #ffffff;
+                border-right: 1px solid var(--border);
             }
 
-            /* Hide Streamlit elements */
-            MainMenu {visibility: hidden;}
+            /* Hide Streamlit chrome but keep sidebar toggle */
             footer {visibility: hidden;}
             div[data-testid="stToolbar"] {visibility: hidden;}
             div[data-testid="stDecoration"] {visibility: hidden;}
             div[data-testid="stStatusWidget"] {visibility: hidden;}
+
+            /* Metrics */
+            .stMetric { border: 1px solid var(--border); border-radius: 12px; padding: 8px; }
         </style>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
