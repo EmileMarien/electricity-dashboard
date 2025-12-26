@@ -6,6 +6,7 @@ def authenticated_menu():
     st.sidebar.page_link("streamlit_app.py", label="Switch accounts")
     st.sidebar.page_link("pages/3_Database.py", label="Grid info")
     st.sidebar.page_link("pages/4_Power_model.py",label="Power Model")
+    st.sidebar.page_link("pages/5_House_builder.py",label="House Builder")
     if st.session_state.role == "user":
         st.sidebar.page_link("pages/2_Consumer_page.py", label="Consumers")
 

@@ -2,7 +2,7 @@ import json
 import uuid
 import streamlit as st
 
-from three_builder_component import three_builder
+from components.three_builder_component import three_builder
 
 st.set_page_config(page_title="House Builder MVP", layout="wide")
 
