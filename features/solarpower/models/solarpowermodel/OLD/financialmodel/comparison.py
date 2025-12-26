@@ -1,2 +1,0 @@
-
-# Compare the different scenarios

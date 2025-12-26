@@ -1,0 +1,9 @@
+
+# Ignore virtual environment
+my-venv/
+
+# dd ddd
+my-venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.dylib
+path/to/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.dylib
+
+# DD
