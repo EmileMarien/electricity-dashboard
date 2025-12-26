@@ -1,14 +1,28 @@
 import os
+from pathlib import Path
 import streamlit.components.v1 as components
 
-# When you build the frontend, it will output to: three_builder_component/frontend/dist
-_BUILD_DIR = os.path.join(os.path.dirname(__file__), "frontend", "dist")
+# Built frontend output (after `npm run build`)
+_BUILD_DIR = Path(__file__).resolve().parent / "frontend" / "dist"
 
-# If dist exists, use the built frontend; otherwise assume dev server (Vite)
-if os.path.isdir(_BUILD_DIR):
-    _component = components.declare_component("three_builder", path=_BUILD_DIR)
+# Dev server URL (Vite)
+_DEV_URL = os.getenv("THREE_BUILDER_DEV_URL", "http://localhost:5173")
+
+# Explicit flag: default to RELEASE everywhere.
+# Set THREE_BUILDER_DEV=1 locally when you want hot-reload dev mode.
+_USE_DEV_SERVER = os.getenv("THREE_BUILDER_DEV", "0") == "1"
+
+if _USE_DEV_SERVER:
+    _component = components.declare_component("three_builder", url=_DEV_URL)
 else:
-    _component = components.declare_component("three_builder", url="http://localhost:5173")
+    if not _BUILD_DIR.exists():
+        raise RuntimeError(
+            f"three_builder_component frontend build not found at {_BUILD_DIR}. "
+            "Run `npm install && npm run build` in `three_builder_component/frontend` "
+            "and commit the `dist/` folder for Streamlit Cloud/Render."
+        )
+    _component = components.declare_component("three_builder", path=str(_BUILD_DIR))
+
 
 def three_builder(catalog, project_id, command, height=640, key=None):
     """
