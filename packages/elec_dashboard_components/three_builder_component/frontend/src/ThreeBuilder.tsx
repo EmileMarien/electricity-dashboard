@@ -4,11 +4,18 @@ import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Grid } from "@react-three/drei";
 import * as THREE from "three";
 
-type CatalogItem =
-  | { id: string; label: string; shape: "box"; size: [number, number, number] }
-  | { id: string; label: string; shape: "cylinder"; radius: number; height: number };
+type CatalogItem = {
+  id: string;
+  label: string;
+  category?: string;
+  shape?: "box" | "cylinder";
+  size?: [number, number, number];  // [width, height, depth] for box
+  radius?: number;                   // for cylinder
+  height?: number;                   // for cylinder
+  color?: string;
+};
 
-type Command = { token: number; type: "insert"; definitionId: string | null };
+type Command = { token: number; type: "insert" | "delete" | "clear"; definitionId: string | null };
 
 type Instance = {
   id: string;
@@ -17,7 +24,11 @@ type Instance = {
   rotationY: number; // radians
 };
 
-type SceneState = { instances: Instance[]; selectedId: string | null };
+type SceneState = { 
+  instances: Instance[]; 
+  selectedId: string | null;
+  lastChange?: { type: string; instanceId?: string; timestamp: number };
+};
 
 function uuid() {
   return crypto.randomUUID ? crypto.randomUUID() : `id_${Math.random().toString(16).slice(2)}`;
@@ -27,14 +38,52 @@ function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
 }
 
+// Default sizes for component types
+const DEFAULT_SIZES: Record<string, [number, number, number]> = {
+  wall: [3, 2.8, 0.3],
+  floor: [4, 0.2, 4],
+  roof: [5, 0.3, 5],
+  window: [1.2, 1.5, 0.1],
+  door: [1, 2.2, 0.1],
+};
+
+const DEFAULT_COLORS: Record<string, string> = {
+  wall: "#b0bec5",
+  floor: "#8d6e63",
+  roof: "#d84315",
+  window: "#81d4fa",
+  door: "#5d4037",
+};
+
 export function ThreeBuilder(props: ComponentProps) {
   const catalog: CatalogItem[] = props.args["catalog"] ?? [];
   const command: Command = props.args["command"] ?? { token: 0, type: "insert", definitionId: null };
+  const initialInstances: Instance[] = props.args["initialInstances"] ?? [];
+  const projectId: string | null = props.args["projectId"] ?? null;
 
-  const [instances, setInstances] = useState<Instance[]>([]);
+  const [instances, setInstances] = useState<Instance[]>(initialInstances);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const lastTokenRef = useRef<number>(-1);
+  const initializedRef = useRef<boolean>(false);
+
+  // Initialize from props once
+  useEffect(() => {
+    if (!initializedRef.current && initialInstances.length > 0) {
+      setInstances(initialInstances);
+      initializedRef.current = true;
+    }
+  }, [initialInstances]);
+
+  // Reset when project changes
+  useEffect(() => {
+    if (projectId) {
+      setInstances(initialInstances);
+      setSelectedId(null);
+      initializedRef.current = true;
+    }
+  }, [projectId]);
 
   // Tell Streamlit our height
   useEffect(() => {
@@ -56,40 +105,94 @@ export function ThreeBuilder(props: ComponentProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instances, selectedId]);
 
-  // Handle insert/clear commands from Streamlit
+  // Handle insert/delete/clear commands from Streamlit
   useEffect(() => {
     if (command.token === lastTokenRef.current) return;
     lastTokenRef.current = command.token;
 
     const defId = command.definitionId;
-    if (!defId) return;
 
-    if (defId === "__CLEAR__") {
+    if (command.type === "clear") {
       setInstances([]);
       setSelectedId(null);
       return;
     }
 
-    // Place new instance near origin with small offset
-    const i: Instance = {
-      id: uuid(),
-      definitionId: defId,
-      position: [0, 0.05, 0],
-      rotationY: 0
-    };
+    if (command.type === "delete" && selectedId) {
+      setInstances((prev) => prev.filter((x) => x.id !== selectedId));
+      setSelectedId(null);
+      return;
+    }
 
-    setInstances((prev) => [...prev, i]);
-    setSelectedId(i.id);
-  }, [command]);
+    if (command.type === "insert" && defId) {
+      // Get catalog item for default sizing
+      const catalogItem = catalog.find((c) => c.id === defId);
+      const size = catalogItem?.size || DEFAULT_SIZES[defId] || [1, 1, 1];
+      
+      // Place new instance at origin, elevated by half height
+      const i: Instance = {
+        id: uuid(),
+        definitionId: defId,
+        position: [0, size[1] / 2, 0],
+        rotationY: 0
+      };
 
-  // Rotation hotkey: R rotates selected by 15 degrees
+      setInstances((prev) => [...prev, i]);
+      setSelectedId(i.id);
+    }
+  }, [command, catalog, selectedId]);
+
+  // Keyboard shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!selectedId) return;
+      
+      // R: Rotate selected by 15 degrees
       if (e.key.toLowerCase() === "r") {
         setInstances((prev) =>
           prev.map((x) =>
             x.id === selectedId ? { ...x, rotationY: x.rotationY + THREE.MathUtils.degToRad(15) } : x
+          )
+        );
+      }
+      
+      // Delete/Backspace: Remove selected
+      if (e.key === "Delete" || e.key === "Backspace") {
+        setInstances((prev) => prev.filter((x) => x.id !== selectedId));
+        setSelectedId(null);
+      }
+      
+      // Arrow keys: Move selected
+      const moveStep = e.shiftKey ? 0.1 : 0.5;
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setInstances((prev) =>
+          prev.map((x) =>
+            x.id === selectedId ? { ...x, position: [x.position[0], x.position[1], x.position[2] - moveStep] } : x
+          )
+        );
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setInstances((prev) =>
+          prev.map((x) =>
+            x.id === selectedId ? { ...x, position: [x.position[0], x.position[1], x.position[2] + moveStep] } : x
+          )
+        );
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setInstances((prev) =>
+          prev.map((x) =>
+            x.id === selectedId ? { ...x, position: [x.position[0] - moveStep, x.position[1], x.position[2]] } : x
+          )
+        );
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setInstances((prev) =>
+          prev.map((x) =>
+            x.id === selectedId ? { ...x, position: [x.position[0] + moveStep, x.position[1], x.position[2]] } : x
           )
         );
       }
@@ -105,26 +208,49 @@ export function ThreeBuilder(props: ComponentProps) {
   }, [catalog]);
 
   return (
-    <div style={{ width: "100%", height: props.args["height"] ?? 640 }}>
-      <Canvas camera={{ position: [4, 4, 4], fov: 50 }}>
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[5, 8, 5]} intensity={1.0} />
+    <div style={{ width: "100%", height: props.args["height"] ?? 640, position: "relative" }}>
+      {/* Instructions overlay */}
+      <div style={{
+        position: "absolute",
+        top: 8,
+        left: 8,
+        background: "rgba(0,0,0,0.6)",
+        color: "white",
+        padding: "8px 12px",
+        borderRadius: 4,
+        fontSize: 12,
+        zIndex: 10,
+        pointerEvents: "none"
+      }}>
+        <div><b>Controls:</b> Drag to move • R to rotate • Delete to remove</div>
+        <div>Arrow keys: fine move (Shift for smaller steps)</div>
+      </div>
+      
+      <Canvas camera={{ position: [8, 8, 8], fov: 50 }}>
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[10, 15, 10]} intensity={1.0} castShadow />
+        <directionalLight position={[-5, 5, -5]} intensity={0.3} />
 
         {/* Ground */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[50, 50]} />
-          <meshStandardMaterial color="#f2f2f2" />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.01, 0]}>
+          <planeGeometry args={[100, 100]} />
+          <meshStandardMaterial color="#e8e8e8" />
         </mesh>
         <Grid
           infiniteGrid
-          cellSize={0.5}
+          cellSize={1}
           cellThickness={0.5}
-          sectionSize={2}
+          sectionSize={5}
           sectionThickness={1}
-          fadeDistance={20}
+          fadeDistance={30}
         />
 
-        <OrbitControls makeDefault />
+        <OrbitControls 
+          makeDefault 
+          enabled={!isDragging}
+          minPolarAngle={0.1}
+          maxPolarAngle={Math.PI / 2 - 0.1}
+        />
 
         <InstancesLayer
           instances={instances}
@@ -132,6 +258,7 @@ export function ThreeBuilder(props: ComponentProps) {
           selectedId={selectedId}
           setSelectedId={setSelectedId}
           catalogMap={catalogMap}
+          setIsDragging={setIsDragging}
         />
       </Canvas>
     </div>
@@ -144,23 +271,41 @@ function InstancesLayer(props: {
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
   catalogMap: Map<string, CatalogItem>;
+  setIsDragging: (dragging: boolean) => void;
 }) {
-  const { instances, setInstances, selectedId, setSelectedId, catalogMap } = props;
+  const { instances, setInstances, selectedId, setSelectedId, catalogMap, setIsDragging } = props;
 
   // Drag on plane using raycasting
   const plane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), []);
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const pointer = useMemo(() => new THREE.Vector2(), []);
-  const draggingRef = useRef<{ id: string } | null>(null);
+  const draggingRef = useRef<{ id: string; offsetX: number; offsetZ: number } | null>(null);
 
-  const onPointerDown = (e: ThreeEvent<PointerEvent>, id: string) => {
+  const onPointerDown = (e: ThreeEvent<PointerEvent>, id: string, inst: Instance) => {
     e.stopPropagation();
     setSelectedId(id);
-    draggingRef.current = { id };
+    
+    // Calculate offset from click point to object center
+    const { camera, gl } = e;
+    const rect = gl.domElement.getBoundingClientRect();
+    pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+
+    raycaster.setFromCamera(pointer, camera);
+    const hit = new THREE.Vector3();
+    raycaster.ray.intersectPlane(plane, hit);
+    
+    draggingRef.current = { 
+      id, 
+      offsetX: inst.position[0] - hit.x,
+      offsetZ: inst.position[2] - hit.z
+    };
+    setIsDragging(true);
   };
 
   const onPointerUp = () => {
     draggingRef.current = null;
+    setIsDragging(false);
   };
 
   const onPointerMove = (e: ThreeEvent<PointerEvent>) => {
@@ -176,41 +321,69 @@ function InstancesLayer(props: {
     const hit = new THREE.Vector3();
     raycaster.ray.intersectPlane(plane, hit);
 
-    // Limit to a reasonable area
-    hit.x = clamp(hit.x, -20, 20);
-    hit.z = clamp(hit.z, -20, 20);
+    // Apply offset and clamp to reasonable area
+    const newX = clamp(hit.x + draggingRef.current.offsetX, -25, 25);
+    const newZ = clamp(hit.z + draggingRef.current.offsetZ, -25, 25);
 
     const id = draggingRef.current.id;
     setInstances((prev) =>
       prev.map((inst) =>
-        inst.id === id ? { ...inst, position: [hit.x, inst.position[1], hit.z] } : inst
+        inst.id === id ? { ...inst, position: [newX, inst.position[1], newZ] } : inst
       )
     );
   };
 
   return (
-    <group onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerMissed={() => setSelectedId(null)}>
+    <group onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp} onPointerMissed={() => setSelectedId(null)}>
       {instances.map((inst) => {
         const def = catalogMap.get(inst.definitionId);
         const isSel = inst.id === selectedId;
+        
+        // Get size from catalog or defaults
+        const size: [number, number, number] = def?.size || DEFAULT_SIZES[inst.definitionId] || [1, 1, 1];
+        const color = def?.color || DEFAULT_COLORS[inst.definitionId] || "#90caf9";
+        const shape = def?.shape || "box";
 
         return (
           <group
             key={inst.id}
             position={inst.position}
             rotation={[0, inst.rotationY, 0]}
-            onPointerDown={(e) => onPointerDown(e, inst.id)}
+            onPointerDown={(e) => onPointerDown(e, inst.id, inst)}
           >
+            {/* Selection outline */}
+            {isSel && (
+              <mesh>
+                {shape === "cylinder" && def?.radius && def?.height ? (
+                  <cylinderGeometry args={[def.radius + 0.05, def.radius + 0.05, def.height + 0.1, 24]} />
+                ) : (
+                  <boxGeometry args={[size[0] + 0.1, size[1] + 0.1, size[2] + 0.1]} />
+                )}
+                <meshBasicMaterial color="#ffd54f" wireframe />
+              </mesh>
+            )}
+            
+            {/* Main mesh */}
             <mesh castShadow receiveShadow>
-              {def?.shape === "cylinder" ? (
+              {shape === "cylinder" && def?.radius && def?.height ? (
                 <cylinderGeometry args={[def.radius, def.radius, def.height, 24]} />
               ) : (
-                // default box
-                <boxGeometry args={(def && def.shape === "box" ? def.size : [1, 1, 1]) as [number, number, number]} />
+                <boxGeometry args={size} />
               )}
-
-              <meshStandardMaterial color={isSel ? "#ffd54f" : "#90caf9"} />
+              <meshStandardMaterial 
+                color={isSel ? "#ffd54f" : color} 
+                transparent={inst.definitionId === "window"}
+                opacity={inst.definitionId === "window" ? 0.6 : 1}
+              />
             </mesh>
+            
+            {/* Label */}
+            {isSel && (
+              <mesh position={[0, size[1] / 2 + 0.3, 0]}>
+                <sphereGeometry args={[0.1, 8, 8]} />
+                <meshBasicMaterial color="#ff5722" />
+              </mesh>
+            )}
           </group>
         );
       })}

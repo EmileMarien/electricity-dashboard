@@ -35,6 +35,8 @@ class ProjectParameters:
             area_m2=float(data.get("area_m2", 100.0)),
             functions=list(data.get("functions", []) or []),
         )
+
+
 # --- Project equivalent ---
 @dataclass
 class Project:
@@ -69,6 +71,46 @@ class Project:
 
     def get_components(self) -> List[Component]:
         return list(self.components)
+
+    def set_components(self, components: List[Component]) -> None:
+        """Replace all components with the given list."""
+        self.components = list(components)
+
+    def get_component_by_id(self, component_id: str) -> Optional[Component]:
+        """Find a component by its ID."""
+        for c in self.components:
+            if c.id == component_id:
+                return c
+        return None
+
+    def update_component(self, component_id: str, updates: Dict[str, Any]) -> bool:
+        """Update a component by ID. Returns True if found and updated."""
+        for i, c in enumerate(self.components):
+            if c.id == component_id:
+                # Update properties if provided
+                if "properties" in updates:
+                    # Merge properties (don't replace entirely)
+                    for key, value in updates["properties"].items():
+                        c.properties[key] = value
+                # Update other fields
+                if "type" in updates:
+                    c.type = updates["type"]
+                if "label" in updates:
+                    c.label = updates["label"]
+                if "quantity" in updates:
+                    c.quantity = float(updates["quantity"])
+                if "unit" in updates:
+                    c.unit = updates["unit"]
+                return True
+        return False
+
+    def delete_component(self, component_id: str) -> bool:
+        """Delete a component by ID. Returns True if found and deleted."""
+        for i, c in enumerate(self.components):
+            if c.id == component_id:
+                del self.components[i]
+                return True
+        return False
 
     def to_dict(self) -> Dict[str, Any]:
         return {

@@ -62,6 +62,43 @@ class BuildingModelApp:
         self.save_project(p)
         return p
 
+    def set_components(self, reference_id: str, components: List[Component]) -> Project:
+        """Replace all components in the project with the given list."""
+        p = self.load_project(reference_id)
+        p.set_components(components)
+        self.save_project(p)
+        return p
+
+    def update_component(self, reference_id: str, component_id: str, updates: Dict[str, Any]) -> Project:
+        """Update a specific component by ID."""
+        p = self.load_project(reference_id)
+        p.update_component(component_id, updates)
+        self.save_project(p)
+        return p
+
+    def update_component_position(
+        self, 
+        reference_id: str, 
+        component_id: str, 
+        position: List[float],
+        rotation_y: Optional[float] = None
+    ) -> Project:
+        """Update position and optionally rotation of a component."""
+        p = self.load_project(reference_id)
+        updates = {"position": position}
+        if rotation_y is not None:
+            updates["rotation_y"] = rotation_y
+        p.update_component(component_id, {"properties": updates})
+        self.save_project(p)
+        return p
+
+    def delete_component(self, reference_id: str, component_id: str) -> Project:
+        """Delete a component by ID."""
+        p = self.load_project(reference_id)
+        p.delete_component(component_id)
+        self.save_project(p)
+        return p
+
     def get_components(self, reference_id: str) -> List[Component]:
         p = self.load_project(reference_id)
         return p.get_components()

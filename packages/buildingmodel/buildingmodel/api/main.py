@@ -23,8 +23,8 @@ from buildingmodel.buildingmodel.api.schemas import (
     UpdateProjectParametersRequest,
     ProjectResponse,
     AddComponentRequest,
-    AddComponentsRequest,
-    ComponentResponse,
+    AddComponentsRequest,    SetComponentsRequest,
+    UpdateComponentPositionRequest,    ComponentResponse,
     MeetstaatResponse,
     LastenboekResponse,
     IfcExportResponse,
@@ -103,6 +103,9 @@ def build_app() -> FastAPI:
                 unit=req.unit or "st",
                 properties=req.properties or {},
             )
+            # If ID is provided, use it
+            if req.id:
+                comp.id = req.id
             p = app.add_component(reference_id, comp)
         except KeyError:
             raise HTTPException(status_code=404, detail="Project not found")
@@ -121,7 +124,34 @@ def build_app() -> FastAPI:
                 )
                 for c in req.components
             ]
+            # Preserve IDs if provided
+            for i, c in enumerate(req.components):
+                if c.id:
+                    comps[i].id = c.id
             p = app.add_components(reference_id, comps)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return p.to_dict()
+
+    @api.put("/projects/{reference_id}/components", response_model=ProjectResponse)
+    def set_components(reference_id: str, req: SetComponentsRequest):
+        """Replace all components in the project."""
+        try:
+            comps = [
+                Component.new(
+                    type=c.type,
+                    label=c.label or "",
+                    quantity=c.quantity or 1.0,
+                    unit=c.unit or "st",
+                    properties=c.properties or {},
+                )
+                for c in req.components
+            ]
+            # Preserve IDs if provided
+            for i, c in enumerate(req.components):
+                if c.id:
+                    comps[i].id = c.id
+            p = app.set_components(reference_id, comps)
         except KeyError:
             raise HTTPException(status_code=404, detail="Project not found")
         return p.to_dict()
@@ -133,6 +163,29 @@ def build_app() -> FastAPI:
         except KeyError:
             raise HTTPException(status_code=404, detail="Project not found")
         return [c.to_dict() for c in comps]
+
+    @api.patch("/projects/{reference_id}/components/{component_id}/position", response_model=ProjectResponse)
+    def update_component_position(reference_id: str, component_id: str, req: UpdateComponentPositionRequest):
+        """Update the position of a specific component."""
+        try:
+            p = app.update_component_position(
+                reference_id,
+                component_id,
+                position=req.position,
+                rotation_y=req.rotation_y,
+            )
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project or component not found")
+        return p.to_dict()
+
+    @api.delete("/projects/{reference_id}/components/{component_id}", response_model=ProjectResponse)
+    def delete_component(reference_id: str, component_id: str):
+        """Delete a specific component."""
+        try:
+            p = app.delete_component(reference_id, component_id)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Project or component not found")
+        return p.to_dict()
 
     # ----------------------------
     # Outputs: Meetstaat & Lastenboek

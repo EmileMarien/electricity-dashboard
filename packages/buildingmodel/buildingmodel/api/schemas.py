@@ -38,8 +38,20 @@ class ProjectParametersResponse(BaseModel):
     functions: List[str]
 
 
+# =============================================================================
+# Component schemas with position support
+# =============================================================================
+
+class Position3D(BaseModel):
+    """3D position for components"""
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
+
+
 class ComponentPayload(BaseModel):
     # payload used in requests (single + batch)
+    id: Optional[str] = None  # If provided, can be used to update existing
     type: str
     label: Optional[str] = ""
     quantity: Optional[float] = 1.0
@@ -53,6 +65,17 @@ class AddComponentRequest(ComponentPayload):
 
 class AddComponentsRequest(BaseModel):
     components: List[ComponentPayload] = Field(default_factory=list)
+
+
+class SetComponentsRequest(BaseModel):
+    """Replace all components in the project"""
+    components: List[ComponentPayload] = Field(default_factory=list)
+
+
+class UpdateComponentPositionRequest(BaseModel):
+    """Update position of a single component"""
+    position: List[float] = Field(default_factory=lambda: [0.0, 0.0, 0.0])
+    rotation_y: Optional[float] = 0.0
 
 
 class ComponentResponse(BaseModel):
