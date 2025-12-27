@@ -5,7 +5,7 @@ import {
   withStreamlitConnection,
 } from "streamlit-component-lib";
 import { Canvas, ThreeEvent, useThree } from "@react-three/fiber";
-import { OrbitControls, Grid } from "@react-three/drei";
+import { OrbitControls, Grid, Line } from "@react-three/drei";
 import * as THREE from "three";
 
 type CatalogItem = {
@@ -17,12 +17,15 @@ type CatalogItem = {
   radius?: number; // for cylinder
   height?: number; // for cylinder
   color?: string;
+  emoji?: string;
+  description?: string;
 };
 
 type Command = {
   token: number;
   type: "insert" | "delete" | "clear";
   definitionId: string | null;
+  floor?: number; // floor level to place the component on
 };
 
 type Instance = {
@@ -30,6 +33,7 @@ type Instance = {
   definitionId: string;
   position: [number, number, number];
   rotationY: number; // radians
+  floor: number; // floor level (0 = ground, 1 = first floor, etc.)
 };
 
 type SceneState = {
@@ -37,6 +41,8 @@ type SceneState = {
   selectedId: string | null;
   lastChange?: { type: string; instanceId?: string; timestamp: number };
 };
+
+type GridSize = [number, number] | null; // [width, depth] in meters
 
 function uuid() {
   return crypto.randomUUID
@@ -76,6 +82,9 @@ const DEFAULT_COLORS: Record<string, string> = {
   door: "#5d4037",
 };
 
+// Standard floor height in meters
+const FLOOR_HEIGHT = 2.8;
+
 function ThreeBuilderInner(props: ComponentProps) {
   const catalog: CatalogItem[] = props.args["catalog"] ?? [];
   const command: Command =
@@ -83,6 +92,9 @@ function ThreeBuilderInner(props: ComponentProps) {
   const initialInstances: Instance[] = props.args["initialInstances"] ?? [];
   const projectId: string | null = props.args["projectId"] ?? null;
   const height: number = props.args["height"] ?? 640;
+  const gridSize: GridSize = props.args["gridSize"] ?? null;
+  const activeFloor: number | null = props.args["activeFloor"] ?? null; // null = show all floors
+  const totalFloors: number = props.args["totalFloors"] ?? 1;
 
   const [instances, setInstances] = useState<Instance[]>(initialInstances);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -122,11 +134,18 @@ function ThreeBuilderInner(props: ComponentProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
-  // Emit state back to Streamlit (throttled-ish via RAF)
+  // Emit state back to Streamlit (debounced to prevent excessive updates)
   const emitRef = useRef<number | null>(null);
+  const lastEmittedRef = useRef<string>("");
+  
   const emitState = (next: SceneState) => {
+    // Serialize state to compare - only emit if actually changed
+    const serialized = JSON.stringify({ instances: next.instances, selectedId: next.selectedId });
+    if (serialized === lastEmittedRef.current) return;
+    
     if (emitRef.current) cancelAnimationFrame(emitRef.current);
     emitRef.current = requestAnimationFrame(() => {
+      lastEmittedRef.current = serialized;
       Streamlit.setComponentValue(next);
     });
   };
@@ -158,18 +177,24 @@ function ThreeBuilderInner(props: ComponentProps) {
     if (command.type === "insert" && defId) {
       const catalogItem = catalog.find((c) => c.id === defId);
       const size = catalogItem?.size || DEFAULT_SIZES[defId] || [1, 1, 1];
+      
+      // Determine which floor to place on (use command.floor, then activeFloor, then 0)
+      const targetFloor = command.floor ?? (activeFloor !== null ? activeFloor : 0);
+      // Calculate base Y position for this floor
+      const floorBaseY = targetFloor * FLOOR_HEIGHT;
 
       const i: Instance = {
         id: uuid(),
         definitionId: defId,
-        position: [0, size[1] / 2, 0],
+        position: [0, floorBaseY + size[1] / 2, 0],
         rotationY: 0,
+        floor: targetFloor,
       };
 
       setInstances((prev) => [...prev, i]);
       setSelectedId(i.id);
     }
-  }, [command, catalog, selectedId]);
+  }, [command, catalog, selectedId, activeFloor]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -234,6 +259,48 @@ function ThreeBuilderInner(props: ComponentProps) {
     return m;
   }, [catalog]);
 
+  // Building footprint outline points
+  const footprintPoints = useMemo(() => {
+    if (!gridSize) return null;
+    const [width, depth] = gridSize;
+    const halfW = width / 2;
+    const halfD = depth / 2;
+    // Create a closed rectangle at ground level
+    return [
+      new THREE.Vector3(-halfW, 0.02, -halfD),
+      new THREE.Vector3(halfW, 0.02, -halfD),
+      new THREE.Vector3(halfW, 0.02, halfD),
+      new THREE.Vector3(-halfW, 0.02, halfD),
+      new THREE.Vector3(-halfW, 0.02, -halfD), // Close the loop
+    ];
+  }, [gridSize]);
+
+  // Grid lines for the building footprint
+  const footprintGridLines = useMemo(() => {
+    if (!gridSize) return [];
+    const [width, depth] = gridSize;
+    const halfW = width / 2;
+    const halfD = depth / 2;
+    const lines: THREE.Vector3[][] = [];
+    const gridStep = GRID_MODULE; // 60cm grid
+
+    // Vertical lines (along Z axis)
+    for (let x = -halfW; x <= halfW + 0.01; x += gridStep) {
+      lines.push([
+        new THREE.Vector3(x, 0.015, -halfD),
+        new THREE.Vector3(x, 0.015, halfD),
+      ]);
+    }
+    // Horizontal lines (along X axis)
+    for (let z = -halfD; z <= halfD + 0.01; z += gridStep) {
+      lines.push([
+        new THREE.Vector3(-halfW, 0.015, z),
+        new THREE.Vector3(halfW, 0.015, z),
+      ]);
+    }
+    return lines;
+  }, [gridSize]);
+
   return (
     <div style={{ width: "100%", height, position: "relative" }}>
       <div
@@ -266,6 +333,62 @@ function ThreeBuilderInner(props: ComponentProps) {
           <meshStandardMaterial color="#e8e8e8" />
         </mesh>
 
+        {/* Building footprint area - filled */}
+        {gridSize && (
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+            <planeGeometry args={gridSize} />
+            <meshStandardMaterial color="#d4edda" transparent opacity={0.4} />
+          </mesh>
+        )}
+
+        {/* Building footprint grid lines */}
+        {footprintGridLines.map((points, i) => (
+          <Line
+            key={`grid-line-${i}`}
+            points={points}
+            color="#90caf9"
+            lineWidth={1}
+            transparent
+            opacity={0.5}
+          />
+        ))}
+
+        {/* Building footprint outline */}
+        {footprintPoints && (
+          <Line
+            points={footprintPoints}
+            color="#2e7d32"
+            lineWidth={3}
+          />
+        )}
+
+        {/* Floor level indicators */}
+        {Array.from({ length: totalFloors }, (_, floorNum) => (
+          <group key={`floor-indicator-${floorNum}`}>
+            {/* Floor plane indicator (semi-transparent) */}
+            {floorNum > 0 && (
+              <mesh
+                rotation={[-Math.PI / 2, 0, 0]}
+                position={[0, floorNum * FLOOR_HEIGHT + 0.01, 0]}
+              >
+                <planeGeometry args={[gridSize ? gridSize[0] : 20, gridSize ? gridSize[1] : 20]} />
+                <meshStandardMaterial
+                  color={activeFloor === floorNum ? "#bbdefb" : "#e3f2fd"}
+                  transparent
+                  opacity={activeFloor === null || activeFloor === floorNum ? 0.3 : 0.1}
+                />
+              </mesh>
+            )}
+            {/* Floor label */}
+            {gridSize && (
+              <mesh position={[-(gridSize[0] / 2) - 0.5, floorNum * FLOOR_HEIGHT + 0.1, 0]}>
+                <boxGeometry args={[0.8, 0.3, 0.05]} />
+                <meshStandardMaterial color={activeFloor === floorNum ? "#1976d2" : "#90a4ae"} />
+              </mesh>
+            )}
+          </group>
+        ))}
+
         <Grid
           infiniteGrid
           cellSize={0.6}
@@ -293,6 +416,7 @@ function ThreeBuilderInner(props: ComponentProps) {
           setSelectedId={setSelectedId}
           catalogMap={catalogMap}
           setIsDragging={setIsDragging}
+          activeFloor={activeFloor}
         />
       </Canvas>
     </div>
@@ -306,15 +430,18 @@ function InstancesLayer(props: {
   setSelectedId: (id: string | null) => void;
   catalogMap: Map<string, CatalogItem>;
   setIsDragging: (dragging: boolean) => void;
+  activeFloor: number | null;
 }) {
-  const { instances, setInstances, selectedId, setSelectedId, catalogMap, setIsDragging } = props;
+  const { instances, setInstances, selectedId, setSelectedId, catalogMap, setIsDragging, activeFloor } = props;
 
   const { camera, gl } = useThree();
 
-  const plane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), []);
+  // Dynamic plane height based on active floor
+  const planeHeight = activeFloor !== null ? activeFloor * FLOOR_HEIGHT : 0;
+  const plane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeHeight), [planeHeight]);
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const pointer = useMemo(() => new THREE.Vector2(), []);
-  const draggingRef = useRef<{ id: string; offsetX: number; offsetZ: number } | null>(null);
+  const draggingRef = useRef<{ id: string; offsetX: number; offsetZ: number; startY: number } | null>(null);
 
   const getHitOnGround = (e: ThreeEvent<PointerEvent>) => {
     const rect = gl.domElement.getBoundingClientRect();
@@ -340,6 +467,7 @@ function InstancesLayer(props: {
       id,
       offsetX: inst.position[0] - hit.x,
       offsetZ: inst.position[2] - hit.z,
+      startY: inst.position[1],
     };
     setIsDragging(true);
   };
@@ -418,6 +546,16 @@ function InstancesLayer(props: {
     );
   };
 
+  // Filter instances by floor if activeFloor is set
+  const visibleInstances = activeFloor !== null
+    ? instances.filter((inst) => inst.floor === activeFloor)
+    : instances;
+  
+  // Get instances on other floors for ghost rendering
+  const ghostInstances = activeFloor !== null
+    ? instances.filter((inst) => inst.floor !== activeFloor)
+    : [];
+
   return (
     <group
       onPointerMove={onPointerMove}
@@ -425,7 +563,37 @@ function InstancesLayer(props: {
       onPointerLeave={onPointerUp}
       onPointerMissed={() => setSelectedId(null)}
     >
-      {instances.map((inst) => {
+      {/* Ghost instances (other floors) - shown semi-transparent */}
+      {ghostInstances.map((inst) => {
+        const def = catalogMap.get(inst.definitionId);
+        const size: [number, number, number] =
+          def?.size || DEFAULT_SIZES[inst.definitionId] || [1, 1, 1];
+        const shape = def?.shape || "box";
+
+        return (
+          <group
+            key={`ghost-${inst.id}`}
+            position={inst.position}
+            rotation={[0, inst.rotationY, 0]}
+          >
+            <mesh>
+              {shape === "cylinder" && def?.radius && def?.height ? (
+                <cylinderGeometry args={[def.radius, def.radius, def.height, 24]} />
+              ) : (
+                <boxGeometry args={size} />
+              )}
+              <meshStandardMaterial
+                color="#b0bec5"
+                transparent
+                opacity={0.2}
+              />
+            </mesh>
+          </group>
+        );
+      })}
+
+      {/* Active floor instances */}
+      {visibleInstances.map((inst) => {
         const def = catalogMap.get(inst.definitionId);
         const isSel = inst.id === selectedId;
 
@@ -435,7 +603,7 @@ function InstancesLayer(props: {
         const color = def?.color || DEFAULT_COLORS[inst.definitionId] || "#90caf9";
         const shape = def?.shape || "box";
 
-        const isWindow = inst.definitionId === "window";
+        const isWindow = inst.definitionId?.includes("window");
 
         return (
           <group

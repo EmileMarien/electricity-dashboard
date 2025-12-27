@@ -32,7 +32,7 @@ class BuildingModelApp:
     # ----------------------------
     # Project parameters
     # ----------------------------
-    def set_project_parameters(
+    def set_project_parameters( #TODO: allow to set them individually?
         self,
         reference_id: str,
         *,
@@ -76,7 +76,7 @@ class BuildingModelApp:
         self.save_project(p)
         return p
 
-    def update_component_position(
+    def update_component_position( #TODO: cant this be merged in the function above?
         self, 
         reference_id: str, 
         component_id: str, 
@@ -106,7 +106,7 @@ class BuildingModelApp:
     # ----------------------------
     # Outputs
     # ----------------------------
-    def compute_meetstaat(self, reference_id: str) -> Meetstaat:
+    def compute_meetstaat(self, reference_id: str) -> Meetstaat: #TODO: move logic more to buildingmodel meetstaat class and extend
         p = self.load_project(reference_id)
 
         # MVP: 1 line per component

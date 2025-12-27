@@ -31,6 +31,9 @@ def three_builder(
     command: dict = None,
     project_id: str = None,
     height: int = 640,
+    grid_size: tuple = None,
+    active_floor: int = None,
+    total_floors: int = 3,
     key: str = None,
 ):
     """
@@ -41,17 +44,20 @@ def three_builder(
             [{"id": "wall", "label": "Muur", "category": "structuur", 
               "size": [3, 2.8, 0.3], "color": "#b0bec5"}, ...]
         initial_instances: list of existing instances to display
-            [{"id": "abc", "definitionId": "wall", "position": [0, 1.4, 0], "rotationY": 0}, ...]
-        command: {"token": int, "type": "insert"|"delete"|"clear", "definitionId": str|None}
+            [{"id": "abc", "definitionId": "wall", "position": [0, 1.4, 0], "rotationY": 0, "floor": 0}, ...]
+        command: {"token": int, "type": "insert"|"delete"|"clear", "definitionId": str|None, "floor": int}
         project_id: optional project reference for tracking
         height: component height in pixels
+        grid_size: optional tuple (width, depth) in meters for displaying the building footprint
+        active_floor: which floor to show/edit (0, 1, 2...) or None for all floors view
+        total_floors: total number of floors in the building (default 3)
         key: streamlit component key
         
     Returns:
         {"instances": [...], "selectedId": str|None}
     """
     if command is None:
-        command = {"token": 0, "type": "insert", "definitionId": None}
+        command = {"token": 0, "type": "insert", "definitionId": None, "floor": 0}
     if initial_instances is None:
         initial_instances = []
     
@@ -61,6 +67,9 @@ def three_builder(
         command=command,
         projectId=project_id,
         height=height,
+        gridSize=grid_size,
+        activeFloor=active_floor,
+        totalFloors=total_floors,
         key=key,
         default={"instances": initial_instances, "selectedId": None},
     )
